@@ -243,7 +243,13 @@ metric_space_basic (X × Y) :=
       exact max_self 0,
     },
   end,
-  dist_symm := sorry,
+  dist_symm := 
+  begin
+    intros xy1 xy2,
+    have h1 := dist_symm xy1.fst xy2.fst, 
+    have h2 := dist_symm xy1.snd xy2.snd, 
+    rw [h1, h2],
+  end,
   triangle :=
   sorry
   }
