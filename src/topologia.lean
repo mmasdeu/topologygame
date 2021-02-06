@@ -221,8 +221,7 @@ metric_space_basic (X × Y) :=
 
       have h6: dist xy1.snd xy2.snd = 0, 
       begin
-        have h5 : max (dist xy1.fst xy2.fst) (dist xy1.snd xy2.snd) ≤ 0 :=
-          by linarith,
+        have h5 : max (dist xy1.fst xy2.fst) (dist xy1.snd xy2.snd) ≤ 0 := by linarith,
         have h4 := max_le_iff.mp h5,
         linarith,
       end,
@@ -246,28 +245,21 @@ metric_space_basic (X × Y) :=
   dist_symm := 
   begin
     intros xy1 xy2,
-    have h1 := dist_symm xy1.fst xy2.fst, 
-    have h2 := dist_symm xy1.snd xy2.snd, 
-    rw [h1, h2],
+    simp only [dist_symm],
   end,
   triangle :=
    begin
     intros x y z,
-    have h := triangle x.fst y.fst z.fst,
-    have h1:= triangle x.snd y.snd z.snd,
-
-    have h3 := dist_nonneg x.fst y.fst,
-    have h4 := dist_nonneg x.snd y.snd,
-    
-    have h5 := dist_nonneg y.fst z.fst,
-    have h6 := dist_nonneg y.snd z.snd,
-    have h7 := max_le_max h h1,
+ 
     let  xy_X := (dist x.fst y.fst),
     let  yz_X := (dist y.fst z.fst),
     let  xy_Y := (dist x.snd y.snd),
     let  yz_Y :=  (dist y.snd z.snd),
-    have h8 :  (max (xy_X + yz_X) ( xy_Y + yz_Y)) ≤ ((max xy_X xy_Y) + (max yz_X yz_Y)),
-    begin
+
+    -- We introduce a refinement.
+    calc  max (dist x.fst z.fst) (dist x.snd z.snd) ≤ (max (xy_X + yz_X) ( xy_Y + yz_Y)): by { apply max_le_max; exact triangle _ _ _ }
+        ... ≤ max (dist x.fst y.fst) (dist x.snd y.snd) + max (dist y.fst z.fst) (dist y.snd z.snd):
+     begin
       refine max_le_iff.mpr _,
       split;
       {
@@ -275,9 +267,8 @@ metric_space_basic (X × Y) :=
         finish,
       }, 
     end,
-    linarith,     
-  end,
-  }
+   end,
+}
 
 /- ## Exercise 5 [short]:
 The previous lemma isn't true! It requires a separation axiom. Define a `class`
