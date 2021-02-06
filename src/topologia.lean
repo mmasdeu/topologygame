@@ -251,7 +251,32 @@ metric_space_basic (X × Y) :=
     rw [h1, h2],
   end,
   triangle :=
-  sorry
+   begin
+    intros x y z,
+    have h := triangle x.fst y.fst z.fst,
+    have h1:= triangle x.snd y.snd z.snd,
+
+    have h3 := dist_nonneg x.fst y.fst,
+    have h4 := dist_nonneg x.snd y.snd,
+    
+    have h5 := dist_nonneg y.fst z.fst,
+    have h6 := dist_nonneg y.snd z.snd,
+    have h7 := max_le_max h h1,
+    let  xy_X := (dist x.fst y.fst),
+    let  yz_X := (dist y.fst z.fst),
+    let  xy_Y := (dist x.snd y.snd),
+    let  yz_Y :=  (dist y.snd z.snd),
+    have h8 :  (max (xy_X + yz_X) ( xy_Y + yz_Y)) ≤ ((max xy_X xy_Y) + (max yz_X yz_Y)),
+    begin
+      refine max_le_iff.mpr _,
+      split;
+      {
+        apply add_le_add;
+        finish,
+      }, 
+    end,
+    linarith,     
+  end,
   }
 
 /- ## Exercise 5 [short]:
