@@ -44,12 +44,19 @@ Before we go on we should be sure we want to use this as our definition.
 class topological_space (X : Type) :=
   (is_open : set X → Prop) -- why set X → Prop not set (set X)? former plays
                            -- nicer with typeclasses later
-  (empty_mem : is_open ∅)
+  --(empty_mem : is_open ∅)
   (univ_mem : is_open univ)
   (union : ∀ (Y : set (set X)) (h : ∀ B ∈ Y, is_open B), is_open (⋃₀ Y))
   (inter : ∀ (A B : set X) (hA : is_open A) (hB : is_open B), is_open (A ∩ B))
 
 namespace topological_space
+
+lemma empty_is_open (X : Type) [topological_space X] : is_open (∅ : set X) :=
+begin
+  rw ←sUnion_empty,
+  apply union,
+  tauto,
+end
 
 /- We can now work with topological spaces like this. -/
 example (X : Type) [topological_space X] (U V W : set X) (hU : is_open U) (hV : is_open V)
@@ -72,7 +79,6 @@ create a new topological space so:
 /- Defining a basic topology now works like so: -/
 def discrete (X : Type) : topological_space X :=
 { is_open := λ U, true, -- everything is open
-  empty_mem := trivial,
   univ_mem := trivial,
   union := begin intros B h, trivial, end,
   inter := begin intros A hA B hB, trivial, end }
@@ -93,7 +99,6 @@ given set in Lean.
 
 /-- The open sets of the least topology containing a collection of basic sets. -/
 inductive generated_open (X : Type) (g : set (set X)) : set X → Prop
-| empty : generated_open ∅
 | univ : generated_open univ
 | generating : ∀ A : set X,  A ∈ g → generated_open A
 | sUnion : ∀ τ : set(set X), (∀ t, t ∈ τ → generated_open t) →
@@ -101,11 +106,9 @@ inductive generated_open (X : Type) (g : set (set X)) : set X → Prop
 | inter : ∀ U V : set X,  generated_open U → generated_open V →
             generated_open (U ∩ V)
 
-
 /-- The smallest topological space containing the collection `g` of basic sets -/
 def generate_from (X : Type) (g : set (set X)) : topological_space X :=
 { is_open   := generated_open X g,
-  empty_mem := generated_open.empty,
   univ_mem  := generated_open.univ,
   inter     := generated_open.inter,
   union     := generated_open.sUnion, }
@@ -115,8 +118,7 @@ lemma generated_open_is_coarsest' {X : Type} (g : set (set X)) [topological_spac
 (h : ∀ U ∈ g,  is_open U) : ∀ U : set X, generated_open X g U → is_open U :=
 begin
   intros U hU,
-  induction hU,
-  { exact empty_mem },
+  induction hU with a b c d e V W hV1 hW1 hV2 hW2,
   { exact univ_mem },
   { apply h, assumption },
   { apply union; assumption },
@@ -267,7 +269,6 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
     {
       intro hU,
       induction hU with V h g h₁ h₂ V W h1 h2 h3 h4,
-      { exact generated_open.empty },
       { exact generated_open.univ },
       {
         simp at *,
@@ -282,7 +283,6 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
     {
       intro h,
       induction h,
-      {apply empty_mem,},
       {apply univ_mem,},
       {
         sorry
@@ -323,9 +323,18 @@ variables { X : set ℝ}
 /-
 Show that {∅, univ, (-∞, a) : a : ℝ} is a topology on ℝ
 -/
+open real
+
+lemma union_of_intervals {α : set ℝ} (hne : ∃ a : ℝ, a ∈ α) (h : ∃ (C : ℝ), ∀ a ∈ α, a ≤ C) :
+  (⋃ a ∈ α, Iio a) = Iio (Sup α) :=
+begin
+  simp only [←Iio_def],
+  ext,
+  simp [lt_Sup α hne h],
+end
+
 def left_ray_topology : topological_space ℝ := {
   is_open := λ (X : set ℝ),  X = ∅ ∨ X = univ ∨ (∃ a : ℝ, X = Iio a),
-  empty_mem := by tauto,
   univ_mem := by tauto,
   union := 
   begin
@@ -339,9 +348,63 @@ def left_ray_topology : topological_space ℝ := {
     },
     push_neg at hempty,
     right,
-    --by_cases huniv : 
-      sorry
-        --  sorry
+    by_cases huniv : ∃ B ∈ I, B = univ,
+    {
+      left,
+      simp at *,
+      ext1,
+      norm_num,
+      use univ,
+      exact ⟨huniv, mem_univ x⟩,
+    },
+    push_neg at huniv,
+    let α := {a | ∃ B ∈ I, B = Iio a},
+    by_cases hbounded : ∃ c : ℝ, ∀ a ∈ α, a ≤ c,
+    {
+      right,
+      use Sup α,
+      rw ←union_of_intervals,
+      {
+        dsimp,
+        ext1,
+        dsimp,
+        split,
+        {
+          intro hx,
+          simp,
+          obtain ⟨B, ⟨hBI, hxB⟩⟩ := hx,
+          specialize h B hBI,
+          replace h : ∃ (a : ℝ), B = Iio a,
+          {
+            rcases h with h1 | h2 | h3,
+            {
+              finish,
+            },
+            {
+              finish,
+            },
+            exact h3,
+          },
+          obtain ⟨a, ha⟩ := h,
+          use a,
+          rw ←ha,
+          finish,
+        },
+        intro hx,
+        simp at hx,
+        obtain ⟨a, ha⟩ := hx,
+        use Iio a,
+        simpa using ha,
+      },
+      {
+        
+        sorry
+      },
+      exact hbounded,
+    },
+    push_neg at hbounded,
+    left,
+    sorry
   end,
   inter :=
   begin
@@ -413,7 +476,6 @@ def mk_closed_sets
   (union : ∀ (A ∈ σ) (B ∈ σ), A ∪ B ∈ σ) :
 topological_space X := { 
   is_open := λ U, U ∈ compl '' σ, -- λ U, compl U ∈ σ
-  empty_mem := _,
   univ_mem := _,
   union := _,
   inter := _ }
