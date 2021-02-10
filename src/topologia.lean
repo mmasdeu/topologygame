@@ -203,12 +203,72 @@ instance prod.metric_space_basic (X Y : Type) [metric_space_basic X] [metric_spa
 metric_space_basic (X × Y) :=
 { dist := λ u v, max (dist u.fst v.fst) (dist u.snd v.snd),
   dist_eq_zero_iff :=
-  sorry
-  ,
-  dist_symm := sorry,
+  begin
+    intro xy1,
+    intro xy2,
+    split,
+    {
+      intro h,
+      have h1: dist xy1.fst xy2.fst ≥ 0 := dist_nonneg _ _,
+      have h2: dist xy1.snd xy2.snd ≥ 0 := dist_nonneg _ _,
+      have h3: dist xy1.fst xy2.fst = 0, 
+      begin
+        have h5 : max (dist xy1.fst xy2.fst) (dist xy1.snd xy2.snd) ≤ 0 :=
+          by linarith,
+        have h4 := max_le_iff.mp h5,
+        linarith,
+      end,
+
+      have h6: dist xy1.snd xy2.snd = 0, 
+      begin
+        have h5 : max (dist xy1.fst xy2.fst) (dist xy1.snd xy2.snd) ≤ 0 := by linarith,
+        have h4 := max_le_iff.mp h5,
+        linarith,
+      end,
+
+       ext;
+       {
+         rw [←dist_eq_zero_iff _ _],
+         tauto,
+       },
+ 
+     },
+    {
+      intro h,
+      -- how to extract `xy1.fst = xy2.snd` from h??
+      subst h,  -- is it possible to skip this step?? 
+      rw (dist_eq_zero_iff xy1.fst xy1.fst).mpr (refl _),
+      rw (dist_eq_zero_iff xy1.snd xy1.snd).mpr (refl _),
+      exact max_self 0,
+    },
+  end,
+  dist_symm := 
+  begin
+    intros xy1 xy2,
+    simp only [dist_symm],
+  end,
   triangle :=
-  sorry
-  }
+   begin
+    intros x y z,
+ 
+    let  xy_X := (dist x.fst y.fst),
+    let  yz_X := (dist y.fst z.fst),
+    let  xy_Y := (dist x.snd y.snd),
+    let  yz_Y :=  (dist y.snd z.snd),
+
+    -- We introduce a refinement.
+    calc  max (dist x.fst z.fst) (dist x.snd z.snd) ≤ (max (xy_X + yz_X) ( xy_Y + yz_Y)): by { apply max_le_max; exact triangle _ _ _ }
+        ... ≤ max (dist x.fst y.fst) (dist x.snd y.snd) + max (dist y.fst z.fst) (dist y.snd z.snd):
+     begin
+      refine max_le_iff.mpr _,
+      split;
+      {
+        apply add_le_add;
+        finish,
+      }, 
+    end,
+   end,
+}
 
 /- ## Exercise 5 [short]:
 The previous lemma isn't true! It requires a separation axiom. Define a `class`
