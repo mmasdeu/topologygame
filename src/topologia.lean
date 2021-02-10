@@ -272,12 +272,7 @@ metric_space_basic (X × Y) :=
    end,
 }
 
-/- ## Exercise 5 [short]:
-The previous lemma isn't true! It requires a separation axiom. Define a `class`
-that posits that the topology on a type `X` satisfies this axiom. Mathlib uses
-`T_i` naming scheme for these axioms. -/
-class t2_space (X : Type) [topological_space X] :=
-(t2 : sorry)
+/- ## Exercise 5 [short]: -/
 
 /- (Bonus exercises [medium], the world is your oyster: prove the correct
 version of the above lemma `diag_closed`, prove that the discrete topology is t2,
@@ -378,8 +373,6 @@ namespace topological_space
 
 noncomputable theory
 
-variables { X : set ℝ}
-
 /-
 Show that {∅, univ, (-∞, a) : a : ℝ} is a topology on ℝ
 -/
@@ -419,11 +412,15 @@ def left_ray_topology : topological_space ℝ := {
     },
     push_neg at huniv,
     let α := {a | ∃ B ∈ I, B = Iio a},
+    have hαne : ∃ a : ℝ, a ∈ α,
+    {
+      sorry
+    },
     by_cases hbounded : ∃ c : ℝ, ∀ a ∈ α, a ≤ c,
     {
       right,
       use Sup α,
-      rw ←union_of_intervals,
+      rw ←union_of_intervals hαne hbounded,
       {
         dsimp,
         ext1,
@@ -456,11 +453,6 @@ def left_ray_topology : topological_space ℝ := {
         use Iio a,
         simpa using ha,
       },
-      {
-        
-        sorry
-      },
-      exact hbounded,
     },
     push_neg at hbounded,
     left,
@@ -507,71 +499,65 @@ def left_ray_topology : topological_space ℝ := {
   end
    }
 
-
-/- As mentioned, there are many definitions of a topological space, for instance
-one can define them via specifying a set of closed sets satisfying various
-axioms, this is equivalent and sometimes more convenient.
-
-We _could_ create two distinct Types defined by different data and provide an
-equivalence between theses types, e.g. `topological_space_via_open_sets` and
-`topological_space_via_closed_sets`, but this would quickly get unwieldy.
-What's better is to make an alternative _constructor_ for our original
-topological space. This is a function takes a set of subsets satisfying the
-axioms to be the closed sets of a topological space and creates the
-topological space defined by the corresponding set of open sets.
-
-## Exercise 7 [medium]:
-Complete the following constructor of a topological space from a set of subsets
-of a given type `X` satisfying the axioms for the closed sets of a topology.
-Hint: there are many useful lemmas about complements in mathlib, with names
-involving `compl`, like `compl_empty`, `compl_univ`, `compl_compl`, `compl_sUnion`,
-`mem_compl_image`, `compl_inter`, `compl_compl'`, `you can #check them to see what they say. -/
+def is_closed {X : Type} [topological_space X] := λ (C : set X), @is_open X _ (compl C)
 
 def mk_closed_sets
   (X : Type)
   (σ : set (set X))
   (empty_mem : ∅ ∈ σ)
-  (univ_mem : univ ∈ σ)
   (inter : ∀ B ⊆ σ, ⋂₀ B ∈ σ)
   (union : ∀ (A ∈ σ) (B ∈ σ), A ∪ B ∈ σ) :
-topological_space X := { 
+topological_space X := {
   is_open := λ U, U ∈ compl '' σ, -- λ U, compl U ∈ σ
-  univ_mem := _,
-  union := _,
-  inter := _ }
+  univ_mem := sorry,
+  union := sorry,
+  inter := sorry}
 
+end topological_space
 
+namespace topological_space
 
+variables {X : Type}
 
+def is_basis [topological_space X] (I : set (set X)) : Prop :=
+(∀ (B : set X), B ∈ I → is_open B) ∧ 
+(∀ U, ∀ x, is_open U → x ∈ U → ∃ B ∈ I, x ∈ B ∧ B ⊆ U)
 
+def basis_condition (I : set (set X)) :=
+⋃₀I = univ ∧ ∀ U V ∈ I, ∀ x : X, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V
 
-/-  {
-  is_open := λ U, U ∈ compl '' σ, -- the corresponding `is_open`
-  empty_mem :=
-    sorry
-  ,
-  univ_mem :=
-    sorry
-  ,
-  union :=
-    sorry
-  ,
-  inter :=
-    sorry
-    }
- -/
-/- Here are some more exercises:
+lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
+  basis_condition I :=
+begin
+  sorry
+end
 
-## Exercise 8 [medium/long]:
-Define the cofinite topology on any type (PR it to mathlib?).
+lemma prop22 (I : set (set X)) (h: basis_condition I) :
+  @is_basis _ (generate_from X I) I :=
+begin
+  unfold is_basis,
+  sorry
+end
 
-## Exercise 9 [medium/long]:
-Define a normed space?
-
-## Exercise 10 [medium/long]:
-Define more separation axioms?
-
+/-
+Define the family of intervals of the form [a, b)
 -/
+def Icos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
+
+example : basis_condition Icos :=
+begin
+  sorry
+end
+
+example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
+begin
+  sorry
+end
+
+example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
+begin
+  sorry
+end
 
 end topological_space
 
