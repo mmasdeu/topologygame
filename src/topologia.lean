@@ -415,23 +415,23 @@ def left_ray_topology : topological_space ℝ := {
     have hαne : ∃ a : ℝ, a ∈ α,
     {
       simp*,
-        cases hempty with T hT,
-        specialize h T hT.1,
-          rcases h with h1 | h2 | h3,
-          {
-            by_contradiction,
-            exact hT.2 h1,
-          },
-          {
-            by_contradiction,
-            exact (huniv T hT.1) h2,
-          },
-          {
-            cases h3 with a ha,
-            use a,
-            rw ← ha, 
-            exact hT.1,
-          },
+      cases hempty with T hT,
+      specialize h T hT.1,
+      rcases h with h1 | h2 | h3,
+      {
+        by_contradiction,
+        exact hT.2 h1,
+      },
+      {
+        by_contradiction,
+        exact (huniv T hT.1) h2,
+      },
+      {
+        cases h3 with a ha,
+        use a,
+        rw ← ha, 
+        exact hT.1,
+      },
     },
     by_cases hbounded : ∃ c : ℝ, ∀ a ∈ α, a ≤ c,
     {
