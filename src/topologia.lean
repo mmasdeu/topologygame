@@ -586,9 +586,37 @@ begin
     rcases hU with ⟨Ua, ⟨Ub , Uab_h⟩⟩,
     rcases hV with ⟨Va, ⟨Vb , Vab_h⟩⟩,
     intro hx,
-
-    sorry,
-  }
+    use Ico (max Ua Va) (min Ub Vb),
+    split,
+    {
+      unfold Icos,
+      use max Ua Va,
+      use min Ub Vb,
+    },
+    {
+    split,
+    {
+      unfold Ico,
+      split;
+        finish,
+    },
+    {
+      unfold Ico,
+      norm_num,
+      split,
+      {
+        subst U,
+        intros a ha,
+        finish,
+      },
+      {
+        intros a ha,
+        subst V,
+        finish,
+      },
+    },
+  },
+},
 end
 
 example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
