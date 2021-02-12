@@ -541,7 +541,7 @@ def is_basis [topological_space X] (I : set (set X)) : Prop :=
 (∀ U, ∀ x, is_open U → x ∈ U → ∃ B ∈ I, x ∈ B ∧ B ⊆ U)
 
 def basis_condition (I : set (set X)) :=
-⋃₀I = univ ∧ ∀ U V ∈ I, ∀ x : X, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V
+⋃₀I = univ ∧ ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V
 
 lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
   basis_condition I :=
@@ -583,6 +583,9 @@ begin
   },
   {
     intros U V hU hV x,
+    rcases hU with ⟨Ua, ⟨Ub , Uab_h⟩⟩,
+    rcases hV with ⟨Va, ⟨Vb , Vab_h⟩⟩,
+    intro hx,
 
     sorry,
   }
