@@ -563,12 +563,35 @@ def Icos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
 
 example : basis_condition Icos :=
 begin
-  sorry
+  unfold basis_condition,
+  split,
+  {
+    ext,
+    split,
+    {
+      intro h,
+      trivial,
+    },
+    {
+      intro h,
+      fconstructor,
+      use Ico (x - 1) (x + 1),
+      norm_num,
+      use x-1,
+      use x+1,     
+    }
+  },
+  {
+    intros U V hU hV x,
+
+    sorry,
+  }
 end
 
 example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
 begin
-  sorry
+  fconstructor,
+  use a, use b,
 end
 
 example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
