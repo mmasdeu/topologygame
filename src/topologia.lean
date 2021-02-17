@@ -540,6 +540,9 @@ structure basis_condition (I : set (set X)) :=
 (univ : ⋃₀I = univ)
 (filter : ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V)
 
+def basis_condition_old (I : set (set X)) :=
+⋃₀I = univ ∧ ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V
+
 lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
   basis_condition I :=
 begin
@@ -558,32 +561,68 @@ Define the family of intervals of the form [a, b)
 -/
 def Icos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
 
-example : basis_condition Icos := { 
-  univ := begin
+example : basis_condition_old Icos :=
+begin
+  unfold basis_condition_old,
+  split,
+  {
     ext,
-    simp,
-    use Ico x (x+1),
     split,
     {
-      use x,
-      use x+1,
+      intro h,
+      trivial,
     },
     {
-      simp only [left_mem_Ico, lt_add_iff_pos_right],
-      exact zero_lt_one,
+      intro h,
+      fconstructor,
+      use Ico (x - 1) (x + 1),
+      norm_num,
+      use x-1,
+      use x+1,     
     }
-  end,
-  filter :=
-  begin
-    intros U V hU hV x hx,
-
-  end
-  }
-
+  },
+  {
+    intros U V hU hV x,
+    rcases hU with ⟨Ua, ⟨Ub , Uab_h⟩⟩,
+    rcases hV with ⟨Va, ⟨Vb , Vab_h⟩⟩,
+    intro hx,
+    use Ico (max Ua Va) (min Ub Vb),
+    split,
+    {
+      unfold Icos,
+      use max Ua Va,
+      use min Ub Vb,
+    },
+    {
+    split,
+    {
+      unfold Ico,
+      split;
+        finish,
+    },
+    {
+      unfold Ico,
+      norm_num,
+      split,
+      {
+        subst U,
+        intros a ha,
+        finish,
+      },
+      {
+        intros a ha,
+        subst V,
+        finish,
+      },
+    },
+  },
+},
+end
 
 example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
 begin
-  sorry
+  fconstructor,
+  use a, use b,
 end
 
 example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
