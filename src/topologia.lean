@@ -51,11 +51,21 @@ class topological_space (X : Type) :=
 
 namespace topological_space
 
-lemma empty_is_open (X : Type) [topological_space X] : is_open (∅ : set X) :=
+lemma empty_is_open {X : Type} [topological_space X] : is_open (∅ : set X) :=
 begin
   rw ←sUnion_empty,
   apply union,
   tauto,
+end
+
+lemma union_is_open {X : Type} [topological_space X] {U V : set X} (hU : is_open U) (hV : is_open V):
+  is_open (U ∪ V) :=
+begin
+  let I : set (set X) := {U, V},
+  have H : ⋃₀ I = U ∪ V := sUnion_pair U V,
+  rw ←H,
+  apply union I,
+  finish,
 end
 
 /- We can now work with topological spaces like this. -/
@@ -107,7 +117,7 @@ inductive generated_open (X : Type) (g : set (set X)) : set X → Prop
             generated_open (U ∩ V)
 
 /-- The smallest topological space containing the collection `g` of basic sets -/
-def generate_from (X : Type) (g : set (set X)) : topological_space X :=
+def generate_from {X : Type} (g : set (set X)) : topological_space X :=
 { is_open   := generated_open X g,
   univ_mem  := generated_open.univ,
   inter     := generated_open.inter,
@@ -131,13 +141,13 @@ def is_coarser {X : Type} (τ : topological_space X) (τ' : topological_space X)
 instance top_has_le {X : Type} : has_le (topological_space X) := ⟨is_coarser⟩
 
 lemma generated_open_is_coarsest {X : Type} (g : set (set X)) [τ : topological_space X]
-(h : ∀ U ∈ g,  is_open U) : (generate_from X g) ≤ τ := λ U, generated_open_is_coarsest' g h U
+(h : ∀ U ∈ g,  is_open U) : (generate_from g) ≤ τ := λ U, generated_open_is_coarsest' g h U
 
 /- ## Exercise 2 [short]:
 Define the indiscrete topology on any type using this.
 (To do it without this it is surprisingly fiddly to prove that the set `{∅, univ}`
 actually forms a topology) -/
-def indiscrete (X : Type) : topological_space X := generate_from X {∅, univ}
+def indiscrete (X : Type) : topological_space X := generate_from {∅, univ}
 
 end topological_space
 
@@ -146,7 +156,7 @@ open topological_space
    topological spaces. -/
 instance prod.topological_space (X Y : Type) [topological_space X]
   [topological_space Y] : topological_space (X × Y) :=
-topological_space.generate_from (X × Y) {U | ∃ (Ux : set X) (Uy : set Y)
+topological_space.generate_from {U | ∃ (Ux : set X) (Uy : set Y)
   (hx : is_open Ux) (hy : is_open Uy), U = set.prod Ux Uy}
 
 
@@ -188,7 +198,7 @@ end
 /- From a metric space we get an induced topological space structure like so: -/
 
 instance {X : Type} [metric_space_basic X] : topological_space X :=
-generate_from X { B | ∃ (x : X) r, B = {y | dist x y < r} }
+generate_from { B | ∃ (x : X) r, B = {y | dist x y < r} }
 
 end metric_space_basic
 
@@ -509,7 +519,7 @@ def mk_closed_sets
   (inter : ∀ B ⊆ σ, ⋂₀ B ∈ σ)
   (union : ∀ (A B ∈ σ), A ∪ B ∈ σ) :
 topological_space X := {
-  is_open :=  λ U, compl U ∈ σ, -- λ U, U ∈ compl '' σ,
+  is_open :=  λ U, compl U ∈ σ,
   univ_mem := by simpa using empty_mem,
   union := 
   begin
@@ -537,11 +547,8 @@ def is_basis [topological_space X] (I : set (set X)) : Prop :=
 (∀ U, ∀ x, is_open U → x ∈ U → ∃ B ∈ I, x ∈ B ∧ B ⊆ U)
 
 structure basis_condition (I : set (set X)) :=
-(univ : ⋃₀I = univ)
+(univ : univ = ⋃₀I)
 (filter : ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V)
-
-def basis_condition_old (I : set (set X)) :=
-⋃₀I = univ ∧ ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V
 
 lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
   basis_condition I :=
@@ -549,8 +556,20 @@ begin
   sorry
 end
 
+def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
+  topological_space X := {
+  is_open := λ U, ∃ J ⊆ ℬ, U = ⋃₀ J,
+  univ_mem := ⟨ℬ, ⟨rfl.subset, h.univ⟩⟩,
+  union := sorry,
+  inter := sorry}
+
+example (X : Type) {I : set (set X)} (h: basis_condition I) : 
+  generate_from_basis h = generate_from I :=
+begin
+  sorry
+end
 lemma prop22 (I : set (set X)) (h: basis_condition I) :
-  @is_basis _ (generate_from X I) I :=
+  @is_basis _ (generate_from_basis h) I :=
 begin
   unfold is_basis,
   sorry
@@ -561,17 +580,12 @@ Define the family of intervals of the form [a, b)
 -/
 def Icos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
 
-example : basis_condition_old Icos :=
+example : basis_condition Icos :=
 begin
-  unfold basis_condition_old,
   split,
   {
     ext,
     split,
-    {
-      intro h,
-      trivial,
-    },
     {
       intro h,
       fconstructor,
@@ -579,7 +593,11 @@ begin
       norm_num,
       use x-1,
       use x+1,     
-    }
+    },
+    {
+      intro h,
+      trivial,
+    },
   },
   {
     intros U V hU hV x,
@@ -619,13 +637,22 @@ begin
 },
 end
 
-example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
+example (a b : ℝ) : @is_open _ (generate_from Icos) (Ico a b) :=
 begin
-  fconstructor,
   use a, use b,
 end
 
-example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
+lemma blah : @generated_open ℝ Icos ((Ico 0 1) ∪ (Ico 2 3)) :=
+begin
+  sorry
+end
+example : @is_open _ (generate_from Icos) ((Ico 0 1) ∪ (Ico 2 3)) :=
+begin
+  apply blah,
+end
+
+
+example (a b : ℝ) : @is_open _ (generate_from Icos) (Ico a b) :=
 begin
   sorry
 end
