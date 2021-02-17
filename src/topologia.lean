@@ -164,7 +164,77 @@ topological_space.generate_from {U | ∃ (Ux : set X) (Uy : set Y)
 lemma is_open_prod_iff (X Y : Type) [topological_space X] [topological_space Y]
   {s : set (X × Y)} :
 is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
-                                  a ∈ u ∧ b ∈ v ∧ set.prod u v ⊆ s) := sorry
+                                  a ∈ u ∧ b ∈ v ∧ set.prod u v ⊆ s) := 
+  begin
+    split,
+    {
+      intros h_s a b h_ab,
+      induction h_s with w hw ℬ hh h₁ h₂ h₃ h₄ h₅ h₆ h₇,
+      {
+        let h := (univ: set X).prod (univ: set Y),
+        exact ⟨univ, univ, univ_mem, univ_mem, trivial, trivial, h.subset_univ⟩,
+      },
+      {
+        rcases hw with ⟨w_x, ⟨w_y, ⟨h_x, ⟨h_y, hh⟩⟩⟩⟩,
+        use w_x, 
+        use w_y,
+        split,
+        exact rfl.mpr h_x,
+        split,
+        exact rfl.mpr h_y,
+        split,
+        finish,
+        split,
+        finish,
+        exact (eq.symm hh).subset,
+      },
+      {
+        let hyp := hh s,
+        sorry,
+      },
+      {
+        cases h_ab,
+        have h1 : ∃ (u : set X) (v : set Y), is_open u ∧ is_open v ∧ a ∈ u ∧ b ∈ v ∧ u.prod v ⊆ h₂,
+        {
+          apply h₆,
+          tauto,
+        },
+        have h2 : ∃ (u : set X) (v : set Y), is_open u ∧ is_open v ∧ a ∈ u ∧ b ∈ v ∧ u.prod v ⊆ h₃,
+        {
+          apply h₇,
+          tauto,
+        },
+        rcases h1 with ⟨x1, y1, is_open_x1, is_open_y1, a_in_x1, b_in_y1, prod_in_h2⟩,
+        rcases h2 with ⟨x2, y2, is_open_x2, is_open_y2, a_in_x2, b_in_y2, prod_in_h3⟩,
+        use x1 ∩ x2,
+        use y1 ∩ y2,
+        
+        split,
+        apply topological_space.inter;
+        tauto,
+        split,
+        apply topological_space.inter;
+        tauto,
+        split,
+        finish,
+        split,
+        finish,
+        intros xy h_xy,
+        have h1: (x1 ∩ x2).prod (y1 ∩ y2) ⊆ x1.prod y1, 
+        {
+          sorry,
+        },
+        have h2: (x1 ∩ x2).prod (y1 ∩ y2) ⊆ x2.prod y2, 
+        {sorry,},
+        split;
+        tauto,
+      }
+    },
+    {
+      intro h,
+      sorry
+    },
+  end
 
 /- # Metric spaces -/
 
