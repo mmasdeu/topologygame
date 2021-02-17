@@ -352,20 +352,6 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
 /- unregister the bad instance we defined earlier -/
 local attribute [-instance] metric_space_basic.topological_space
 
-/- Now this will work, there is only one topological space on the product, we can
-rewrite like we tried to before a lemma about topologies our result on metric spaces,
-as there is only one topology here.
-
-## Exercise 6 [long?]:
-Complete the proof of the example (you can generalise the 100 too if it makes it
-feel less silly). -/
-
-example (X : Type) [metric_space X] : is_open {xy : X × X | dist xy.fst xy.snd < 100 } :=
-begin
-  rw is_open_prod_iff X X,
-  sorry
-end
-
 end metric_space
 
 
@@ -450,14 +436,8 @@ def left_ray_topology : topological_space ℝ := {
           specialize h B hBI,
           replace h : ∃ (a : ℝ), B = Iio a,
           {
-            rcases h with h1 | h2 | h3,
-            {
-              finish,
-            },
-            {
-              finish,
-            },
-            exact h3,
+            rcases h with h1 | h2 | h3;
+            finish,
           },
           obtain ⟨a, ha⟩ := h,
           use a,
@@ -473,7 +453,11 @@ def left_ray_topology : topological_space ℝ := {
     },
     push_neg at hbounded,
     left,
-    sorry
+    ext,
+    simp only [exists_prop, mem_univ, mem_set_of_eq, iff_true],
+    obtain ⟨a, ⟨ha1, ha2⟩⟩ := hbounded x,
+    use Iio a,
+    split; finish,
   end,
   inter :=
   begin
@@ -523,12 +507,24 @@ def mk_closed_sets
   (σ : set (set X))
   (empty_mem : ∅ ∈ σ)
   (inter : ∀ B ⊆ σ, ⋂₀ B ∈ σ)
-  (union : ∀ (A ∈ σ) (B ∈ σ), A ∪ B ∈ σ) :
+  (union : ∀ (A B ∈ σ), A ∪ B ∈ σ) :
 topological_space X := {
-  is_open := λ U, U ∈ compl '' σ, -- λ U, compl U ∈ σ
-  univ_mem := sorry,
-  union := sorry,
-  inter := sorry}
+  is_open :=  λ U, compl U ∈ σ, -- λ U, U ∈ compl '' σ,
+  univ_mem := by simpa using empty_mem,
+  union := 
+  begin
+    intros Y hY,
+    rw compl_sUnion,
+    apply inter (compl '' Y),
+    simpa using hY,
+  end,
+  inter := 
+  begin
+    intros A B hA hB,
+    rw compl_inter,
+    exact union (compl A) (compl B) hA hB,
+  end
+  }
 
 end topological_space
 
@@ -540,8 +536,9 @@ def is_basis [topological_space X] (I : set (set X)) : Prop :=
 (∀ (B : set X), B ∈ I → is_open B) ∧ 
 (∀ U, ∀ x, is_open U → x ∈ U → ∃ B ∈ I, x ∈ B ∧ B ⊆ U)
 
-def basis_condition (I : set (set X)) :=
-⋃₀I = univ ∧ ∀ U V ∈ I, ∀ x : X, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V
+structure basis_condition (I : set (set X)) :=
+(univ : ⋃₀I = univ)
+(filter : ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V)
 
 lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
   basis_condition I :=
@@ -561,10 +558,28 @@ Define the family of intervals of the form [a, b)
 -/
 def Icos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
 
-example : basis_condition Icos :=
-begin
-  sorry
-end
+example : basis_condition Icos := { 
+  univ := begin
+    ext,
+    simp,
+    use Ico x (x+1),
+    split,
+    {
+      use x,
+      use x+1,
+    },
+    {
+      simp only [left_mem_Ico, lt_add_iff_pos_right],
+      exact zero_lt_one,
+    }
+  end,
+  filter :=
+  begin
+    intros U V hU hV x hx,
+
+  end
+  }
+
 
 example (a b : ℝ) : @is_open _ (generate_from ℝ Icos) (Ico a b) :=
 begin
