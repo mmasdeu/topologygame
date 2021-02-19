@@ -443,8 +443,14 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
       {
         sorry
       },
-      {sorry},
-      {sorry},
+      {
+        apply topological_space.union,
+        finish,
+    },
+      {
+        apply topological_space.inter;
+        tauto,
+      },
     },
   end,
   ..prod.topological_space X Y,
