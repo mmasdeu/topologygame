@@ -253,7 +253,43 @@ is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
     },
     {
       intro h,
-      sorry
+     let Opens : set (set (X × Y)):=
+       { uv | ∃ (u: set X) (v : set Y), uv = (set.prod u v) ∧ is_open u ∧ is_open v ∧ (set.prod u v) ⊆ s},
+     have h_s : s = ⋃₀ Opens,
+     begin
+       ext1,
+       split,
+       {
+         cases x with x y,
+         intro h_xy,
+         norm_num,
+         have hh := h x y h_xy,
+         obtain ⟨u, v, is_open_u, is_open_v, x_in_u, y_in_v, uv_in_s⟩ := hh,
+         use set.prod u v,
+         use u,
+         use v,
+         tauto,
+         finish,
+    },
+       {
+         intro h_Opens,
+         obtain ⟨U, ⟨x, y, U_eq_xy, is_open_x, is_open_y, xy_subset_s⟩, x_in_U⟩ := h_Opens,
+         apply xy_subset_s,
+         finish,
+       }
+     end,
+     rw h_s,
+     apply topological_space.union,
+     intros B hB,
+     simp at *,
+     obtain ⟨x, y, B_is_xy, is_open_x, is_open_y, h_xy⟩ := hB,
+     fconstructor,
+     norm_num,
+     use x,
+     split,
+     exact is_open_x,
+     use y,
+     finish,
     },
   end
 
