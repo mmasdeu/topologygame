@@ -705,7 +705,36 @@ lemma prop22 (I : set (set X)) (h: basis_condition I) :
   @is_basis _ (generate_from_basis h) I :=
 begin
   unfold is_basis,
-  sorry
+  split,
+  {
+    intros B hB,
+    use {B},
+    exact ⟨singleton_subset_iff.mpr hB, by simp⟩,
+  },
+  {
+    intros U x hU hx,
+    induction hU with J hJ,
+    simp at hJ,
+    have hxJ: ∃ Uj ∈ J, x ∈ Uj,
+    {
+      rw [hJ.2, mem_sUnion] at hx,
+      assumption,
+    },
+    obtain ⟨Uj, hUjJ, hUjx⟩ := hxJ,
+    use Uj,
+    have hUjI : Uj ∈ I,
+    {
+      replace hJ := hJ.1,
+      tauto,
+    },
+    have Uj_in_U : Uj ⊆ U,
+    {
+      rw hJ.2,
+      apply subset_sUnion_of_subset J Uj _ hUjJ,
+      tauto,
+    },
+    exact ⟨hUjI,hUjx,Uj_in_U⟩,
+  }
 end
 
 /-
@@ -771,9 +800,7 @@ begin
 end
 
 example (a b : ℝ) : @is_open _ (generate_from Icos) (Ico a b) :=
-begin
-  use a, use b,
-end
+  generated_open.generating (Ico a b) (Exists.intro a (Exists.intro b rfl))
 
 lemma blah : @generated_open ℝ Icos ((Ico 0 1) ∪ (Ico 2 3)) :=
 begin
