@@ -3,8 +3,7 @@ import data.set.finite
 import data.real.basic -- for metrics
 
 /-
-# (Re)-Building topological spaces in Lean
- -- Credit: Alex Best
+# Building topological spaces in Lean
 -/
 
 /-
@@ -14,6 +13,9 @@ the theory of which is not computable, and we'll use sets.
 noncomputable theory
 open set
 
+/-
+Definition of a topological space
+-/
 @[ext]
 class topological_space (X : Type) :=
   (is_open : set X → Prop)
@@ -21,8 +23,10 @@ class topological_space (X : Type) :=
   (union : ∀ (Y : set (set X)) (h : ∀ B ∈ Y, is_open B), is_open (⋃₀ Y))
   (inter : ∀ (A B : set X) (hA : is_open A) (hB : is_open B), is_open (A ∩ B))
 
+
 namespace topological_space
 
+/-- The empty set is open -/
 lemma empty_mem {X : Type} [topological_space X] : is_open (∅ : set X) :=
 begin
   rw ←sUnion_empty,
@@ -30,6 +34,7 @@ begin
   tauto,
 end
 
+/-- The union of two open sets is open -/
 lemma union_is_open {X : Type} [topological_space X] {U V : set X}
 (hU : is_open U) (hV : is_open V): is_open (U ∪ V) :=
 begin
@@ -41,6 +46,7 @@ begin
   replace hB : B = U ∨ B = V, by tauto,
   cases hB; {rw hB, assumption},
 end
+
 
 /- We can now work with topological spaces like this. -/
 example (X : Type) [topological_space X] (U V W : set X) (hU : is_open U) (hV : is_open V)
@@ -54,10 +60,10 @@ end
 def discrete (X : Type) : topological_space X :=
 { is_open := λ U, true, -- everything is open
   univ_mem := trivial,
-  union := begin intros B h, trivial, end,
-  inter := begin intros A hA B hB, trivial, end }
+  union := λ _ _, by trivial,
+  inter := λ _ _ _ _, by trivial }
 
-/-- The open sets of the least topology containing a collection of basic sets. -/
+/-- The open sets of the least topology containing a collection of basic sets -/
 inductive generated_open (X : Type) (g : set (set X)) : set X → Prop
 | univ : generated_open univ
 | generating : ∀ A : set X,  A ∈ g → generated_open A
@@ -73,8 +79,17 @@ def generate_from {X : Type} (g : set (set X)) : topological_space X :=
   inter     := generated_open.inter,
   union     := generated_open.sUnion, }
 
-lemma generated_open_is_coarsest' {X : Type} (g : set (set X)) [topological_space X]
-(h : ∀ U ∈ g,  is_open U) : ∀ U : set X, generated_open X g U → is_open U :=
+def is_coarser {X : Type} (τ : topological_space X) (τ' : topological_space X) :=
+  ∀ (U : set X), @is_open _ τ U → @is_open _ τ' U
+
+/-- Given topologies τ and τ' on X, we say that τ ≤ τ' iff τ ⊆ τ' (as subsets) -/
+instance top_has_le {X : Type} : has_le (topological_space X) :=
+  ⟨λ τ τ', (∀ (U : set X), @is_open _ τ U → @is_open _ τ' U)⟩
+
+/-- The topology generated from a collection of sets is the coarsest topology
+  that contains those sets -/
+lemma generated_open_is_coarsest {X : Type} (g : set (set X)) [τ : topological_space X]
+(h : ∀ U ∈ g,  is_open U) : (generate_from g) ≤ τ :=
 begin
   intros U hU,
   induction hU,
@@ -84,16 +99,10 @@ begin
   { apply inter; assumption },
 end
 
-def is_coarser {X : Type} (τ : topological_space X) (τ' : topological_space X) :=
-  ∀ (U : set X), @is_open _ τ U → @is_open _ τ' U
+/-- The indiscrete topology is the coarsest possible one. -/
+def indiscrete (X : Type) : topological_space X := generate_from ∅
 
-instance top_has_le {X : Type} : has_le (topological_space X) := ⟨is_coarser⟩
-
-lemma generated_open_is_coarsest {X : Type} (g : set (set X)) [τ : topological_space X]
-(h : ∀ U ∈ g,  is_open U) : (generate_from g) ≤ τ := λ U, generated_open_is_coarsest' g h U
-
-def indiscrete (X : Type) : topological_space X := generate_from {∅, univ}
-
+/-- The only opens in the indiscrete topology are ∅ and univ -/
 lemma indiscrete_is_open_iff {X : Type} (U : set X) :
 @is_open _ (indiscrete X) U ↔ U = ∅ ∨ U = univ :=
 begin
@@ -171,8 +180,8 @@ topological_space.generate_from {U | ∃ (Ux : set X) (Uy : set Y)
 
 lemma is_open_prod_iff (X Y : Type) [topological_space X] [topological_space Y]
   {s : set (X × Y)} :
-is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
-                                  a ∈ u ∧ b ∈ v ∧ set.prod u v ⊆ s) := 
+  is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
+  a ∈ u ∧ b ∈ v ∧ set.prod u v ⊆ s) := 
   begin
     split,
     {
@@ -186,15 +195,8 @@ is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
         rcases hw with ⟨w_x, ⟨w_y, ⟨h_x, ⟨h_y, hh⟩⟩⟩⟩,
         use w_x, 
         use w_y,
-        split,
-        exact rfl.mpr h_x,
-        split,
-        exact rfl.mpr h_y,
-        split,
-        finish,
-        split,
-        finish,
-        exact (eq.symm hh).subset,
+        repeat {split},
+        all_goals {try {finish} },
       },
       {
         rcases h_ab with ⟨U, hU_1, hU_2⟩,
@@ -203,16 +205,9 @@ is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
         obtain ⟨u, h_u⟩ := h1,
         cases h_u with is_open_u h_uv,
         obtain ⟨v, h_v⟩ := h_uv,
-        use u, 
-        use v,
-        split,
-        tauto,
-        split,
-        tauto,
-        split,
-        tauto,
-        split,
-        tauto,
+        use u, use v,
+        repeat {split},
+        all_goals {try {tauto}},
         intros a ha,
         use U,
         tauto,
@@ -233,28 +228,17 @@ is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
         rcases h2 with ⟨x2, y2, is_open_x2, is_open_y2, a_in_x2, b_in_y2, prod_in_h3⟩,
         use x1 ∩ x2,
         use y1 ∩ y2,
-        
-        split,
-        apply topological_space.inter;
-        tauto,
-        split,
-        apply topological_space.inter;
-        tauto,
-        split,
-        finish,
-        split,
-        finish,
+        repeat {split},
+        all_goals {
+          try {apply topological_space.inter},
+          try {tauto},
+          try {assumption},
+        },
         intros xy h_xy,
-        have h1: (x1 ∩ x2).prod (y1 ∩ y2) ⊆ x1.prod y1, 
-        {
-          intro,
-          finish,
-        },
-        have h2: (x1 ∩ x2).prod (y1 ∩ y2) ⊆ x2.prod y2, 
-        {
-          intro, 
-          finish,
-        },
+        have h1: (x1 ∩ x2).prod (y1 ∩ y2) ⊆ x1.prod y1,
+          by simp [←prod_inter_prod],
+        have h2: (x1 ∩ x2).prod (y1 ∩ y2) ⊆ x2.prod y2,
+          by simp [←prod_inter_prod],
         split;
         tauto,
       }
@@ -297,7 +281,7 @@ is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
      split,
      exact is_open_x,
      use y,
-     finish,
+     split; assumption,
     },
   end
 
@@ -717,6 +701,8 @@ lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_b
     end
      }
 
+/-- A basis defines a topological space, by decreeing open the arbitrary
+  unions of basis elements --/
 def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
   topological_space X := {
   is_open := λ U, ∃ J ⊆ ℬ, U = ⋃₀ J,
@@ -725,11 +711,19 @@ def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
   begin
     intros Y hY,
     simp at hY,
-    choose T hT using hY,
-    rw ←sUnion_bUnion  (λ s hs, (hT s hs).2),
-    {
-      sorry      
-    },
+    choose ι h using hY,
+    have h1 := λ y hy, (h y hy).1,
+    have h2 := λ y hy, (h y hy).2,
+    clear h,
+    norm_num,
+    use ⋃ (y : set X) (hy : y ∈ Y), ι y hy,
+    rw ←sUnion_bUnion h2,
+    simp,
+    intros x hx,
+    simp at hx,
+    obtain ⟨y, hy1, hy2⟩ := hx,
+    specialize h1 y hy1,
+    tauto,
   end,
   inter := 
   begin
@@ -743,31 +737,76 @@ def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
     rw sUnion_inter_sUnion at hUV,
     suffices : ∀ x ∈ U ∩ V, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U ∩ V,
     {
-      sorry
+      use {W ∈ ℬ | W ⊆ U ∩ V},
+      split,
+      {
+        intro W,
+        simp,
+        tauto,
+      },
+      {
+        ext,
+        split,
+        {
+          intro hx,
+          specialize this x hx,
+          obtain ⟨W, hW⟩ := this,
+          simp at hW,
+          simp,
+          use W,
+          tauto,
+        },
+        {
+          intro hx,
+          simp at hx,
+          obtain ⟨a, ⟨ha1, ha2⟩, ha3⟩ := hx,
+          have : a ⊆ U ∩ V,
+          {
+            norm_num,
+            exact ha2,
+          },
+          tauto,
+        }
+      },
     },
     intros x hx,
     rw hUV at hx,
     simp at hx,
-    sorry,
+    obtain ⟨j, k, ⟨hjk1, hjk2⟩, hjk3, hjk4 ⟩ := hx,
+    have hh : ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ j ∩ k,
+    {
+      apply basis_condition.filter,
+      tauto,
+      tauto,
+      finish,
+    },
+    obtain ⟨W, hxW, hWjk⟩ := hh,
+    use W,
+    have hWUV : W ⊆ U ∩ V,
+    {
+      have hjU : j ⊆ U,
+      {
+        rw hJ2,
+        apply subset_sUnion_of_mem hjk1,
+      },
+      have hkV : k ⊆ V,
+      {
+        rw hK2,
+        apply subset_sUnion_of_mem hjk2,
+      },
+      have hjkUV : j ∩ k ⊆ U ∩ V := inter_subset_inter hjU hkV,
+      --replace hWjk := hWjk.2,
+      tauto,
+    },
+    tauto,
   end
   }
 
-example (X : Type) {I : set (set X)} (h: basis_condition I) : 
-  generate_from_basis h = generate_from I :=
+lemma generate_from_basis_simp {X : Type} {I : set (set X)} (h: basis_condition I) : 
+  generate_from I = generate_from_basis h :=
 begin
   ext U,
   split,
-  {
-    intro hU,
-    induction hU with J hJ,
-    simp at hJ,
-    rw hJ.2,
-    apply union,
-    intros V hV,
-    fconstructor,
-    replace hJ := hJ.1,
-    solve_by_elim,
-  },
   {
     intro hU,
     induction hU with V hV J hJ h W1 W2 hW1 hW2 hW1' hW2',
@@ -787,10 +826,23 @@ begin
       apply inter;
       assumption,
     }
+  },
+  {
+    intro hU,
+    induction hU with J hJ,
+    simp at hJ,
+    rw hJ.2,
+    apply union,
+    intros V hV,
+    fconstructor,
+    replace hJ := hJ.1,
+    solve_by_elim,
   }
 end
-lemma prop22 (I : set (set X)) (h: basis_condition I) :
-  @is_basis _ (generate_from_basis h) I :=
+
+/-- A set ℬ satisfying the basis condition is a basis for the topology it generates -/
+lemma prop22 (ℬ : set (set X)) (h : basis_condition ℬ) :
+  @is_basis _ (generate_from_basis h) ℬ :=
 begin
   unfold is_basis,
   split,
@@ -810,7 +862,7 @@ begin
     },
     obtain ⟨Uj, hUjJ, hUjx⟩ := hxJ,
     use Uj,
-    have hUjI : Uj ∈ I,
+    have hUjI : Uj ∈ ℬ,
     {
       replace hJ := hJ.1,
       tauto,
@@ -889,7 +941,6 @@ end
 
 example (a b : ℝ) : @is_open _ (generate_from Icos) (Ico a b) :=
   generated_open.generating (Ico a b) (Exists.intro a (Exists.intro b rfl))
-
 
 end topological_space
 
