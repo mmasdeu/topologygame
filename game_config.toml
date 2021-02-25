@@ -1,0 +1,13 @@
+name = "Lean Topology game"
+version = "1.0.0"
+extra_files = "extras"
+intro = "src/game/intro.lean"
+
+[[worlds]]
+name = "Basic definitions"
+id = 1
+levels = [
+	"src/game/level1.lean",
+	
+
+]
