@@ -144,19 +144,55 @@ def is_interior_point := is_neighborhood x A
 
 def interior := { x : X | is_interior_point x A }
 
-lemma interior_is_open : is_open (interior A) :=
-begin
-  sorry
-end
-
 lemma interior_def' : interior A = ⋃₀ {U : set X | is_open U ∧ U ⊆ A} :=
 begin
-  sorry
+  ext,
+  split,
+  {
+    rintros ⟨U, is_open_U, x_in_U, U_subset_A⟩,
+    use U,
+    split,
+    finish,
+    exact x_in_U,
+  },
+  {
+    rintros ⟨U, ⟨is_open_U, U_subset_A⟩, x_in_U⟩,
+    use U,
+    tauto,
+  }
+end
+
+lemma interior_is_open : is_open (interior A) :=
+begin
+  rw interior_def',
+  apply union,
+  rintros B ⟨is_open_B, B_subset_A⟩,
+  tauto,
 end
 
 lemma is_open_iff_eq_interior : is_open A ↔ A = interior A :=
 begin
-  sorry
+  split,
+  {
+    intro is_open_A,
+    rw interior_def',
+    ext1,
+    split,
+    {
+      intro x_in_A,
+      norm_num,
+      use A,
+      tauto,
+    },
+    {
+      rintros ⟨hx,⟨⟨h₂, h₃⟩, h₄⟩⟩,
+      tauto,
+    }
+  },
+  { intro hA,
+    rw hA, 
+    exact interior_is_open A,
+  }
 end
 
 -- més deures: definir adherència i propietats (pg 27)
