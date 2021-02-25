@@ -57,7 +57,13 @@ begin
   },
   {
     intros U S hUS hSfin hind h,
-    sorry
+    have h : ⋂₀ insert U S = (⋂₀ S) ∩ U,
+    {
+      finish,
+    },
+    rw h, 
+    apply topological_space.inter;
+    finish
   }
 end
 
