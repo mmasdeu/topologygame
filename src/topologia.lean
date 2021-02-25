@@ -144,23 +144,19 @@ def is_interior_point := is_neighborhood x A
 
 def interior := { x : X | is_interior_point x A }
 
-
-
 lemma interior_def' : interior A = ⋃₀ {U : set X | is_open U ∧ U ⊆ A} :=
 begin
   ext,
   split,
   {
-    intro hx,
-    rcases hx with ⟨U, is_open_U, x_in_U, U_subset_A⟩,
+    rintros ⟨U, is_open_U, x_in_U, U_subset_A⟩,
     use U,
     split,
     finish,
     exact x_in_U,
   },
   {
-    intro hx,
-    rcases hx with ⟨U, ⟨is_open_U, U_subset_A⟩, x_in_U⟩,
+    rintros ⟨U, ⟨is_open_U, U_subset_A⟩, x_in_U⟩,
     use U,
     tauto,
   }
@@ -170,8 +166,7 @@ lemma interior_is_open : is_open (interior A) :=
 begin
   rw interior_def',
   apply union,
-  intros B hB,
-  cases hB,
+  rintros B ⟨is_open_B, B_subset_A⟩,
   tauto,
 end
 
@@ -188,8 +183,11 @@ begin
       norm_num,
       use A,
       tauto,
+    },
+    {
+      rintros ⟨hx,⟨⟨h₂, h₃⟩, h₄⟩⟩,
+      tauto,
     }
-    sorry,
   },
   { intro hA,
     rw hA, 
