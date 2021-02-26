@@ -202,7 +202,40 @@ begin
 end
 
 -- més deures: definir adherència i propietats (pg 27)
+/-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
+def is_adherent_point := ∀ N, is_neighborhood x N → N ∩ A ≠ ∅
 
+/-- The closure of A is the set of all the adherent points of A -/
+def closure:= {x | is_adherent_point x A}
+
+lemma closure_def' : closure A = ⋂₀ {C : set X | is_closed C ∧ A ⊆ C} :=
+begin
+  ext1,
+  split,
+  {
+    rintros x_in_closure U ⟨is_open_U, U_contains_A⟩,
+    sorry,
+  },
+  {
+    rintros hx N ⟨U, is_open_U, x_in_U, N_contains_U⟩,
+    sorry,
+  },
+end
+
+lemma closure_is_closed: is_closed (closure A) :=
+begin
+  sorry,
+end
+
+lemma is_closed_iff_eq_closure : is_closed A ↔ A = closure A :=
+begin
+  sorry,
+end
+
+example: closure A = (interior Aᶜ)ᶜ :=
+begin
+  sorry,
+end
 
 end topological_space
 
