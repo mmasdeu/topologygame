@@ -59,7 +59,13 @@ begin
   { simp },
   {
     intros U S hUS hSfin hind h,
-    sorry
+    have h : ⋂₀ insert U S = (⋂₀ S) ∩ U,
+    {
+      finish,
+    },
+    rw h, 
+    apply topological_space.inter;
+    finish
   }
 end
 
@@ -198,6 +204,79 @@ begin
 end
 
 -- més deures: definir adherència i propietats (pg 27)
+/-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
+def is_adherent_point := ∀ N, is_neighborhood x N → N ∩ A ≠ ∅
+
+/-- The closure of A is the set of all the adherent points of A -/
+def closure:= {x | is_adherent_point x A}
+
+lemma closure_eq_compl_of_interior_compl: closure A = (interior Aᶜ)ᶜ :=
+begin
+  ext1,
+  unfold interior is_interior_point is_neighborhood closure is_adherent_point is_neighborhood,
+  simp only [not_exists, and_imp, not_and, mem_set_of_eq, ne.def, exists_imp_distrib, mem_compl_eq],
+  split,
+  {
+    intros hx U is_open_U x_in_U hU,
+    let hhh := hx Aᶜ U is_open_U x_in_U hU,
+    finish,
+  },
+  {
+    intros hx U V is_open_V x_in_V hV hU,
+    apply hx V is_open_V x_in_V,
+    intros a a_in_V a_in_A,
+    have h: a ∈ U ∩ A,
+    {
+      split;
+      tauto,
+    },
+    finish,
+  }
+end
+
+
+lemma closure_def' : closure A = ⋂₀ {C : set X | is_closed C ∧ A ⊆ C} :=
+begin
+  have hh: (compl '' { U: set X | is_open U ∧ U ⊆ A ᶜ}) = {C: set X | is_closed C ∧ A ⊆ C},
+  {
+    ext1 V,
+    split,
+    {
+      rintros ⟨U,⟨_, _⟩, Uh_right⟩,
+      rw [is_closed, ← Uh_right],
+      split,
+      norm_num;
+      assumption,
+      tauto,
+    },
+    {
+      rintros ⟨_, _⟩,
+      use Vᶜ,
+      norm_num,
+      tauto,
+    },
+  },
+  rw [closure_eq_compl_of_interior_compl, interior_def', compl_sUnion, hh],
+end
+
+lemma closure_is_closed: is_closed (closure A) :=
+begin
+  rw [closure_eq_compl_of_interior_compl, is_closed],
+  norm_num,
+  exact interior_is_open _,
+end
+
+lemma is_closed_iff_eq_closure : is_closed A ↔ A = closure A :=
+begin
+  rw [closure_eq_compl_of_interior_compl],
+  let h := is_open_iff_eq_interior Aᶜ,
+  have hh : Aᶜ = interior Aᶜ ↔ A = (interior Aᶜ)ᶜ,
+  {   
+    rw [compl_inj_iff.symm, compl_compl],
+  },
+  rw hh at h,
+  exact h,
+end
 
 
 end topological_space
