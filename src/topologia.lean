@@ -1,5 +1,6 @@
 import tactic
 import data.set.finite
+import for_mathlib
 
 /-
 # Building topological spaces in Lean
@@ -25,12 +26,16 @@ class topological_space (X : Type) :=
 namespace topological_space
 
 /-- The empty set is open -/
+@[simp]
 lemma empty_mem {X : Type} [topological_space X] : is_open (∅ : set X) :=
 begin
   rw ←sUnion_empty,
   apply union,
   tauto,
 end
+
+@[simp]
+lemma univ_mem' {X : Type} [topological_space X] : is_open (univ : set X) := univ_mem
 
 /-- The union of two open sets is open -/
 lemma open_of_open_union_open {X : Type} [topological_space X] {U V : set X}
@@ -51,10 +56,7 @@ lemma open_of_finite_set_opens {X : Type} [topological_space X] {S : set (set X)
 begin
   revert h,
   apply finite.induction_on hfin,
-  {
-    simp,
-    exact univ_mem,
-  },
+  { simp },
   {
     intros U S hUS hSfin hind h,
     sorry

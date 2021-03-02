@@ -2,9 +2,12 @@ import .topologia
 import .bases
 import .productes
 import .metrics
+import data.real.ereal
 
 open set
 open topological_space
+
+noncomputable theory
 
 /- We can now work with topological spaces like this. -/
 example (X : Type) [topological_space X] (U V W : set X) (hU : is_open U) (hV : is_open V)
@@ -24,6 +27,15 @@ def discrete (X : Type) : topological_space X :=
 /-- The indiscrete topology is the coarsest possible one. -/
 def indiscrete (X : Type) : topological_space X := generate_from ∅
 
+/- The union of a family of sets containing univ is univ -/
+lemma sUnion_univ_of_mem_univ {X : Type} {I : set (set X)} (h : univ ∈ I) : ⋃₀ I = univ :=
+begin
+  rw sUnion_eq_univ_iff,
+  intros x,
+  use univ,
+  exact ⟨h, mem_univ x⟩,
+end
+
 /-- The only opens in the indiscrete topology are ∅ and univ -/
 lemma indiscrete_is_open_iff {X : Type} (U : set X) :
 @is_open _ (indiscrete X) U ↔ U = ∅ ∨ U = univ :=
@@ -36,24 +48,11 @@ begin
     { tauto },
     {
       by_cases H : univ ∈ I,
-      {
-        right,
-        rw sUnion_eq_univ_iff,
-        intros x,
-        use univ,
-        exact ⟨H, mem_univ x⟩,
-      },
+      { exact or.inr (sUnion_univ_of_mem_univ H) },
       {
         left,
-        suffices : ∀ t ∈ I, t = ∅, by simpa [sUnion_eq_empty] using this,
-        intros t ht,
-        specialize hI' t ht,
-        cases hI',
-        { exact hI' },
-        {
-          rw hI' at ht,
-          contradiction,
-        }
+        rw sUnion_eq_empty,
+        finish,
       }
     },
     {
@@ -63,30 +62,14 @@ begin
         rw [inter_comm, hW1'],
         apply inter_empty,
       },
-      cases hW2',
-      {
-        left,
-        rw hW2',
-        apply inter_empty,
-      },
-      {
-        right,
-        rw [hW1',hW2'],
-        apply inter_univ,
-      },
+      subst hW1',
+      simpa,
     },
   },
   {
     intro h,
     cases h,
-    { 
-      rw h,
-      exact @empty_mem _ (indiscrete X),
-    },
-    {
-      rw h,
-      exact @univ_mem _ (indiscrete X),
-    }
+    all_goals {rw h, simp },
   }
 end
 
@@ -95,6 +78,139 @@ end
 Show that {∅, univ, (-∞, a) : a : ℝ} is a topology on ℝ
 -/
 open real
+open ereal
+
+
+def left_ray : ereal → (set ℝ) := λ a , (ite (a = ⊥) ∅ (ite (a = ⊤) univ {x : ℝ | (x : ereal) < a}))
+
+@[simp]
+lemma left_ray_top_def : left_ray ⊤ = univ :=
+begin
+  unfold left_ray,
+  simp,
+  tauto,
+end
+
+@[simp]
+lemma left_ray_bot_def : left_ray ⊥ = ∅ :=
+begin
+  unfold left_ray,
+  simp,
+end
+
+@[simp]
+lemma left_ray_eq_Iio (x : ℝ) : left_ray (x : ereal) = Iio x :=
+begin
+  unfold left_ray,
+  have xnetop : (x : ereal) ≠ ⊤, by trivial,
+  have xnebot : (x : ereal) ≠ ⊥ := dec_trivial,
+  simp [xnetop, xnebot, Iio_def],
+end
+
+@[simp]
+lemma left_ray_mem (x : ℝ) (y : ereal) : x ∈ left_ray y ↔ (x : ereal) < y :=
+begin
+  by_cases ht : y = ⊤,
+  {
+    simp [ht],
+    exact dec_trivial,
+  },
+  by_cases hb : y = ⊥,
+  { simp [hb] },
+  obtain ⟨z, hz⟩ := lift_to_real hb ht,
+  subst hz,
+  simp,
+end
+
+lemma left_ray_def (x : ereal) : left_ray x = {y : ℝ | (y : ereal) < x } :=
+begin
+  ext,
+  simp,
+end
+
+@[simp]
+lemma left_ray_univ_iff (b : ereal) : left_ray b = univ ↔ b = ⊤ :=
+begin
+  split,
+  {
+    intro h,
+    unfold left_ray at h,
+    by_contradiction hc,
+    simp [hc] at h,
+    by_cases ht : b = ⊥,
+    {
+      subst ht,
+      simp at h,
+      exact empty_ne_univ h,
+    },
+    obtain ⟨z, hz⟩ := lift_to_real ht hc,
+    simp [ht] at h,
+    subst hz,
+    simp at h,
+    specialize h (z+1),
+    linarith [h],
+  },
+  exact λ h, by simp [h],
+end
+
+@[simp]
+lemma left_ray_empty_iff (b : ereal) : left_ray b = ∅ ↔ b = ⊥ :=
+begin
+  split,
+  {
+    intro h,
+    unfold left_ray at h,
+    by_contradiction hc,
+    simp [hc] at h,
+    by_cases ht : b = ⊤,
+    { simpa [ht] using h },
+    { simp [ht] at h,
+      obtain ⟨z, hz⟩ := lift_to_real hc ht,
+      subst hz,
+      simp at h,
+      specialize h (z-1),
+      linarith [h] },
+  },
+  exact λ h, by simp [h],
+end
+
+@[simp]
+lemma left_ray_subset_iff (a b : ereal) : left_ray a ⊆ left_ray b ↔ a ≤ b :=
+begin
+  by_cases ha1 : a = ⊥,
+  { simp [ha1] },
+  by_cases ha2 : a = ⊤,
+  { simp [ha2, univ_subset_iff] },
+  by_cases hb1 : b = ⊥,
+  { simp [hb1, subset_empty_iff] },
+  by_cases hb2 : b = ⊤,
+  { simp [hb2] },
+  { simp [left_ray_def],
+    obtain ⟨r, hr⟩ := lift_to_real ha1 ha2,
+    obtain ⟨s, hs⟩ := lift_to_real hb1 hb2,
+    subst hr, subst hs,
+    simp,
+    exact forall_lt_iff_le },
+end
+
+@[simp]
+lemma left_ray_inter (a b : ereal) :
+  left_ray a ∩ left_ray b = left_ray (min a b) :=
+begin
+  by_cases a ≤ b,
+  {
+    rw min_eq_left h,
+    apply inter_eq_self_of_subset_left,
+    simp [h],
+  },
+  {
+    push_neg at h,
+    replace h := le_of_lt h,
+    rw min_eq_right h,
+    apply inter_eq_self_of_subset_right,
+    simp [h],
+  }
+end
 
 lemma union_of_intervals {α : set ℝ} (hne : ∃ a : ℝ, a ∈ α) (h : ∃ (C : ℝ), ∀ a ∈ α, a ≤ C) :
   (⋃ a ∈ α, Iio a) = Iio (Sup α) :=
@@ -104,133 +220,51 @@ begin
   simp [lt_Sup α hne h],
 end
 
+lemma bUnion_left_ray {α : set ereal} :
+  (⋃ a ∈ α, left_ray a) = left_ray (Sup α) :=
+begin
+  apply eq_of_subset_of_subset,
+  {
+    apply bUnion_subset,
+    exact λ _ hx, by simp [ereal.le_Sup hx],
+  },
+  {
+    intros x hx,
+    rw mem_bUnion_iff,
+    have hx' : (x : ereal) < Sup α, by simpa using hx,
+    obtain ⟨y, ⟨hy1, hy2⟩⟩ := ereal.lt_Sup hx',
+    exact ⟨y, by simp [hy1, hy2]⟩,
+  }
+end
+
 def left_ray_topology : topological_space ℝ := {
-  is_open := λ (X : set ℝ),  X = ∅ ∨ X = univ ∨ (∃ a : ℝ, X = Iio a),
-  univ_mem := by tauto,
-  union := 
+  is_open := left_ray '' univ,
+  univ_mem := ⟨⊤, by tauto⟩,
+  union :=
   begin
-    intro I,
-    intro h,
-    by_cases hempty : ∀ B ∈ I, B = ∅,
+    intros Y hY,
+    use Sup (left_ray⁻¹' Y),
+    simp [←bUnion_left_ray, sUnion_eq_bUnion],
+    ext1,
+    simp,
+    split,
+    { rintro ⟨a, ha⟩,
+      exact ⟨left_ray a, by simp [ha]⟩ },
     {
-      left,
-      simp,
-      exact hempty,
-    },
-    push_neg at hempty,
-    right,
-    by_cases huniv : ∃ B ∈ I, B = univ,
-    {
-      left,
-      simp at *,
-      ext1,
-      norm_num,
-      use univ,
-      exact ⟨huniv, mem_univ x⟩,
-    },
-    push_neg at huniv,
-    let α := {a | ∃ B ∈ I, B = Iio a},
-    have hαne : ∃ a : ℝ, a ∈ α,
-    {
-      simp*,
-      cases hempty with T hT,
-      specialize h T hT.1,
-      rcases h with h1 | h2 | h3,
-      {
-        by_contradiction,
-        exact hT.2 h1,
-      },
-      {
-        by_contradiction,
-        exact (huniv T hT.1) h2,
-      },
-      {
-        cases h3 with a ha,
-        use a,
-        rw ← ha, 
-        exact hT.1,
-      },
-    },
-    by_cases hbounded : ∃ c : ℝ, ∀ a ∈ α, a ≤ c,
-    {
-      right,
-      use Sup α,
-      rw ←union_of_intervals hαne hbounded,
-      {
-        dsimp,
-        ext1,
-        dsimp,
-        split,
-        {
-          intro hx,
-          simp,
-          obtain ⟨B, ⟨hBI, hxB⟩⟩ := hx,
-          specialize h B hBI,
-          replace h : ∃ (a : ℝ), B = Iio a,
-          {
-            rcases h with h1 | h2 | h3;
-            finish,
-          },
-          obtain ⟨a, ha⟩ := h,
-          use a,
-          rw ←ha,
-          finish,
-        },
-        intro hx,
-        simp at hx,
-        obtain ⟨a, ha⟩ := hx,
-        use Iio a,
-        simpa using ha,
-      },
-    },
-    push_neg at hbounded,
-    left,
-    ext,
-    simp only [exists_prop, mem_univ, mem_set_of_eq, iff_true],
-    obtain ⟨a, ⟨ha1, ha2⟩⟩ := hbounded x,
-    use Iio a,
-    split; finish,
+      rintro ⟨B, hB⟩,
+      obtain ⟨i, ⟨hi1, hi2⟩⟩ := hY B hB.1,
+      use i,
+      rw [←left_ray_mem, hi2],
+      exact hB,
+    }
   end,
   inter :=
   begin
-    intros A B,
-    intros hA hB,
-    rcases hA with hA  | hA | hA,
-    {
-      left,
-      subst hA,
-      exact empty_inter B,
-    },
-    {
-      subst hA,
-      simp,
-      exact hB,
-    },
-    {
-      rcases hB with hB  | hB | hB,
-      {
-        left,
-        subst hB,
-        exact inter_empty A,
-      },
-      {
-        subst B,
-        simp,
-        right,right,
-        exact hA,
-      },
-      {
-        obtain ⟨a, ha⟩ := hA,
-        subst ha,
-        obtain ⟨b, hb⟩ := hB,
-        subst hb,
-        right,right,
-        use min a b,
-        exact Iio_inter_Iio,
-      },
-    }
+    rintros A B ⟨a, _, haA⟩ ⟨b, _, hbB⟩,
+    subst haA, subst hbB,
+    exact ⟨min a b, by simp⟩,
   end
-   }
+}
 
 /-
 Define the family of intervals of the form [a, b)
