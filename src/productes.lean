@@ -151,37 +151,47 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
     {
       intro hU, 
       induction hU with V hVW g h₁ h₂ V W h1 h2 h3 h4,
-      { exact generated_open.univ },
+      {
+         -- library_search behaves oddly
+         apply univ_mem,
+      },
       {
         simp at *,
         obtain ⟨V,hV,W,⟨hW,hprod⟩⟩ := hVW,
         subst hprod,
+        unfold ball,
         unfold metric_space_basic.dist,
         simp,
         sorry
       },
-      { exact generated_open.sUnion g h₂ },
-      { exact generated_open.inter V W h3 h4 },
+      {
+        -- library_search behaves oddly
+        apply union,
+        intros B hB,
+        tauto,
+      },
+      { 
+        -- library_search behaves oddly
+        apply inter;
+        tauto,
+      },
     },
     {
       intro h,
       induction h with V h,
-      {apply univ_mem,},
       {
-        norm_num at *,
-        obtain ⟨x, y, r, H⟩ := h,
-        subst H,
-        unfold metric_space_basic.dist,
-        simp,
-        exact is_open_prod_balls r (x,y),
-      },
-      {
-        apply topological_space.union,
-        finish,
-      },
-      {
-        apply topological_space.inter;
-        tauto,
+        cases h,
+        subst U,
+        apply union,
+        intros B B_in_V,
+        norm_num,
+        have h: ∃ x r, B = ball x r,
+        {
+          tauto,
+        },
+        rcases h with ⟨xy, r, _⟩,
+        subst B,
+        sorry,
       },
     },
   end,
