@@ -15,7 +15,15 @@ instance prod.topological_space (X Y : Type) [topological_space X]
 topological_space.generate_from {U | ∃ (Ux : set X) (Uy : set Y)
   (hx : is_open Ux) (hy : is_open Uy), U = set.prod Ux Uy}
 
-lemma is_open_prod_iff (X Y : Type) [topological_space X] [topological_space Y]
+lemma is_open_prod (X Y : Type) [topological_space X] [topological_space Y]
+ {U : set X} {V : set Y} (hU : is_open U) (hV : is_open V) : is_open (U.prod V) :=
+begin
+  fconstructor,
+  simp,
+  exact ⟨U, hU, ⟨V, ⟨hV,rfl⟩⟩⟩,
+end
+
+lemma is_open_prod_iff {X Y : Type} [topological_space X] [topological_space Y]
   {s : set (X × Y)} :
   is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
   a ∈ u ∧ b ∈ v ∧ set.prod u v ⊆ s) := 
@@ -122,6 +130,18 @@ lemma is_open_prod_iff (X Y : Type) [topological_space X] [topological_space Y]
     },
   end
 
+
+lemma is_open_prod_balls {X Y : Type} (r : ℝ) [metric_space X] [metric_space Y]
+  (xy : X × Y) : is_open {zt : X × Y | metric_space_basic.dist xy.1 zt.1 < r ∧
+  metric_space_basic.dist xy.2 zt.2 < r} :=
+begin
+  change is_open ({x : X | metric_space_basic.dist xy.1 x < r}.prod 
+  {y : Y | metric_space_basic.dist xy.2 y < r}),
+  apply is_open_prod;
+  apply metric_space.open_of_ball,
+end
+
+
 /- Now lets define the product of two metric spaces properly -/
 instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) :=
 { compatible :=
@@ -129,12 +149,15 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
     intro U,
     split,
     {
-      intro hU,
-      induction hU with V h g h₁ h₂ V W h1 h2 h3 h4,
+      intro hU, 
+      induction hU with V hVW g h₁ h₂ V W h1 h2 h3 h4,
       { exact generated_open.univ },
       {
         simp at *,
-        obtain ⟨Ux,hUx,Uy,⟨hUy,hprod⟩⟩ := h,
+        obtain ⟨V,hV,W,⟨hW,hprod⟩⟩ := hVW,
+        subst hprod,
+        unfold metric_space_basic.dist,
+        simp,
         sorry
       },
       { exact generated_open.sUnion g h₂ },
@@ -142,15 +165,20 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
     },
     {
       intro h,
-      induction h,
+      induction h with V h,
       {apply univ_mem,},
       {
-        sorry
+        norm_num at *,
+        obtain ⟨x, y, r, H⟩ := h,
+        subst H,
+        unfold metric_space_basic.dist,
+        simp,
+        exact is_open_prod_balls r (x,y),
       },
       {
         apply topological_space.union,
         finish,
-    },
+      },
       {
         apply topological_space.inter;
         tauto,

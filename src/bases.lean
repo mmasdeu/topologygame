@@ -8,50 +8,21 @@ def is_basis [topological_space X] (I : set (set X)) : Prop :=
 (∀ {B : set X}, B ∈ I → is_open B) ∧ 
 (∀ U, ∀ x, is_open U → x ∈ U → ∃ B ∈ I, x ∈ B ∧ B ⊆ U)
 
-class basis_condition (I : set (set X)) :=
-(univ : univ = ⋃₀I)
-(filter : ∀ U V ∈ I, ∀ x ∈ U ∩ V, ∃ W ∈ I, x ∈ W ∧ W ⊆ U ∩ V)
+class basis_condition (ℬ : set (set X)) :=
+(univ : ∀ x : X, ∃ U ∈ ℬ, x ∈ U)
+(filter : ∀ U V ∈ ℬ, ∀ x ∈ U ∩ V, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U ∩ V)
 
 lemma basis_condition_inter (ℬ : set (set X)) [basis_condition ℬ] {U V : set X}
 (hU : U ∈ ℬ) (hV : V ∈ ℬ) : ∃ J ⊆ ℬ, U ∩ V = ⋃₀ J :=
 begin
-  use {W | W ∈ ℬ ∧ W ⊆ U ∩ V },
-  split,
-  {
-    norm_num,
-    intros x hx,
-    simp at hx,
-    exact hx.1,
-  },
-  {
-    ext,
-    split,
-    {
-      intro hx,
-      norm_num,
-      have hh := basis_condition.filter U V hU hV x hx,
-      obtain ⟨W, hW1, hW2, hW3⟩ := hh,
-      use W,
-      finish,
-    },
-    {
-      intro hx,
-      simp at hx,
-      obtain ⟨a, ⟨ha1, ha2, ha3⟩, hxa⟩ := hx,
-      suffices : a ⊆ U ∩ V,
-      {
-        exact this hxa,
-      },
-      exact subset_inter ha2 ha3,
-    }
-  }
+  apply sUnion_eq_of_pointwise (basis_condition.filter U V hU hV),
 end
 
 lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
   basis_condition I := {
     univ := 
     begin
-      ext,
+      intro x,
       simp,
       have hunivopen: is_open univ, by simp [univ_mem],
       have h2 := h.2 univ x hunivopen (mem_univ x),
@@ -73,12 +44,22 @@ lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_b
     end
      }
 
+
+
 /-- A basis defines a topological space, by decreeing open the arbitrary
   unions of basis elements --/
 def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
   topological_space X := {
   is_open := λ U, ∃ J ⊆ ℬ, U = ⋃₀ J,
-  univ_mem := ⟨ℬ, ⟨rfl.subset, h.univ⟩⟩,
+  univ_mem :=
+  begin
+    use ℬ,
+    split,
+    { tauto },
+    symmetry,
+    have H := h.univ,
+    finish, -- improve it?
+  end,
   union :=
   begin
     intros Y hY,
@@ -174,6 +155,11 @@ def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
   end
   }
 
+@[simp]
+lemma generate_from_basis_open_iff {ℬ : set (set X)} (h: basis_condition ℬ) {U : set X}
+: @is_open X (generate_from_basis h) U ↔ ∃ J⊆ ℬ, U = ⋃₀ J := by refl
+
+
 lemma generate_from_basis_simp {X : Type} {I : set (set X)} (h: basis_condition I) : 
   generate_from I = generate_from_basis h :=
 begin
@@ -248,3 +234,6 @@ begin
     exact ⟨hUjI,hUjx,Uj_in_U⟩,
   }
 end
+
+-- Axiomes "countability"
+-- 

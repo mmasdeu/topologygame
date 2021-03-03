@@ -7,7 +7,5 @@ intro = "src/game/intro.lean"
 name = "Basic definitions"
 id = 1
 levels = [
-	"src/game/level1.lean",
-	
-
+	"src/game/level1.lean"
 ]

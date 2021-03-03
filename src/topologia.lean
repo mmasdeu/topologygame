@@ -203,7 +203,6 @@ begin
   }
 end
 
--- més deures: definir adherència i propietats (pg 27)
 /-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
 def is_adherent_point := ∀ N, is_neighborhood x N → N ∩ A ≠ ∅
 
@@ -278,6 +277,11 @@ begin
   exact h,
 end
 
-
+-- Definir frontera
+-- Definir (quasi)compacte
+-- Axiomes de separació (T0, T1, T2, T3, Hausdorff )
+-- Definir funció contínua
+-- Afegir [simp] als lemes d'interior, clausura...
+-- Afegir problemes al Game a partir dels exercicis de la secció 2.
 end topological_space
 

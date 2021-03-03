@@ -2,6 +2,7 @@ import tactic
 import data.set.finite
 import data.real.basic -- for metrics
 import .topologia
+import .bases
 
 open set
 open topological_space
@@ -16,6 +17,10 @@ class metric_space_basic (X : Type) :=
   (triangle : ∀ x y z, dist x z ≤ dist x y + dist y z)
 
 namespace metric_space_basic
+
+@[simp]
+lemma dist_eq_zero_iff' {X : Type} (x y : X) [metric_space_basic X] :
+  dist x y = 0 ↔ x = y := dist_eq_zero_iff x y
 
 lemma dist_nonneg {X : Type} [metric_space_basic X] (x y : X) : 0 ≤ dist x y :=
 begin
@@ -63,18 +68,15 @@ metric_space_basic (X × Y) :=
         have h4 := max_le_iff.mp h5,
         linarith,
       end,
-
-       ext;
-       {
-         rw [←dist_eq_zero_iff _ _],
-         tauto,
-       },
- 
+      ext;
+      {
+        rw [←dist_eq_zero_iff _ _],
+        tauto,
+      },
      },
     {
       intro h,
-      -- how to extract `xy1.fst = xy2.snd` from h??
-      subst h,  -- is it possible to skip this step?? 
+      subst h, 
       rw (dist_eq_zero_iff xy1.fst xy1.fst).mpr (refl _),
       rw (dist_eq_zero_iff xy1.snd xy1.snd).mpr (refl _),
       exact max_self 0,
@@ -88,7 +90,6 @@ metric_space_basic (X × Y) :=
   triangle :=
    begin
     intros x y z,
- 
     let  xy_X := (dist x.fst y.fst),
     let  yz_X := (dist y.fst z.fst),
     let  xy_Y := (dist x.snd y.snd),
@@ -108,8 +109,26 @@ metric_space_basic (X × Y) :=
    end,
 }
 
+def ball {X : Type} [metric_space_basic X] (x : X) (r : ℝ) := {y | dist x y < r}
+
+lemma balls_form_basis {X : Type} [metric_space_basic X] :
+  basis_condition { B | ∃ (x : X) r, B = ball x r} :=
+begin
+  unfold ball,
+  sorry
+end
+
 class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
   (compatible : ∀ U, is_open U ↔ generated_open X { B | ∃ (x : X) r, B = {y | dist x y < r}} U)
+
+--class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
+--  (compatible : ∀ (U : set X), is_open U ↔ (∀ x ∈ U, ∃ r > 0, (ball x r) ⊆ U))
+
+--class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
+--  (compatible : ∀ (U : set X), is_open U ↔
+--  @is_open _ (generate_from_basis (balls_form_basis)) U)
+
+
 
 namespace metric_space
 
@@ -123,8 +142,20 @@ properties it satisfies, i.e. a `metric_space_basic`, so we should setup a metri
 constructor from a `metric_space_basic` by setting the topology to be the induced one. -/
 
 def of_basic {X : Type} (m : metric_space_basic X) : metric_space X :=
-{ compatible := begin intros, refl, /- this should work when the above parts are complete -/ end,
+{ compatible := begin intros,
+sorry,
+ --refl,
+ end,
   ..m,
   ..metric_space_basic.topological_space}
+ 
+/-- Open balls are open -/
+lemma open_of_ball {X : Type} [metric_space X] {x : X} {r : ℝ} :
+  is_open {y | dist x y < r} :=
+begin
+  fconstructor,
+  simp,
+  use x, use r,
+end
 
 end metric_space

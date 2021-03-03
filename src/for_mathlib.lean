@@ -43,6 +43,16 @@ begin
 end
 
 
+lemma sUnion_eq_of_pointwise {X : Type} {U : set X} {ℬ : set (set X)}
+  (h : ∀ x ∈ U, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U) :  ∃ J ⊆ ℬ, U = ⋃₀ J :=
+begin
+  use {W ∈ ℬ | W ⊆ U},
+  split,
+  { apply sep_subset },
+  apply eq_of_subset_of_subset,
+  all_goals {intros x hx, simp at hx ⊢, try {specialize h x hx}, tauto },
+end
+
 lemma lift_to_real {x : ereal} (h : x ≠ ⊥) (h' : x ≠ ⊤) :
   ∃ (c : ℝ), (c : ereal) = x :=
 begin

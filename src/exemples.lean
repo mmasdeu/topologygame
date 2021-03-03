@@ -80,7 +80,6 @@ Show that {∅, univ, (-∞, a) : a : ℝ} is a topology on ℝ
 open real
 open ereal
 
-
 def left_ray : ereal → (set ℝ) := λ a , (ite (a = ⊥) ∅ (ite (a = ⊤) univ {x : ℝ | (x : ereal) < a}))
 
 @[simp]
@@ -327,3 +326,5 @@ begin
   },
 },
 end
+
+-- definir una topologia per un conjunt de tres elements
