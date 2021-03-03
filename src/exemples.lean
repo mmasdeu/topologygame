@@ -274,20 +274,11 @@ example : basis_condition Icos :=
 begin
   split,
   {
-    ext,
-    split,
-    {
-      intro h,
-      fconstructor,
-      use Ico (x - 1) (x + 1),
-      norm_num,
-      use x-1,
-      use x+1,     
-    },
-    {
-      intro h,
-      trivial,
-    },
+    intro x,
+    use Ico (x-1) (x+1),
+    norm_num,
+    use x-1,
+    use x+1,
   },
   {
     intros U V hU hV x,
