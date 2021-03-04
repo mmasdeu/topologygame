@@ -1,5 +1,4 @@
 import game.definition -- hide
-import game.initial_tactics -- hide
 
 /- Tactic : refl
 
