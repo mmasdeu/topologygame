@@ -118,15 +118,15 @@ begin
   sorry
 end
 
---class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
---  (compatible : ∀ U, is_open U ↔ generated_open X { B | ∃ (x : X) r, B = {y | dist x y < r}} U)
+class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
+  (compatible : ∀ U, is_open U ↔ generated_open X { B | ∃ (x : X) r, B = {y | dist x y < r}} U)
 
 --class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
 --  (compatible : ∀ (U : set X), is_open U ↔ (∀ x ∈ U, ∃ r > 0, (ball x r) ⊆ U))
 
-class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
-  (compatible : ∀ (U : set X), is_open U ↔
-    @topological_space.is_open _ (generate_from_basis (balls_form_basis)) U)
+--class metric_space (X : Type) extends topological_space X, metric_space_basic X :=
+--  (compatible : ∀ (U : set X), is_open U ↔
+--  @is_open _ (generate_from_basis (balls_form_basis)) U)
 
 
 
