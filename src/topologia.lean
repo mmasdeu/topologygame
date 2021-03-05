@@ -165,15 +165,13 @@ begin
   {
     rintros ⟨U, is_open_U, x_in_U, U_subset_A⟩,
     use U,
-    split,
-    finish,
-    exact x_in_U,
+    exact ⟨⟨is_open_U, U_subset_A⟩, x_in_U⟩,
   },
   {
     rintros ⟨U, ⟨is_open_U, U_subset_A⟩, x_in_U⟩,
     use U,
-    tauto,
-  }
+    exact ⟨is_open_U, ⟨x_in_U, U_subset_A⟩⟩
+  },
 end
 
 /--The interior of a set is always open.-/
