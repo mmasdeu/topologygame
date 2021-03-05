@@ -144,13 +144,19 @@ end topological_space
 
 namespace topological_space
 variables {X : Type}
-variables [topological_space X] (x : X)  (A : set X)
+variables [topological_space X] (x : X)  (A B : set X)
 
 def is_neighborhood := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
 
 def is_interior_point := is_neighborhood x A
 
 def interior := { x : X | is_interior_point x A }
+
+@[simp] lemma interior_is_subset: interior A ⊆ A :=
+begin
+  rintros x ⟨_, _⟩,
+  tauto,
+end
 
 lemma interior_def' : interior A = ⋃₀ {U : set X | is_open U ∧ U ⊆ A} :=
 begin
@@ -178,6 +184,38 @@ begin
   rintros B ⟨is_open_B, B_subset_A⟩,
   tauto,
 end
+
+lemma interior_is_biggest_open: ∀ B, (B ⊆ A) → is_open B → B ⊆ interior A :=
+begin
+  intros B hB is_open_B x x_in_B,
+  rw interior_def',
+  use B,
+  exact ⟨⟨is_open_B,hB⟩, x_in_B⟩,
+end 
+
+/-These three properties characterize the interior-/
+
+lemma interior_def'': is_open B ∧ B ⊆ A ∧ (∀ U, U ⊆ A → is_open U → U ⊆ B) ↔ B = interior A :=   
+begin
+  split,
+  {
+    rintros ⟨is_open_B, ⟨B_subset_A, B_is_biggest_open⟩⟩,
+    ext1,
+    split,
+    {
+      apply interior_is_biggest_open A B B_subset_A is_open_B,
+    },
+    {
+      intro ha,
+      exact B_is_biggest_open (interior A) (interior_is_subset A) (interior_is_open A) ha,
+    },
+  },
+  {
+    intro,
+    subst B,
+    exact ⟨interior_is_open A, ⟨interior_is_subset A, interior_is_biggest_open A⟩⟩,
+  },
+end 
 
 @[simp] lemma eq_interior_iff_is_open : A = interior A ↔ is_open A :=
 begin
@@ -269,8 +307,42 @@ end
 @[simp] lemma eq_closure_iff_is_closed: A = closure A ↔ is_closed A:=
 begin
   rw ←compl_inj_iff,
-  simp,
- end
+  simp only [compl_compl, eq_interior_iff_is_open, closure_eq_compl_of_interior_compl, is_closed],
+end
+
+-- Can we simplify this proof?
+@[simp] lemma interior_interior: interior (interior A) = interior A :=
+begin
+  exact ((eq_interior_iff_is_open (interior A)).mpr (interior_is_open A)).symm,
+end
+
+@[simp] lemma closure_closure: closure (closure A) = closure A :=
+begin
+  simp only [compl_compl, closure_eq_compl_of_interior_compl, interior_interior],
+end
+
+lemma interior_inter: interior (A ∩ B) = interior A ∩ interior B :=
+begin
+  sorry,
+end
+
+/-- Kuratowski's problem -/
+example: closure (interior (closure( interior A))) = closure (interior A) :=
+begin
+  sorry,
+end
+
+/-- Kuratowski's problem -/
+example: interior (closure( interior (closure A))) = interior (closure A) :=
+begin
+  sorry,
+end
+
+def is_dense (A: set X) := closure A = univ
+
+def boundary (A: set X) := closure A ∩ closure Aᶜ
+
+
 
 -- Definir frontera
 -- Definir (quasi)compacte
