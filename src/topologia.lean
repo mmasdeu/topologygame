@@ -114,7 +114,7 @@ namespace topological_space
 
 noncomputable theory
 
-def is_closed {X : Type} [topological_space X] := λ (C : set X), @is_open X _ (compl C)
+@[simp] def is_closed {X : Type} [topological_space X] := λ (C : set X), @is_open X _ (compl C)
 
 def mk_closed_sets
   (X : Type)
@@ -170,7 +170,8 @@ begin
   }
 end
 
-lemma interior_is_open : is_open (interior A) :=
+/--The interior of a set is always open.-/
+@[simp] lemma interior_is_open : is_open (interior A) :=
 begin
   rw interior_def',
   apply union,
@@ -178,28 +179,28 @@ begin
   tauto,
 end
 
-lemma is_open_iff_eq_interior : is_open A ↔ A = interior A :=
+@[simp] lemma eq_interior_iff_is_open : A = interior A ↔ is_open A :=
 begin
   split,
   {
+    intro hA,
+    rw hA, 
+    exact interior_is_open A,
+  },
+  { 
     intro is_open_A,
     rw interior_def',
     ext1,
     split,
     {
       intro x_in_A,
-      norm_num,
-      use A,
-      tauto,
+      exact ⟨A, ⟨is_open_A, refl A⟩, x_in_A⟩,
     },
     {
-      rintros ⟨hx,⟨⟨h₂, h₃⟩, h₄⟩⟩,
-      tauto,
-    }
-  },
-  { intro hA,
-    rw hA, 
-    exact interior_is_open A,
+      rintros ⟨U,⟨⟨_, U_subset_A⟩, x_in_U⟩⟩,
+      --show_term{tauto,}, -- bug?
+      exact U_subset_A x_in_U,
+    },
   }
 end
 
@@ -209,7 +210,7 @@ def is_adherent_point := ∀ N, is_neighborhood x N → N ∩ A ≠ ∅
 /-- The closure of A is the set of all the adherent points of A -/
 def closure:= {x | is_adherent_point x A}
 
-lemma closure_eq_compl_of_interior_compl: closure A = (interior Aᶜ)ᶜ :=
+@[simp] lemma closure_eq_compl_of_interior_compl: closure A = (interior Aᶜ)ᶜ :=
 begin
   ext1,
   unfold interior is_interior_point is_neighborhood closure is_adherent_point is_neighborhood,
@@ -224,6 +225,7 @@ begin
     intros hx U V is_open_V x_in_V hV hU,
     apply hx V is_open_V x_in_V,
     intros a a_in_V a_in_A,
+    --is this in mathlib?
     have h: a ∈ U ∩ A,
     {
       split;
@@ -236,7 +238,7 @@ end
 
 lemma closure_def' : closure A = ⋂₀ {C : set X | is_closed C ∧ A ⊆ C} :=
 begin
-  have hh: (compl '' { U: set X | is_open U ∧ U ⊆ A ᶜ}) = {C: set X | is_closed C ∧ A ⊆ C},
+  have hh: (compl '' { U: set X | is_open U ∧ U ⊆ Aᶜ}) = {C: set X | is_closed C ∧ A ⊆ C},
   {
     ext1 V,
     split,
@@ -244,7 +246,7 @@ begin
       rintros ⟨U,⟨_, _⟩, Uh_right⟩,
       rw [is_closed, ← Uh_right],
       split,
-      norm_num;
+      simp only [compl_compl],
       assumption,
       tauto,
     },
@@ -258,24 +260,17 @@ begin
   rw [closure_eq_compl_of_interior_compl, interior_def', compl_sUnion, hh],
 end
 
-lemma closure_is_closed: is_closed (closure A) :=
+-- Not sure if this should be simp lemma. It is now solvable by simp.
+@[simp] lemma closure_is_closed: is_closed (closure A) :=
 begin
-  rw [closure_eq_compl_of_interior_compl, is_closed],
-  norm_num,
-  exact interior_is_open _,
+  simp only [interior_is_open, compl_compl, closure_eq_compl_of_interior_compl, is_closed],
 end
 
-lemma is_closed_iff_eq_closure : is_closed A ↔ A = closure A :=
+@[simp] lemma eq_closure_iff_is_closed: A = closure A ↔ is_closed A:=
 begin
-  rw [closure_eq_compl_of_interior_compl],
-  let h := is_open_iff_eq_interior Aᶜ,
-  have hh : Aᶜ = interior Aᶜ ↔ A = (interior Aᶜ)ᶜ,
-  {   
-    rw [compl_inj_iff.symm, compl_compl],
-  },
-  rw hh at h,
-  exact h,
-end
+  rw ←compl_inj_iff,
+  simp,
+ end
 
 -- Definir frontera
 -- Definir (quasi)compacte
