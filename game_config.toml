@@ -9,3 +9,12 @@ id = 1
 levels = [
 	"src/game/level1.lean"
 ]
+
+[[worlds]]
+name = "Interior world"
+id = 2
+parents = [1]
+levels = [
+	"src/game/interior_world/level1.lean"
+	"src/game/interior_world/level2.lean"
+]
