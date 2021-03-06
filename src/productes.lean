@@ -25,12 +25,12 @@ end
 
 lemma is_open_prod_iff {X Y : Type} [topological_space X] [topological_space Y]
   {s : set (X × Y)} :
-  is_open s ↔ (∀a b, (a, b) ∈ s → ∃u v, is_open u ∧ is_open v ∧
-  a ∈ u ∧ b ∈ v ∧ set.prod u v ⊆ s) := 
+  is_open s ↔ (∀ (ab : X × Y), ab ∈ s → ∃u v, is_open u ∧ is_open v ∧
+  ab.1 ∈ u ∧ ab.2 ∈ v ∧ set.prod u v ⊆ s) := 
   begin
     split,
     {
-      intros h_s a b h_ab,
+      intros h_s ab h_ab,
       induction h_s with w hw ℬ hh h₁ h₂ h₃ h₄ h₅ h₆ h₇,
       {
         let h := (univ: set X).prod (univ: set Y),
@@ -59,12 +59,12 @@ lemma is_open_prod_iff {X Y : Type} [topological_space X] [topological_space Y]
       },
       {
         cases h_ab,
-        have h1 : ∃ (u : set X) (v : set Y), is_open u ∧ is_open v ∧ a ∈ u ∧ b ∈ v ∧ u.prod v ⊆ h₂,
+        have h1 : ∃ (u : set X) (v : set Y), is_open u ∧ is_open v ∧ ab.1 ∈ u ∧ ab.2 ∈ v ∧ u.prod v ⊆ h₂,
         {
           apply h₆,
           tauto,
         },
-        have h2 : ∃ (u : set X) (v : set Y), is_open u ∧ is_open v ∧ a ∈ u ∧ b ∈ v ∧ u.prod v ⊆ h₃,
+        have h2 : ∃ (u : set X) (v : set Y), is_open u ∧ is_open v ∧ ab.1 ∈ u ∧ ab.2 ∈ v ∧ u.prod v ⊆ h₃,
         {
           apply h₇,
           tauto,
@@ -100,7 +100,7 @@ lemma is_open_prod_iff {X Y : Type} [topological_space X] [topological_space Y]
          cases x with x y,
          intro h_xy,
          norm_num,
-         have hh := h x y h_xy,
+         have hh := h (x, y) h_xy,
          obtain ⟨u, v, is_open_u, is_open_v, x_in_u, y_in_v, uv_in_s⟩ := hh,
          use set.prod u v,
          use u,
@@ -130,17 +130,18 @@ lemma is_open_prod_iff {X Y : Type} [topological_space X] [topological_space Y]
     },
   end
 
+namespace metric_space
+open metric_space_basic
 
 lemma is_open_prod_balls {X Y : Type} (r : ℝ) [metric_space X] [metric_space Y]
-  (xy : X × Y) : is_open {zt : X × Y | metric_space_basic.dist xy.1 zt.1 < r ∧
-  metric_space_basic.dist xy.2 zt.2 < r} :=
+  (xy : X × Y) : is_open {zt : X × Y | dist xy.1 zt.1 < r ∧
+  dist xy.2 zt.2 < r} :=
 begin
-  change is_open ({x : X | metric_space_basic.dist xy.1 x < r}.prod 
-  {y : Y | metric_space_basic.dist xy.2 y < r}),
+  change is_open ({x : X | dist xy.1 x < r}.prod 
+  {y : Y | dist xy.2 y < r}),
   apply is_open_prod;
-  apply metric_space.open_of_ball,
+  apply open_of_ball,
 end
-
 
 /- Now lets define the product of two metric spaces properly -/
 instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) :=
@@ -149,42 +150,53 @@ instance {X Y : Type} [metric_space X] [metric_space Y] : metric_space (X × Y) 
     intro U,
     split,
     {
-      intro hU, 
-      induction hU with V hVW g h₁ h₂ V W h1 h2 h3 h4,
-      { exact generated_open.univ },
+      intros hU xy hxy,
+      have H := is_open_prod_iff.1 hU xy hxy,
+      obtain ⟨u, v, ⟨hu, hv, hxyu, hxyv, huvU⟩⟩ := H,
+      have hu' : ∃ ru, (0 < ru) ∧ (ball xy.fst ru ⊆ u)
+        := (compatible u).mp hu xy.fst hxyu,
+      have hv' : ∃ rv, (0 < rv) ∧ ball xy.snd rv ⊆ v 
+        := (compatible v).mp hv xy.snd hxyv,
+      obtain ⟨ru, ⟨hru, hu'⟩⟩ := hu',
+      obtain ⟨rv, ⟨hrv, hv'⟩⟩ := hv',
+      use min ru rv,
+      split,
+      { exact lt_min hru hrv },
+      have hu'': ball xy.fst (min ru rv) ⊆ u
+        := subset.trans (ball_subset_ball (min_le_left ru rv)) hu',
+      have hv'': ball xy.snd (min ru rv) ⊆ v
+        := subset.trans (ball_subset_ball (min_le_right ru rv)) hv',
+      apply subset.trans _ huvU,
+      have H' : {zt : X × Y | dist xy zt < min ru rv} =
+        {z : X | dist xy.fst z < min ru rv}.prod {t : Y | dist xy.snd t < min ru rv},
       {
-        simp at *,
-        obtain ⟨V,hV,W,⟨hW,hprod⟩⟩ := hVW,
-        subst hprod,
-        unfold metric_space_basic.dist,
+        unfold dist,
+        ext,
         simp,
-        sorry
-      },
-      { exact generated_open.sUnion g h₂ },
-      { exact generated_open.inter V W h3 h4 },
-    },
-    {
-      intro h,
-      induction h with V h,
-      {apply univ_mem,},
-      {
-        norm_num at *,
-        obtain ⟨x, y, r, H⟩ := h,
-        subst H,
-        unfold metric_space_basic.dist,
-        simp,
-        exact is_open_prod_balls r (x,y),
-      },
-      {
-        apply topological_space.union,
-        finish,
-      },
-      {
-        apply topological_space.inter;
         tauto,
       },
+      rw H',
+      rw prod_subset_prod_iff, left,
+      split; assumption,
     },
+    {
+      intros h,
+      rw is_open_prod_iff,
+      intros ab hab,
+      specialize h ab hab,
+      obtain ⟨r, hr, hrU⟩ := h,
+      use (ball ab.fst r),
+      use (ball ab.snd r),
+      repeat {split},
+      { exact open_of_ball },
+      { exact open_of_ball },
+      { exact mem_center_ball_iff.mpr hr },
+      { exact mem_center_ball_iff.mpr hr },
+      simp [hrU],
+    }
   end,
   ..prod.topological_space X Y,
   ..prod.metric_space_basic X Y
 }
+
+end metric_space

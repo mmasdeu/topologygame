@@ -270,61 +270,38 @@ Define the family of intervals of the form [a, b)
 -/
 def Icos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
 
+lemma mem_Icos {a b : ℝ} : Ico a b ∈ Icos :=  ⟨a, ⟨b, rfl⟩⟩
+
 example : basis_condition Icos :=
 begin
   split,
   {
-    ext,
-    split,
-    {
-      intro h,
-      fconstructor,
-      use Ico (x - 1) (x + 1),
-      norm_num,
-      use x-1,
-      use x+1,     
-    },
-    {
-      intro h,
-      trivial,
-    },
+    intros x,
+    use Ico x (x+1),
+    split; simp [mem_Icos, zero_lt_one],
   },
   {
     intros U V hU hV x,
     rcases hU with ⟨Ua, ⟨Ub , Uab_h⟩⟩,
     rcases hV with ⟨Va, ⟨Vb , Vab_h⟩⟩,
+    subst Uab_h, subst Vab_h,
     intro hx,
     use Ico (max Ua Va) (min Ub Vb),
     split,
-    {
-      unfold Icos,
-      use max Ua Va,
-      use min Ub Vb,
-    },
-    {
+    { simp [mem_Icos], },
     split,
     {
-      unfold Ico,
-      split;
-        finish,
+      simp [mem_Ico] at hx,
+      simp [hx],
     },
     {
       unfold Ico,
       norm_num,
-      split,
-      {
-        subst U,
-        intros a ha,
-        finish,
-      },
-      {
-        intros a ha,
-        subst V,
-        finish,
-      },
+      split;
+      { intros,
+        simp * },
     },
   },
-},
 end
 
 -- definir una topologia per un conjunt de tres elements

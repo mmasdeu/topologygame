@@ -15,10 +15,10 @@ class basis_condition (ℬ : set (set X)) :=
 lemma basis_condition_inter (ℬ : set (set X)) [basis_condition ℬ] {U V : set X}
 (hU : U ∈ ℬ) (hV : V ∈ ℬ) : ∃ J ⊆ ℬ, U ∩ V = ⋃₀ J :=
 begin
-  apply sUnion_eq_of_pointwise (basis_condition.filter U V hU hV),
+  apply sUnion_eq_of_pointwise.mpr (basis_condition.filter U V hU hV),
 end
 
-lemma basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
+instance basis_has_basis_condition [topological_space X] {I : set (set X)} (h: is_basis I):
   basis_condition I := {
     univ := 
     begin
@@ -155,10 +155,25 @@ def generate_from_basis {ℬ : set (set X)} (h: basis_condition ℬ):
   end
   }
 
+lemma is_open_of_basis_set {ℬ : set (set X)} (h: basis_condition ℬ) {U : set X} (hU : U ∈ ℬ)
+: @is_open X (generate_from_basis h) U :=
+begin
+  use {U},
+  split,
+  { exact singleton_subset_iff.mpr hU },
+  { simp only [sUnion_singleton] }
+end
+
 @[simp]
 lemma generate_from_basis_open_iff {ℬ : set (set X)} (h: basis_condition ℬ) {U : set X}
-: @is_open X (generate_from_basis h) U ↔ ∃ J⊆ ℬ, U = ⋃₀ J := by refl
+: @is_open X (generate_from_basis h) U ↔ ∃ J ⊆ ℬ, U = ⋃₀ J := by refl
 
+lemma generate_from_basis_open_iff' {ℬ : set (set X)} (h: basis_condition ℬ) {U : set X}
+: @is_open X (generate_from_basis h) U ↔ ∀ x ∈ U, ∃ B ∈ ℬ, x ∈ B ∧ B ⊆ U :=
+begin
+  rw generate_from_basis_open_iff,
+  exact sUnion_eq_of_pointwise,
+end
 
 lemma generate_from_basis_simp {X : Type} {I : set (set X)} (h: basis_condition I) : 
   generate_from I = generate_from_basis h :=

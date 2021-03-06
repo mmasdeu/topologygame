@@ -43,14 +43,30 @@ begin
 end
 
 
-lemma sUnion_eq_of_pointwise {X : Type} {U : set X} {ℬ : set (set X)}
-  (h : ∀ x ∈ U, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U) :  ∃ J ⊆ ℬ, U = ⋃₀ J :=
+lemma sUnion_eq_of_pointwise {X : Type} {U : set X} {ℬ : set (set X)} :
+  ( ∃ J ⊆ ℬ, U = ⋃₀ J ) ↔  (∀ x ∈ U, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U) :=
 begin
-  use {W ∈ ℬ | W ⊆ U},
   split,
-  { apply sep_subset },
-  apply eq_of_subset_of_subset,
-  all_goals {intros x hx, simp at hx ⊢, try {specialize h x hx}, tauto },
+  { 
+    intros h x hx,
+    obtain ⟨J, ⟨hJ1, hJ2⟩⟩ := h,
+    subst hJ2,
+    rw mem_sUnion at hx,
+    obtain ⟨t, ht1, ht2⟩ := hx,
+    use t,
+    repeat {split},
+    { tauto },
+    { tauto },
+    { exact subset_sUnion_of_mem ht1 },
+  },
+  {
+    intro h,
+    use {W ∈ ℬ | W ⊆ U},
+    split,
+    { apply sep_subset },
+    apply eq_of_subset_of_subset,
+    all_goals {intros x hx, simp at hx ⊢, try {specialize h x hx}, tauto },
+  }
 end
 
 lemma lift_to_real {x : ereal} (h : x ≠ ⊥) (h' : x ≠ ⊤) :
@@ -100,3 +116,4 @@ begin
   rw hz at h,
   finish,
 end
+
