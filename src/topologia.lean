@@ -2,6 +2,7 @@ import tactic
 import data.set.finite
 import for_mathlib
 
+
 /-
 # Building topological spaces in Lean
 -/
@@ -340,7 +341,27 @@ def is_dense (A: set X) := closure A = univ
 
 def boundary (A: set X) := closure A ∩ closure Aᶜ
 
+class Kolmogorov_space (X : Type) [topological_space X] := 
+(t0 :∀ (x y : X) (h : y ≠ x) , ∃ (U : set X) (hU : is_open U), ((x ∈ U) ∧ (y ∉ U)) ∨ ((x ∉ U) ∧ (y ∈ U)))
 
+class Frechet_space (X : Type)  [topological_space X] := 
+(t1 :∀ (x y : X)(h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U))
+
+lemma T1_is_T0 [topological_space X] [h : Frechet_space X] : Kolmogorov_space X :=
+{ t0 := 
+begin
+  intros x y hxy,
+  obtain ⟨U, hU, hh⟩ := Frechet_space.t1 x y hxy,
+  use U,
+  split,
+    exact hU,
+  {
+    left,
+    exact hh,
+  },
+end}
+
+ 
 
 -- Definir frontera
 -- Definir (quasi)compacte
