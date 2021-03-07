@@ -263,8 +263,8 @@ begin
     apply hx V is_open_V x_in_V,
     intros a a_in_V a_in_A,
     --is this in mathlib?
-    -- I've made a lemma in mathlib similar, I think it could be usefull in this proof, but I'm not shure.
-    -- In the following lines I attach the final part of this lemma using the mathlib lemma.
+    -- I've made a similar lemma in mathlib, I think it could be usefull for this proof, but I'm not sure.
+    -- In following lines I attach the final part of this lemma using the mathlib lemma.
     /-have t : a ∈ U, solve_by_elim,
     have h := inter_is_not_is_empty_intersection X a U A t hU,
     exact h a_in_A,-/
