@@ -265,8 +265,7 @@ begin
     --is this in mathlib?
     -- I've made a similar lemma in mathlib, I think it could be usefull for this proof, but I'm not sure.
     -- In following lines I attach the final part of this lemma using the mathlib lemma.
-    /-have t : a ∈ U, solve_by_elim,
-    have h := inter_is_not_is_empty_intersection X a U A t hU,
+    /-have h := inter_is_not_is_empty_intersection X a U A (hV a_in_V) hU,
     exact h a_in_A,-/
     have h: a ∈ U ∩ A,
     {
