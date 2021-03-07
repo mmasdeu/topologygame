@@ -347,7 +347,7 @@ class Kolmogorov_space (X : Type) [topological_space X] :=
 class Frechet_space (X : Type)  [topological_space X] := 
 (t1 : ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U))
 
-lemma T1_is_T0 [topological_space X] [h : Frechet_space X] : Kolmogorov_space X :=
+lemma T1_is_T0 [topological_space X] (h : Frechet_space X) : Kolmogorov_space X :=
 { t0 := 
 begin
   intros x y hxy,
@@ -361,12 +361,10 @@ begin
   },
 end}
 
-
-
 class Hausdorff_space (X : Type) [topological_space X] :=
 (t2 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (y ∈ V))
 
-lemma T2_is_T1 [topological_space X] [h : Hausdorff_space X] : Frechet_space X :=
+lemma T2_is_T1 [topological_space X] (h : Hausdorff_space X) : Frechet_space X :=
 { t1 := 
 begin
   intros x y hxy,
@@ -377,6 +375,11 @@ begin
     exact hU,
     exact ⟨hh.1, (inter_is_not_is_empty_intersection X y V U hh.2 hUV)⟩,
 end }
+
+lemma T2_is_T0 [topological_space X] (h : Hausdorff_space X) : Kolmogorov_space X := 
+begin
+  exact T1_is_T0 (T2_is_T1 h),
+end
 
 
 -- Definir frontera
