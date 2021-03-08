@@ -304,6 +304,5 @@ begin
   },
 end
 
-variables {X : Type}
 
 -- definir una topologia per un conjunt de tres elements
