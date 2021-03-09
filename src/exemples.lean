@@ -304,4 +304,5 @@ begin
   },
 end
 
+
 -- definir una topologia per un conjunt de tres elements

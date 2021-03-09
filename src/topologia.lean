@@ -2,6 +2,7 @@ import tactic
 import data.set.finite
 import for_mathlib
 
+
 /-
 # Building topological spaces in Lean
 -/
@@ -262,6 +263,10 @@ begin
     apply hx V is_open_V x_in_V,
     intros a a_in_V a_in_A,
     --is this in mathlib?
+    -- I've made a similar lemma in mathlib, I think it could be usefull for this proof, but I'm not sure.
+    -- In following lines I attach the final part of this lemma using the mathlib lemma.
+    /-have h := inter_is_not_is_empty_intersection X a U A (hV a_in_V) hU,
+    exact h a_in_A,-/
     have h: a ∈ U ∩ A,
     {
       split;
@@ -340,6 +345,45 @@ def is_dense (A: set X) := closure A = univ
 
 def boundary (A: set X) := closure A ∩ closure Aᶜ
 
+class Kolmogorov_space (X : Type) [topological_space X] := 
+(t0 : ∀ (x y : X) (h : y ≠ x) , ∃ (U : set X) (hU : is_open U), ((x ∈ U) ∧ (y ∉ U)) ∨ ((x ∉ U) ∧ (y ∈ U)))
+
+class Frechet_space (X : Type)  [topological_space X] := 
+(t1 : ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U))
+
+lemma T1_is_T0 [topological_space X] (h : Frechet_space X) : Kolmogorov_space X :=
+{ t0 := 
+begin
+  intros x y hxy,
+  obtain ⟨U, hU, hh⟩ := Frechet_space.t1 x y hxy,
+  use U,
+  split,
+    exact hU,
+  {
+    left,
+    exact hh,
+  },
+end}
+
+class Hausdorff_space (X : Type) [topological_space X] :=
+(t2 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (y ∈ V))
+
+lemma T2_is_T1 [topological_space X] (h : Hausdorff_space X) : Frechet_space X :=
+{ t1 := 
+begin
+  intros x y hxy,
+  obtain ⟨U, V, hU, hV, hUV, hh⟩ := Hausdorff_space.t2 x y hxy,
+  rw inter_comm at hUV,
+  use U,
+  split,
+    exact hU,
+    exact ⟨hh.1, (inter_is_not_is_empty_intersection X y V U hh.2 hUV)⟩,
+end }
+
+lemma T2_is_T0 [topological_space X] (h : Hausdorff_space X) : Kolmogorov_space X := 
+begin
+  exact T1_is_T0 (T2_is_T1 h),
+end
 
 
 -- Definir frontera
