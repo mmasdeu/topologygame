@@ -145,13 +145,13 @@ end topological_space
 
 namespace topological_space
 variables {X : Type}
-variables [topological_space X] (x : X)  (A B : set X)
+variables [topological_space X]  (A B : set X)
 
-def is_neighborhood := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
+def is_neighborhood (x : X) := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
 
-def is_interior_point := is_neighborhood x A
+--def is_interior_point := is_neighborhood x A
 
-def interior := { x : X | is_interior_point x A }
+def interior := { x : X | is_neighborhood A x }
 
 @[simp] lemma interior_is_subset: interior A ⊆ A :=
 begin
@@ -242,15 +242,15 @@ begin
 end
 
 /-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
-def is_adherent_point := ∀ N, is_neighborhood x N → N ∩ A ≠ ∅
+def is_adherent_point (x : X) := ∀ N, is_neighborhood N x → N ∩ A ≠ ∅
 
 /-- The closure of A is the set of all the adherent points of A -/
-def closure:= {x | is_adherent_point x A}
+def closure:= {x | is_adherent_point A x}
 
 @[simp] lemma closure_eq_compl_of_interior_compl: closure A = (interior Aᶜ)ᶜ :=
 begin
   ext1,
-  unfold interior is_interior_point is_neighborhood closure is_adherent_point is_neighborhood,
+  unfold interior is_neighborhood closure is_adherent_point is_neighborhood,
   simp only [not_exists, and_imp, not_and, mem_set_of_eq, ne.def, exists_imp_distrib, mem_compl_eq],
   split,
   {
@@ -326,53 +326,95 @@ end
 
 lemma interior_inter: interior (A ∩ B) = interior A ∩ interior B :=
 begin
-  sorry,
+  unfold interior is_neighborhood,
+  ext,
+  simp,
+  split,
+  {
+    intro h,
+    obtain ⟨U, h1⟩ :=h,
+    repeat {use U, tauto},
+  },
+  {
+    rintro ⟨ha, hb⟩,
+    obtain ⟨U, ⟨h1,h2,h3⟩⟩ := ha,
+    obtain ⟨V, ⟨g1,g2,g3⟩⟩ := hb,
+    use U ∩ V,
+    repeat {split},
+    { exact inter U V h1 g1 },
+    repeat {tauto},
+    {
+      apply subset.trans _ h3,
+      apply inter_subset_left,
+    },
+    {
+      apply subset.trans _ g3,
+      apply inter_subset_right,
+    }
+  },
 end
 
 /-- Kuratowski's problem -/
-example: closure (interior (closure( interior A))) = closure (interior A) :=
+example : closure (interior (closure( interior A))) = closure (interior A) :=
 begin
   sorry,
 end
 
 /-- Kuratowski's problem -/
-example: interior (closure( interior (closure A))) = interior (closure A) :=
+example : interior (closure( interior (closure A))) = interior (closure A) :=
 begin
   sorry,
 end
 
 def is_dense (A: set X) := closure A = univ
 
+lemma dense_iff (A : set X) : is_dense A ↔ interior (A.compl) = ∅ :=
+begin
+  sorry
+end
+
+lemma dense_iff' (A : set X) : is_dense A ↔
+  ∀ x : X, ∀ U : set X, is_neighborhood U x → U ∩ A ≠ ∅ :=
+begin
+  sorry
+end
+
 def boundary (A: set X) := closure A ∩ closure Aᶜ
 
-class Kolmogorov_space (X : Type) [topological_space X] := 
+lemma mem_boundary_iff (A : set X) (x : X) :
+  x ∈ boundary A ↔ ∀ U : set X, is_neighborhood U x → (U ∩ A ≠ ∅ ∧ U ∩ A.compl ≠ ∅) :=
+begin
+  sorry
+end
+
+class kolmogorov_space (X : Type) [topological_space X] := 
 (t0 : ∀ (x y : X) (h : y ≠ x) , ∃ (U : set X) (hU : is_open U), ((x ∈ U) ∧ (y ∉ U)) ∨ ((x ∉ U) ∧ (y ∈ U)))
 
-class Frechet_space (X : Type)  [topological_space X] := 
+class frechet_space (X : Type) [topological_space X] := 
 (t1 : ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U))
 
-lemma T1_is_T0 [topological_space X] (h : Frechet_space X) : Kolmogorov_space X :=
+lemma T1_is_T0 [frechet_space X] : kolmogorov_space X :=
 { t0 := 
 begin
   intros x y hxy,
-  obtain ⟨U, hU, hh⟩ := Frechet_space.t1 x y hxy,
+  obtain ⟨U, hU, hh⟩ := frechet_space.t1 x y hxy,
   use U,
   split,
-    exact hU,
+  { exact hU },
   {
     left,
     exact hh,
   },
 end}
 
-class Hausdorff_space (X : Type) [topological_space X] :=
+class hausdorff_space (X : Type) [topological_space X] :=
 (t2 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (y ∈ V))
 
-lemma T2_is_T1 [topological_space X] (h : Hausdorff_space X) : Frechet_space X :=
+lemma T2_is_T1 [hausdorff_space X] : frechet_space X :=
 { t1 := 
 begin
   intros x y hxy,
-  obtain ⟨U, V, hU, hV, hUV, hh⟩ := Hausdorff_space.t2 x y hxy,
+  obtain ⟨U, V, hU, hV, hUV, hh⟩ := hausdorff_space.t2 x y hxy,
   rw inter_comm at hUV,
   use U,
   split,
@@ -380,17 +422,26 @@ begin
     exact ⟨hh.1, (inter_is_not_is_empty_intersection X y V U hh.2 hUV)⟩,
 end }
 
-lemma T2_is_T0 [topological_space X] (h : Hausdorff_space X) : Kolmogorov_space X := 
+lemma T2_is_T0 [hausdorff_space X] : kolmogorov_space X := 
 begin
-  exact T1_is_T0 (T2_is_T1 h),
+  exact @T1_is_T0 _ _ T2_is_T1,
 end
 
 
--- Definir frontera
--- Definir (quasi)compacte
--- Axiomes de separació (T0, T1, T2, T3, Hausdorff )
--- Definir funció contínua
+-- Definir frontera ✓
+-- Definir (quasi)compacte ✓
+-- Axiomes de separació (T0, T1, T2, T3, Hausdorff ) ✓
+-- Definir funció contínua ✓
 -- Afegir [simp] als lemes d'interior, clausura...
 -- Afegir problemes al Game a partir dels exercicis de la secció 2.
-end topological_space
 
+
+/-- A function f : X → Y is continuous iff the preimage of every open set is open -/
+def is_continuous {X Y : Type} [topological_space X] [topological_space Y] (f : X → Y) :=
+  ∀ (V : set Y), is_open V → is_open (f⁻¹' V)
+
+/-- A topological space is (quasi)compact if every open covering admits a finite subcovering -/
+def is_quasicompact {X : Type} [topological_space X] :=
+  ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) → (⋃₀ 𝒰 = univ) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ ⋃₀ℱ = univ)
+
+end topological_space
