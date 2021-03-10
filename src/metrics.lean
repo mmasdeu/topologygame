@@ -50,6 +50,60 @@ begin
   { exact λ h, by simpa using h },
 end
 
+lemma ball_subset_ball {X : Type} [metric_space_basic X] {x : X} {r s : ℝ} (h : r ≤ s) :
+  ball x r ⊆ ball x s :=
+begin
+  simp,
+  intros a ha,
+  linarith,
+end
+
+@[simp]
+lemma ball_nonempty_iff {X : Type} [metric_space_basic X] {x : X} {r : ℝ} :
+  ball x r ≠ ∅ ↔ 0 < r :=
+begin
+  simp,
+  split,
+  {
+    intro h,
+    obtain ⟨z, hz⟩ := h,
+    have H := dist_nonneg x z,
+    linarith,
+  },
+  {
+    intro h,
+    use x,
+    rw dist_self_zero,
+    exact h,
+  }
+end
+
+lemma ball_around_interior_point {X : Type} [metric_space_basic X] {r : ℝ}
+  {x y : X} (h: y ∈ ball x r) : ∃ s, 0 < s ∧ ball y s ⊆ ball x r :=
+begin
+  have : 0 < r,
+  {
+    have hne : ball x r ≠ ∅,
+    {
+      unfold ball,
+      simp,
+      use y,
+      simpa using h,
+    },
+    apply (@ball_nonempty_iff X _ x r).1 hne,
+  },
+  use r - dist x y,
+  split,
+  { simpa using h },
+  {
+    simp,
+    intros a ha,
+    replace ha : dist x y + dist y a < r,
+    { linarith },
+    calc dist x a ≤ dist x y + dist y a : triangle x y a
+      ... < r : ha,
+  }
+end
 
 lemma balls_form_basis {X : Type} [metric_space_basic X] :
  basis_condition { B | ∃ (x : X) r, B = {y | dist x y < r} } :=
@@ -95,6 +149,36 @@ begin
     }
   }
 end
+
+lemma metric_space_is_open_compatible {X : Type} [metric_space_basic X] {U : set X} :
+@is_open X (generate_from_basis balls_form_basis) U ↔
+(∀ x ∈ U, ∃ r, 0 < r ∧ {y | dist x y < r} ⊆ U) :=
+begin
+  simp [generate_from_basis_open_iff'],
+  split,
+  {
+    intros h x hx,
+    specialize h x hx,
+    obtain ⟨B, ⟨⟨z, h, hB⟩, ⟨hz1, hz2⟩⟩⟩ := h,
+    subst hB,
+    simp at hz1 hz2,
+    obtain ⟨s, hs, hsr⟩ := ball_around_interior_point hz1,
+    use s,
+    split,
+    { exact hs },
+    rw ←ball_def at hz2 ⊢,
+    exact subset.trans hsr hz2,
+  },
+  {
+    intros h x hx,
+    obtain ⟨r, hr1, hr2⟩ := h x hx,
+    use {y : X | dist x y < r},
+    use x, use r,
+    simp,
+    tauto,
+  }
+end
+
 
 end metric_space_basic
 
@@ -192,54 +276,12 @@ class metric_space (X : Type) extends topological_space X, metric_space_basic X 
 
 namespace metric_space
 
-def ball {X : Type} [metric_space X] (x : X) (r : ℝ) := {y | dist x y < r}
-
-@[simp]
-lemma ball_def {X : Type} [metric_space X] (x : X) (r : ℝ) : ball x r = { y | dist x y < r} := rfl
-
 open topological_space
-open metric_space_basic
 
 /-
 We would still like a way of making a `metric_space` just given a metric and some
 properties it satisfies, i.e. a `metric_space_basic`, so we should setup a metric space
 constructor from a `metric_space_basic` by setting the topology to be the induced one. -/
-
-lemma ball_subset_ball {X : Type} [metric_space X] {x : X} {r s : ℝ} (h : r ≤ s) :
-  ball x r ⊆ ball x s :=
-begin
-  simp,
-  intros a ha,
-  linarith,
-end
-
-@[simp]
-lemma mem_center_ball_iff {X : Type} [metric_space X] {x : X} {r : ℝ} :
-  x ∈ ball x r ↔ 0 < r :=
-begin
-  split;
-  { exact λ h, by simpa using h },
-end
-
-@[simp]
-lemma ball_nonempty_iff {X : Type} [metric_space X] {x : X} {r : ℝ} :
-  ball x r ≠ ∅ ↔ 0 < r :=
-begin
-  simp,
-  split,
-  {
-    intro h,
-    obtain ⟨z, hz⟩ := h,
-    have H := dist_nonneg x z,
-    linarith,
-  },
-  {
-    intro h,
-    use x,
-    rw dist_self_zero,
-    exact h,
-  }
-end
 
 def of_basic {X : Type} (m : metric_space_basic X) : metric_space X :=
 { compatible := begin 
@@ -254,7 +296,7 @@ def of_basic {X : Type} (m : metric_space_basic X) : metric_space X :=
   {
     obtain ⟨B, ⟨a, r, har⟩, ⟨hB1, hB2⟩⟩ := h x hx,
     subst har,
-    use (r - dist a x), -- (Marc: I think that this is correct)
+    use (r - dist a x),
     simp at hB1 hB2,
     split,
     { linarith [hB1] },
@@ -279,77 +321,19 @@ def of_basic {X : Type} (m : metric_space_basic X) : metric_space X :=
   ..generate_from_basis balls_form_basis
 }
 
-lemma ball_around_interior_point {X : Type} [metric_space X] {r : ℝ}
-  {x y : X} (h: y ∈ ball x r) : ∃ s, 0 < s ∧ ball y s ⊆ ball x r :=
-begin
-  have : 0 < r,
-  {
-    have hne : ball x r ≠ ∅,
-    {
-      unfold ball,
-      simp,
-      use y,
-      simpa using h,
-    },
-    apply (@ball_nonempty_iff X _ x r).1 hne,
-  },
-  use r - dist x y,
-  split,
-  { simpa using h },
-  {
-    simp,
-    intros a ha,
-    replace ha : dist x y + dist y a < r,
-    { linarith },
-    calc dist x a ≤ dist x y + dist y a : triangle x y a
-      ... < r : ha,
-  }
-end
-
-@[simp]
-lemma metric_space_is_open_compatible {X : Type} [metric_space X] {U : set X} :
-@is_open X (generate_from_basis balls_form_basis) U ↔ is_open U :=
-begin
-  simp [compatible, generate_from_basis_open_iff'],
-  split,
-  {
-    intros h x hx,
-    specialize h x hx,
-    obtain ⟨B, ⟨⟨z, h, hB⟩, ⟨hz1, hz2⟩⟩⟩ := h,
-    subst hB,
-    simp at hz1 hz2,
-    obtain ⟨s, hs, hsr⟩ := ball_around_interior_point hz1,
-    use s,
-    split,
-    { exact hs },
-    rw ←ball_def at hz2 ⊢,
-    exact subset.trans hsr hz2,
-  },
-  {
-    intros h x hx,
-    obtain ⟨r, hr1, hr2⟩ := h x hx,
-    use {y : X | dist x y < r},
-    use x, use r,
-    simp,
-    tauto,
-  }
-end
 
 /-- Open balls are open -/
 lemma open_of_ball {X : Type} [metric_space X] {x : X} {r : ℝ} :
   is_open (ball x r) :=
 begin
+
   have H:= @generate_from_basis_open_iff' X _ balls_form_basis {y : X | dist x y < r},
-  simp at H ⊢,
-  rw H,
+  rw [ball_def, compatible, ←metric_space_is_open_compatible, H],
   intros y hy,
   use {y : X | dist x y < r},
   use x, use r,
   { tauto },
 end
 
-
-/- unregister the bad instance we defined earlier -/
---local attribute [-instance] metric_space_basic.topological_space
 
 end metric_space
