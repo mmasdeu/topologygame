@@ -265,7 +265,7 @@ begin
     --is this in mathlib?
     -- I've made a similar lemma in mathlib, I think it could be usefull for this proof, but I'm not sure.
     -- In following lines I attach the final part of this lemma using the mathlib lemma.
-    /-have h := inter_is_not_is_empty_intersection X a U A (hV a_in_V) hU,
+    /-have h := inter_is_not_is_empty_intersection U A (hV a_in_V) hU,
     exact h a_in_A,-/
     have h: a ∈ U ∩ A,
     {
@@ -407,6 +407,11 @@ begin
   },
 end}
 
+lemma T1_characterisation  [frechet_space X] (x : X): is_closed {y | y = x}:=
+begin
+  sorry
+end
+
 class hausdorff_space (X : Type) [topological_space X] :=
 (t2 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (y ∈ V))
 
@@ -419,7 +424,7 @@ begin
   use U,
   split,
     exact hU,
-    exact ⟨hh.1, (inter_is_not_is_empty_intersection X y V U hh.2 hUV)⟩,
+    exact ⟨hh.1, (inter_is_not_is_empty_intersection V U hh.2 hUV)⟩,
 end }
 
 lemma T2_is_T0 [hausdorff_space X] : kolmogorov_space X := 
@@ -438,6 +443,7 @@ lemma T3_is_T2 [regular_hausdorff_space X] : hausdorff_space X :=
 { t2 := 
 begin
   intros x y hxy,
+  --obtain h := regular_hausdorff_space.regular.regular,
   --obtain ⟨U, hU, hh⟩ := regular_hausdorff_space.frechet.t1 x y hxy,
   sorry
 end}
