@@ -427,6 +427,20 @@ begin
   exact @T1_is_T0 _ _ T2_is_T1,
 end
 
+class regular_space (X : Type) [topological_space X] :=
+(regular : ∀ (x : X) (F : set X) (hF : is_closed F) (hxF: x ∉ F), ∃ (U V : set X) (hU : is_open U) (hV : is_open V), (x ∈ U) ∧ (F ⊆ V))
+
+class regular_hausdorff_space (X : Type) [topological_space X] :=
+(regular : regular_space X)
+(frechet : frechet_space X)
+
+lemma T3_is_T2 [regular_hausdorff_space X] : hausdorff_space X :=
+{ t2 := 
+begin
+  intros x y hxy,
+  --obtain ⟨U, hU, hh⟩ := regular_hausdorff_space.frechet.t1 x y hxy,
+  sorry
+end}
 
 -- Definir frontera ✓
 -- Definir (quasi)compacte ✓
