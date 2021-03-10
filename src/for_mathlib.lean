@@ -117,10 +117,5 @@ begin
   finish,
 end
 
-lemma inter_is_not_is_empty_intersection (X : Type) (x : X) (U V : set X) (h : x ∈ U) (hh : U ∩ V = ∅ ): x ∉ V:=
-begin
-  intro t,
-  have r : x ∈ (U ∩ V),
-    exact mem_inter h t,
-  exact eq_empty_iff_forall_not_mem.mp hh x r,
-end
+lemma inter_is_not_is_empty_intersection (X : Type) (x : X) (U V : set X)
+  (hxU : x ∈ U) (hUV : U ∩ V = ∅ ) : x ∉ V := disjoint_left.1 (disjoint_iff_inter_eq_empty.2 hUV) hxU
