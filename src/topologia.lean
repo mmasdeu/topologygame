@@ -235,7 +235,6 @@ begin
     },
     {
       rintros ⟨U,⟨⟨_, U_subset_A⟩, x_in_U⟩⟩,
-      --show_term{tauto,}, -- bug?
       exact U_subset_A x_in_U,
     },
   }
@@ -261,18 +260,8 @@ begin
   {
     intros hx U V is_open_V x_in_V hV hU,
     apply hx V is_open_V x_in_V,
-    intros a a_in_V a_in_A,
-    --is this in mathlib?
-    -- I've made a similar lemma in mathlib, I think it could be usefull for this proof, but I'm not sure.
-    -- In following lines I attach the final part of this lemma using the mathlib lemma.
-    /-have h := inter_is_not_is_empty_intersection U A (hV a_in_V) hU,
-    exact h a_in_A,-/
-    have h: a ∈ U ∩ A,
-    {
-      split;
-      tauto,
-    },
-    finish,
+    intros a a_in_V,
+    exact inter_is_not_is_empty_intersection (hV a_in_V) hU,
   }
 end
 
@@ -381,19 +370,27 @@ end
 
 def boundary (A: set X) := closure A ∩ closure Aᶜ
 
+lemma boundary_def (A : set X) : boundary A = (closure A) \ (interior A) :=
+begin
+  sorry
+end
+
 lemma mem_boundary_iff (A : set X) (x : X) :
   x ∈ boundary A ↔ ∀ U : set X, is_neighborhood U x → (U ∩ A ≠ ∅ ∧ U ∩ A.compl ≠ ∅) :=
 begin
   sorry
 end
 
-class kolmogorov_space (X : Type) [topological_space X] := 
+class kolmogorov_space (X : Type) extends topological_space X := -- is this how to do it?
 (t0 : ∀ (x y : X) (h : y ≠ x) , ∃ (U : set X) (hU : is_open U), ((x ∈ U) ∧ (y ∉ U)) ∨ ((x ∉ U) ∧ (y ∈ U)))
 
-class frechet_space (X : Type) [topological_space X] := 
-(t1 : ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U))
+def is_frechet_space (X : Type) [topological_space X] := 
+  ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U)
 
-lemma T1_is_T0 [frechet_space X] : kolmogorov_space X :=
+class frechet_space (X : Type) extends topological_space X := 
+(t1 : is_frechet_space X) -- Marc : look up what's the best way to do this
+
+instance T1_is_T0 [frechet_space X] : kolmogorov_space X :=
 { t0 := 
 begin
   intros x y hxy,
@@ -405,9 +402,11 @@ begin
     left,
     exact hh,
   },
-end}
+end
+}
 
-lemma T1_characterisation  [frechet_space X] (x : X): is_closed {y | y = x}:=
+lemma T1_characterisation (X : Type) [topological_space X] :
+  is_frechet_space X ↔ (∀ (x : X), is_closed ({x} : set X)) :=
 begin
   sorry
 end
@@ -415,7 +414,7 @@ end
 class hausdorff_space (X : Type) [topological_space X] :=
 (t2 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (y ∈ V))
 
-lemma T2_is_T1 [hausdorff_space X] : frechet_space X :=
+instance T2_is_T1 [hausdorff_space X] : frechet_space X :=
 { t1 := 
 begin
   intros x y hxy,
@@ -424,22 +423,34 @@ begin
   use U,
   split,
     exact hU,
-    exact ⟨hh.1, (inter_is_not_is_empty_intersection V U hh.2 hUV)⟩,
+    exact ⟨hh.1, (inter_is_not_is_empty_intersection hh.2 hUV)⟩,
 end }
 
-lemma T2_is_T0 [hausdorff_space X] : kolmogorov_space X := 
+--lemma T2_is_T0 [hausdorff_space X] : kolmogorov_space X := 
+--begin
+--  --exact @T1_is_T0 _ _ T2_is_T1,
+--end
+
+-- fix this
+lemma tmp (X : Type) [topological_space X] [h:kolmogorov_space X] : 3 = 5 :=
 begin
-  exact @T1_is_T0 _ _ T2_is_T1,
+  sorry
+end
+
+example [topological_space X] [hausdorff_space X] : 3 = 5 :=
+begin
+  exact tmp,
+  sorry
 end
 
 class regular_space (X : Type) [topological_space X] :=
 (regular : ∀ (x : X) (F : set X) (hF : is_closed F) (hxF: x ∉ F), ∃ (U V : set X) (hU : is_open U) (hV : is_open V), (x ∈ U) ∧ (F ⊆ V))
 
-class regular_hausdorff_space (X : Type) [topological_space X] :=
+class T3_space (X : Type) [topological_space X] :=
 (regular : regular_space X)
 (frechet : frechet_space X)
 
-lemma T3_is_T2 [regular_hausdorff_space X] : hausdorff_space X :=
+lemma T3_is_T2 [T3_space X] : hausdorff_space X :=
 { t2 := 
 begin
   intros x y hxy,
@@ -448,20 +459,27 @@ begin
   sorry
 end}
 
--- Definir frontera ✓
--- Definir (quasi)compacte ✓
--- Axiomes de separació (T0, T1, T2, T3, Hausdorff ) ✓
--- Definir funció contínua ✓
--- Afegir [simp] als lemes d'interior, clausura...
 -- Afegir problemes al Game a partir dels exercicis de la secció 2.
 
 
 /-- A function f : X → Y is continuous iff the preimage of every open set is open -/
-def is_continuous {X Y : Type} [topological_space X] [topological_space Y] (f : X → Y) :=
-  ∀ (V : set Y), is_open V → is_open (f⁻¹' V)
+def is_continuous {X Y : Type} [topological_space X] [topological_space Y]
+(f : X → Y) :=  ∀ (V : set Y), is_open V → is_open (f⁻¹' V)
 
 /-- A topological space is (quasi)compact if every open covering admits a finite subcovering -/
-def is_quasicompact {X : Type} [topological_space X] :=
-  ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) → (⋃₀ 𝒰 = univ) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ ⋃₀ℱ = univ)
+def is_compact {X : Type} [topological_space X] :=
+  ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) →
+  (⋃₀ 𝒰 = univ) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ ⋃₀ℱ = univ)
+
+def is_compact_subset {X : Type} [topological_space X] (S : set X):=
+  ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) →
+  (⋃₀ 𝒰 = S) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ ⋃₀ℱ = S)
+
+/- Exemples de compacitat: topologica cofinita (definir-la) i demostrar compacitat -/
+/- Conjunt finit → compacte -/
+/- Imatge contínua de compacte és compacte -/
+/- Compacte dins d'un Hausdorff és tancat -/
+/- Definir topologia de subespai -/
+
 
 end topological_space

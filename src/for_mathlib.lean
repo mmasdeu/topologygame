@@ -117,5 +117,5 @@ begin
   finish,
 end
 
-lemma inter_is_not_is_empty_intersection (X : Type) (x : X) (U V : set X)
+lemma inter_is_not_is_empty_intersection {X : Type} {x : X} {U V : set X}
   (hxU : x ∈ U) (hUV : U ∩ V = ∅ ) : x ∉ V := disjoint_left.1 (disjoint_iff_inter_eq_empty.2 hUV) hxU
