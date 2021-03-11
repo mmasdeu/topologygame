@@ -91,8 +91,7 @@ begin
       {
         have htx := (mem_compl_singleton_iff.mp ht).symm,
         obtain ⟨U, hU, hh⟩ := h t x htx,
-        use U,
-        exact ⟨⟨hh.2, hU⟩, hh.1⟩,
+        exact ⟨U, ⟨hh.2, hU⟩, hh.1⟩,
       }
     },
     rw ← p,
@@ -102,8 +101,7 @@ begin
   },
   {
     intros h x y hxy,
-    use {y}ᶜ,
-    exact ⟨h y, mem_compl_singleton_iff.mpr (ne.symm hxy), not_not.mpr rfl⟩,
+    exact ⟨{y}ᶜ,h y, mem_compl_singleton_iff.mpr (ne.symm hxy), not_not.mpr rfl⟩,
   }
 end
 
@@ -121,8 +119,7 @@ begin
   intros x y hxy,
   obtain ⟨U, V, hU, hV, hUV, hh⟩ := t2 x y hxy,
   rw inter_comm at hUV,
-  use U,
-  exact ⟨hU, ⟨hh.1, (inter_is_not_is_empty_intersection hh.2 hUV)⟩⟩,
+  exact ⟨U, hU, ⟨hh.1, (inter_is_not_is_empty_intersection hh.2 hUV)⟩⟩,
 end }
 
 end hausdorff_space
@@ -141,10 +138,35 @@ instance T3_is_T2 (X : Type) [T3_space X] : hausdorff_space X :=
 { t2 := 
 begin
   intros x y hxy,
-  obtain ⟨U, V, hU, hV, hUV, hh⟩  := regular y {x} ((T1_characterisation X).1 t1 x) hxy,
+  obtain ⟨U, V, hU, hV, hUV, hh⟩ := regular y {x} ((T1_characterisation X).1 t1 x) hxy,
   rw inter_comm U V at hUV,
-  use V, use U,
-  exact ⟨hV, ⟨hU, ⟨hUV, ⟨singleton_subset_iff.mp hh.2, hh.1⟩⟩⟩⟩, 
+  exact ⟨V, U, hV, ⟨hU, ⟨hUV, ⟨singleton_subset_iff.mp hh.2, hh.1⟩⟩⟩⟩,
 end}
+
+instance T0_and_regular_is_T3 (X : Type) [kolmogorov_space X] (h : is_regular X):
+  T3_space X :=
+{ 
+  t1 := 
+  begin
+    intros x y hxy,
+    obtain ⟨U, hU, hh⟩ := kolmogorov_space.t0 x y hxy,
+    cases hh,
+      exact ⟨U, hU, hh⟩,
+    {
+      have hUc : is_closed Uᶜ,
+      {
+        simp,
+        exact hU,
+      },
+      have hy_not_Uc : y ∉ Uᶜ,
+      {
+        intro t,
+        exact (not_mem_of_mem_compl t) hh.2,
+      },
+      obtain ⟨A, B, hA, hB, hAB, hhAB⟩ := h y Uᶜ hUc hy_not_Uc,
+      exact ⟨B, hB, hhAB.2 hh.1, inter_is_not_is_empty_intersection hhAB.1 hAB⟩,
+    }
+  end,
+  regular := by exact h, }
 
 end T3_space
