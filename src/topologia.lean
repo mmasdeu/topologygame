@@ -165,8 +165,8 @@ end
 begin
   rw interior_def',
   apply union,
-  rintros B ⟨is_open_B, B_subset_A⟩,
-  tauto,
+  rintros B ⟨is_open_B, _⟩,
+  exact is_open_B,
 end
 
 lemma interior_is_biggest_open: ∀ B, (B ⊆ A) → is_open B → B ⊆ interior A :=
@@ -203,26 +203,8 @@ end
 
 @[simp] lemma eq_interior_iff_is_open : A = interior A ↔ is_open A :=
 begin
-  split,
-  {
-    intro hA,
-    rw hA, 
-    exact interior_is_open A,
-  },
-  { 
-    intro is_open_A,
-    rw interior_def',
-    ext1,
-    split,
-    {
-      intro x_in_A,
-      exact ⟨A, ⟨is_open_A, refl A⟩, x_in_A⟩,
-    },
-    {
-      rintros ⟨U,⟨⟨_, U_subset_A⟩, x_in_U⟩⟩,
-      exact U_subset_A x_in_U,
-    },
-  }
+  rw ← interior_def'',
+  tauto,
 end
 
 /-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
