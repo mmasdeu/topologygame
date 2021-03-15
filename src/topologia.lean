@@ -156,18 +156,8 @@ end
 
 lemma interior_def' : interior A = ⋃₀ {U : set X | is_open U ∧ U ⊆ A} :=
 begin
-  ext,
-  split,
-  {
-    rintros ⟨U, is_open_U, x_in_U, U_subset_A⟩,
-    use U,
-    exact ⟨⟨is_open_U, U_subset_A⟩, x_in_U⟩,
-  },
-  {
-    rintros ⟨U, ⟨is_open_U, U_subset_A⟩, x_in_U⟩,
-    use U,
-    exact ⟨is_open_U, ⟨x_in_U, U_subset_A⟩⟩
-  },
+  unfold interior is_neighborhood set.sUnion,
+  finish,
 end
 
 /--The interior of a set is always open.-/
