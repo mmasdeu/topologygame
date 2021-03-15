@@ -235,26 +235,9 @@ end
 
 lemma closure_def' : closure A = ⋂₀ {C : set X | is_closed C ∧ A ⊆ C} :=
 begin
-  have hh: (compl '' { U: set X | is_open U ∧ U ⊆ Aᶜ}) = {C: set X | is_closed C ∧ A ⊆ C},
-  {
-    ext1 V,
-    split,
-    {
-      rintros ⟨U,⟨_, _⟩, Uh_right⟩,
-      rw [is_closed, ← Uh_right],
-      split,
-      simp only [compl_compl],
-      assumption,
-      tauto,
-    },
-    {
-      rintros ⟨_, _⟩,
-      use Vᶜ,
-      norm_num,
-      tauto,
-    },
-  },
-  rw [closure_eq_compl_of_interior_compl, interior_def', compl_sUnion, hh],
+  rw [closure_eq_compl_of_interior_compl, interior_def', compl_sUnion],
+  rw compl_image_set_of,
+  simp only [compl_subset_compl, is_closed],
 end
 
 -- Not sure if this should be simp lemma. It is now solvable by simp.
