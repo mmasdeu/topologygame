@@ -170,3 +170,30 @@ instance T0_and_regular_is_T3 (X : Type) [kolmogorov_space X] (h : is_regular X)
   regular := by exact h, }
 
 end T3_space
+
+def is_normal (X : Type) [topological_space X] :=
+  ∀ (F E : set X) (hF : is_closed F) (hE : is_closed E) (hEF : F ∩ E = ∅), 
+  ∃ (U V : set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (F ⊆ U) ∧ (E ⊆ V)
+
+class T4_space (X : Type) extends frechet_space X :=
+(normal : is_normal X)
+
+namespace T4_space
+open frechet_space
+
+
+lemma T4_is_T3 (X : Type) [h : T4_space X] : T3_space X :=
+{ is_open := h.is_open,
+  univ_mem := h.univ_mem,
+  union := h.union,
+  inter := h.inter,
+  t1 := h.t1,
+  regular := 
+  begin
+    intros x F hF hxF,
+    obtain ⟨U, V, hU, hV, hUV, hh ⟩ := normal F {x} hF ((T1_characterisation X).1 t1 x) (inter_singleton_eq_empty.mpr hxF),
+    rw inter_comm U V at hUV,
+    exact ⟨V, U, hV, hU, hUV, hh.2 (mem_singleton x), hh.1 ⟩,
+  end}
+
+end T4_space
