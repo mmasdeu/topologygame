@@ -21,7 +21,10 @@ def is_dense {X : Type} [topological_space X] (A : set X) : Prop := closure A = 
 
 lemma dense_iff (A : set X) : is_dense A ↔ (interior (A.compl) = ∅) :=
 begin
-  sorry
+  rw is_dense,
+  rw closure_eq_compl_of_interior_compl,
+  rw compl_univ_iff,
+  refl,
 end
 
 lemma dense_iff' (A : set X) : is_dense A ↔
@@ -34,7 +37,10 @@ def boundary {X : Type} [topological_space X] (A : set X) := closure A ∩ closu
 
 lemma boundary_def (A : set X) : boundary A = (closure A) \ (interior A) :=
 begin
-  sorry
+  rw boundary,
+  rw closure_eq_compl_of_interior_compl Aᶜ,
+  rw compl_compl,
+  refl,
 end
 
 lemma mem_boundary_iff (A : set X) (x : X) :
