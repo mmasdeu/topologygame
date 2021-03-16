@@ -216,6 +216,19 @@ def is_adherent_point (x : X) := ∀ N, is_neighborhood N x → N ∩ A ≠ ∅
 /-- The closure of A is the set of all the adherent points of A -/
 def closure:= {x | is_adherent_point A x}
 
+@[simp] lemma set_in_closure: A ⊆ closure A :=
+begin
+  intros x hx,
+  have hhx : is_adherent_point A x,
+  {
+    intros B hBx hn,
+    unfold is_neighborhood at hBx,
+    rcases hBx with ⟨D, hD, h⟩,
+    exact eq_empty_iff_forall_not_mem.mp hn x (mem_inter (h.2 h.1) hx),
+  },
+  exact hhx,
+end
+
 @[simp] lemma closure_eq_compl_of_interior_compl: closure A = (interior Aᶜ)ᶜ :=
 begin
   ext1,
