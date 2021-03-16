@@ -19,7 +19,7 @@ end
 
 def is_dense {X : Type} [topological_space X] (A : set X) : Prop := closure A = univ
 
-lemma dense_iff (A : set X) : is_dense A ↔ (interior (A.compl) = ∅) :=
+lemma dense_iff (A : set X) : is_dense A ↔ (interior (A.compl) = ∅) := -- why not Aᶜ?, then the refl, line it's not necesary
 begin
   rw is_dense,
   rw closure_eq_compl_of_interior_compl,
@@ -30,7 +30,22 @@ end
 lemma dense_iff' (A : set X) : is_dense A ↔
   ∀ x : X, ∀ U : set X, is_neighborhood U x → U ∩ A ≠ ∅ :=
 begin
-  sorry
+  unfold is_dense,
+  split; intro h,
+  {
+    intros x U hUx,
+    have hx : x ∈ closure A,
+    {
+      rw h,
+      exact mem_univ x,
+    },
+    exact hx U hUx,
+  },
+  {
+    simp,
+    intros x U hU hUx hn,
+    exact (h x U ⟨U, hU, hUx, rfl.subset⟩) (subset_compl_iff_disjoint.mp hn),
+  }
 end
 
 def boundary {X : Type} [topological_space X] (A : set X) := closure A ∩ closure Aᶜ
