@@ -193,3 +193,56 @@ end
 }
 
 end T4_space
+
+class T5_space : Prop :=
+(t5 : ∀ (A B : set X) (hAB : A ∩ B = ∅), ∃ (U V : set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), A ⊆ U ∧ B ⊆ V)
+
+namespace T5_space
+open frechet_space
+
+lemma T5_characterisation : T5_space X ↔ (∀ (A : set X), is_open A) :=
+begin
+  split; intro h,
+  {
+    intro A,
+    replace h := h.t5,
+    obtain ⟨U, V, hU, hV, hUV, hh⟩ := h A Aᶜ (inter_compl_self A),
+    have hA : A = U,
+    {
+      apply subset.antisymm,
+        exact hh.1,
+      {
+        intros x hx,
+        by_contradiction hn,
+        have hnV : x ∈ V,
+          exact hh.2 (mem_compl hn),
+        exact inter_is_not_is_empty_intersection hx hUV hnV,
+      }
+    },
+    rwa hA,
+  },
+  {
+    fconstructor,
+    intros U V hUV,
+    exact ⟨U, V, h U, h V, hUV ,rfl.subset , rfl.subset⟩,
+  }
+end
+
+instance T5_is_T4 [T5_space X] : T4_space X :=
+{ t1 := 
+  begin
+    
+    have h : ∀ (x : X), is_closed {x},
+    {
+      intro x,
+      exact (T5_characterisation X).1 _inst_2 {x}ᶜ,
+    },
+    exact ((T1_characterisation X).2 h).t1,
+  end,
+  normal := 
+  begin
+    intros F E hF hE hFE,
+    exact ⟨F, E, (T5_characterisation X).1 _inst_2 F, (T5_characterisation X).1 _inst_2 E, hFE, rfl.subset, rfl.subset⟩,
+  end}
+
+end T5_space
