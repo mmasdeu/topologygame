@@ -190,7 +190,6 @@ begin
       rw ← hAB,
       split,
       {
-        
         sorry
       },
         exact hh2.2 ht.2,
