@@ -144,9 +144,9 @@ namespace topological_space
 variables {X : Type}
 variables [topological_space X] (A B : set X)
 
-def is_neighborhood (x : X) := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
+@[simp] def is_neighborhood (x : X) := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
 
-def interior := { x : X | is_neighborhood A x }
+@[simp] def interior := { x : X | is_neighborhood A x }
 
 @[simp] lemma interior_is_subset: interior A ⊆ A :=
 begin
@@ -154,10 +154,13 @@ begin
   tauto,
 end
 
+open set
 lemma interior_def' : interior A = ⋃₀ {U : set X | is_open U ∧ U ⊆ A} :=
 begin
-  unfold interior is_neighborhood set.sUnion,
-  finish,
+  simp only [interior, is_neighborhood, sUnion],
+  ext,
+  norm_num,
+  tauto,
 end
 
 /--The interior of a set is always open.-/
