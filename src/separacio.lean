@@ -3,24 +3,23 @@ import topologia
 open topological_space
 open set
 
-variables {X : Type}
-variables [topological_space X] (A B : set X)
+variables (X : Type) [topological_space X]
 
 /-- Kuratowski's problem -/
-example : closure (interior (closure( interior A))) = closure (interior A) :=
+example (A : set X) : closure (interior (closure( interior A))) = closure (interior A) :=
 begin
   sorry,
 end
 
 /-- Kuratowski's problem -/
-example : interior (closure( interior (closure A))) = interior (closure A) :=
+example (A : set X) : interior (closure( interior (closure A))) = interior (closure A) :=
 begin
   sorry,
 end
 
-def is_dense (A: set X) := closure A = univ
+def is_dense {X : Type} [topological_space X] (A : set X) : Prop := closure A = univ
 
-lemma dense_iff (A : set X) : is_dense A ↔ interior (A.compl) = ∅ :=
+lemma dense_iff (A : set X) : is_dense A ↔ (interior (A.compl) = ∅) :=
 begin
   sorry
 end
@@ -31,7 +30,7 @@ begin
   sorry
 end
 
-def boundary (A: set X) := closure A ∩ closure Aᶜ
+def boundary {X : Type} [topological_space X] (A : set X) := closure A ∩ closure Aᶜ
 
 lemma boundary_def (A : set X) : boundary A = (closure A) \ (interior A) :=
 begin
@@ -44,18 +43,15 @@ begin
   sorry
 end
 
-class kolmogorov_space (X : Type) extends topological_space X :=
+class kolmogorov_space : Prop :=
 (t0 : ∀ (x y : X) (h : y ≠ x) , ∃ (U : set X) (hU : is_open U), ((x ∈ U) ∧ (y ∉ U)) ∨ ((x ∉ U) ∧ (y ∈ U)))
 
-def is_frechet_space (X : Type) [topological_space X] := 
-  ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U)
-
-class frechet_space (X : Type) extends topological_space X := 
-(t1 : is_frechet_space X) -- Marc : look up what's the best way to do this
+class frechet_space : Prop := 
+(t1 : ∀ (x y : X) (h : y ≠ x), ∃ (U : set X) (hU : is_open U), (x ∈ U) ∧ (y ∉ U)) -- Marc : look up what's the best way to do this
 
 namespace frechet_space
 
-instance T1_is_T0 (X : Type) [frechet_space X] : kolmogorov_space X :=
+instance T1_is_T0 [frechet_space X] : kolmogorov_space X :=
 { t0 := 
 begin
   intros x y hxy,
@@ -70,8 +66,7 @@ begin
 end
 }
 
-lemma T1_characterisation (X : Type) [topological_space X] :
-  is_frechet_space X ↔ (∀ (x : X), is_closed ({x} : set X)) :=
+lemma T1_characterisation : frechet_space X ↔ (∀ (x : X), is_closed ({x} : set X)) :=
 begin
   split,
   {
@@ -90,6 +85,7 @@ begin
       },
       {
         have htx := (mem_compl_singleton_iff.mp ht).symm,
+        replace h := h.t1,
         obtain ⟨U, hU, hh⟩ := h t x htx,
         exact ⟨U, ⟨hh.2, hU⟩, hh.1⟩,
       }
@@ -100,7 +96,9 @@ begin
     exact topological_space.union I c,
   },
   {
-    intros h x y hxy,
+    intros h,
+    fconstructor,
+    intros x y hxy,
     exact ⟨{y}ᶜ,h y, mem_compl_singleton_iff.mpr (ne.symm hxy), not_not.mpr rfl⟩,
   }
 end
@@ -108,12 +106,12 @@ end
 end frechet_space
 
 
-class hausdorff_space (X : Type) extends topological_space X :=
+class hausdorff_space :=
 (t2 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (y ∈ V))
 
 namespace hausdorff_space
 
-instance T2_is_T1 (X : Type) [hausdorff_space X] : frechet_space X :=
+instance T2_is_T1 [hausdorff_space X] : frechet_space X :=
 { t1 := 
 begin
   intros x y hxy,
@@ -124,26 +122,27 @@ end }
 
 end hausdorff_space
 
-def is_regular (X : Type) [topological_space X] :=
-  ∀ (x : X) (F : set X) (hF : is_closed F) (hxF: x ∉ F),
+def is_regular := ∀ (x : X) (F : set X) (hF : is_closed F) (hxF: x ∉ F),
   ∃ (U V : set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (F ⊆ V)
 
-class T3_space (X : Type) extends frechet_space X :=
+class T3_space extends frechet_space X : Prop :=
 (regular : is_regular X)
 
 namespace T3_space
 open frechet_space
 
-instance T3_is_T2 (X : Type) [T3_space X] : hausdorff_space X :=
+instance T3_is_T2 [T3_space X] : hausdorff_space X :=
 { t2 := 
 begin
   intros x y hxy,
-  obtain ⟨U, V, hU, hV, hUV, hh⟩ := regular y {x} ((T1_characterisation X).1 t1 x) hxy,
-  rw inter_comm U V at hUV,
-  exact ⟨V, U, hV, ⟨hU, ⟨hUV, ⟨singleton_subset_iff.mp hh.2, hh.1⟩⟩⟩⟩,
+  have H := (T1_characterisation X).1 _inst_2.to_frechet_space y,
+  have x_notin_y : x ∉ ({y} : set X), by tauto,
+  obtain ⟨U, V, hU, hV, hUV, hh⟩ := regular x ({y} : set X) H x_notin_y,
+  rw singleton_subset_iff at hh,
+  exact ⟨U, V, hU, ⟨hV, ⟨hUV, ⟨hh.1, hh.2⟩⟩⟩⟩,
 end}
 
-instance T0_and_regular_is_T3 (X : Type) [kolmogorov_space X] (h : is_regular X):
+lemma T0_and_regular_is_T3 [kolmogorov_space X] (h: is_regular X) :
   T3_space X :=
 { 
   t1 := 
@@ -167,7 +166,8 @@ instance T0_and_regular_is_T3 (X : Type) [kolmogorov_space X] (h : is_regular X)
       exact ⟨B, hB, hhAB.2 hh.1, inter_is_not_is_empty_intersection hhAB.1 hAB⟩,
     }
   end,
-  regular := by exact h, }
+  regular := h,
+}
 
 end T3_space
 
@@ -175,18 +175,21 @@ def is_normal (X : Type) [topological_space X] :=
   ∀ (F E : set X) (hF : is_closed F) (hE : is_closed E) (hEF : F ∩ E = ∅), 
   ∃ (U V : set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (F ⊆ U) ∧ (E ⊆ V)
 
-class T4_space (X : Type) extends frechet_space X :=
+class T4_space extends frechet_space X :=
 (normal : is_normal X)
 
 namespace T4_space
 open frechet_space
 
-/-lemma T4_is_T3 (X : Type) [T4_space X] : T3_space X :=
+instance T4_is_T3 [T4_space X] : T3_space X :=
 { regular := 
-  begin
-    intros x F hF hxF,
-    obtain ⟨U, V, hU, hV, hUV, hh ⟩ := normal F {x} hF ((T1_characterisation X).1 t1 x) (inter_singleton_eq_empty.mpr hxF),
-    rw inter_comm U V at hUV,
-    exact ⟨V, U, hV, hU, hUV, hh.2 (mem_singleton x), hh.1⟩,
-  end}-/
+begin
+  intros x F hF hxF,
+  obtain ⟨U, V, hU, hV, hUV, hh ⟩ := normal F {x} hF ((T1_characterisation X).1 _inst_2.to_frechet_space x)
+  (inter_singleton_eq_empty.mpr hxF),
+  rw inter_comm U V at hUV,
+  exact ⟨V, U, hV, hU, hUV, hh.2 (mem_singleton x), hh.1⟩,
+end  
+}
+
 end T4_space
