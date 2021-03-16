@@ -181,19 +181,12 @@ class T4_space (X : Type) extends frechet_space X :=
 namespace T4_space
 open frechet_space
 
-
-lemma T4_is_T3 (X : Type) [h : T4_space X] : T3_space X :=
-{ is_open := h.is_open,
-  univ_mem := h.univ_mem,
-  union := h.union,
-  inter := h.inter,
-  t1 := h.t1,
-  regular := 
+/-lemma T4_is_T3 (X : Type) [T4_space X] : T3_space X :=
+{ regular := 
   begin
     intros x F hF hxF,
     obtain ⟨U, V, hU, hV, hUV, hh ⟩ := normal F {x} hF ((T1_characterisation X).1 t1 x) (inter_singleton_eq_empty.mpr hxF),
     rw inter_comm U V at hUV,
-    exact ⟨V, U, hV, hU, hUV, hh.2 (mem_singleton x), hh.1 ⟩,
-  end}
-
+    exact ⟨V, U, hV, hU, hUV, hh.2 (mem_singleton x), hh.1⟩,
+  end}-/
 end T4_space
