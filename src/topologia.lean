@@ -256,6 +256,13 @@ begin
   simp only [compl_subset_compl, is_closed],
 end
 
+@[simp] lemma subset_closed_inclusion_closure [topological_space X] {A B : set X} (h : A ⊆ B) (hB : is_closed B) : closure A ⊆ B:=
+begin
+  intros x hx,
+  rw closure_def' at hx,
+  exact hx B ⟨hB, h⟩,
+end
+
 -- Not sure if this should be simp lemma. It is now solvable by simp.
 @[simp] lemma closure_is_closed: is_closed (closure A) :=
 begin
