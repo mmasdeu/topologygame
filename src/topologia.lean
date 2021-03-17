@@ -312,9 +312,81 @@ end
 
 -- Afegir problemes al Game a partir dels exercicis de la secció 2.
 
+def is_open_map {X Y : Type} [topological_space X] [topological_space Y]
+(f : X → Y) :=  ∀ (V : set X), is_open V → is_open (f '' V)
+
+def is_closed_map {X Y : Type} [topological_space X] [topological_space Y]
+(f : X → Y) :=  ∀ (V : set Y), is_closed V → is_closed (f⁻¹' V)
 
 /-- A function f : X → Y is continuous iff the preimage of every open set is open -/
 def is_continuous {X Y : Type} [topological_space X] [topological_space Y]
 (f : X → Y) :=  ∀ (V : set Y), is_open V → is_open (f⁻¹' V)
+
+/-- The identity map is continuous. -/
+lemma id_is_cont {X: Type} [topological_space X]: is_continuous (λ x : X, x) :=
+begin
+  tauto,
+end
+
+/-- The identity map is open. -/
+lemma id_is_open {X: Type} [topological_space X]: is_open_map (λ x : X, x) :=
+begin
+  intros V hV,
+  finish,
+end
+
+/-- The identity map is closed. -/
+lemma id_is_closed {X: Type} [topological_space X]: is_closed_map (λ x : X, x) :=
+begin
+  tauto,
+end
+
+/-- The constant map is continuous. -/
+lemma const_is_cont {X Y: Type} [topological_space X] [topological_space Y] (y: Y)
+: is_continuous (λ x : X, y) :=
+begin
+  intros V hV,
+  by_cases y ∈ V,
+  {
+    convert univ_mem,
+    ext,
+    tauto,
+  },
+  {
+    convert empty_mem,
+    ext,
+    tauto,
+  },
+end
+
+/-- The composition of continuous maps is continuous. -/
+lemma comp_cont {X Y Z: Type} [topological_space X] [topological_space Y] [topological_space Z]
+(f: X → Y) (hf: is_continuous f) (g: Y → Z) (hg: is_continuous g): is_continuous (g ∘ f) :=
+begin
+  intros U hU,
+  specialize hg U hU,
+  exact hf _ hg,
+end
+
+/-- The composition of open maps is open. -/
+lemma comp_open {X Y Z: Type} [topological_space X] [topological_space Y] [topological_space Z]
+(f: X → Y) (hf: is_open_map f) (g: Y → Z) (hg: is_open_map g): is_open_map (g ∘ f) :=
+begin
+  intros U hU,
+  specialize hf U hU,
+  specialize hg _ hf,
+  rw image_image at hg,
+  exact hg,
+end
+
+
+def homeomorphism {X Y: Type} [topological_space X] [topological_space Y] (f: X → Y)
+   := is_continuous f → function.bijective f → is_open_map f
+
+
+variables {Y: Type}
+variables [topological_space Y]
+
+notation X `≅` Y := ∃ f : X → Y, homeomorphism f 
 
 end topological_space

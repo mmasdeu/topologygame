@@ -73,6 +73,20 @@ begin
   }
 end
 
+/-- A map to an indiscrete topology is always continuous. -/
+lemma is_continuous_to_indiscrete {X Y: Type} [topological_space X]
+(f: X → Y) : @is_continuous _ _ _ (indiscrete Y) f :=
+begin
+  intros V hV,
+  rw indiscrete_is_open_iff at hV,
+  cases hV; rw hV,
+  {
+    apply empty_mem,
+  },
+  {
+    apply univ_mem,
+  }
+end
 
 /-
 Show that {∅, univ, (-∞, a) : a : ℝ} is a topology on ℝ
