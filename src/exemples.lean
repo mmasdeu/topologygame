@@ -73,6 +73,14 @@ begin
   }
 end
 
+/-- A map from a discrete topology is always continuous. -/
+lemma is_continuous_from_discrete {X Y: Type} [topological_space Y]
+(f: X → Y) : @is_continuous _ _ (discrete X) _ f :=
+begin
+  intros V hV,
+  tauto,
+end
+
 /-- A map to an indiscrete topology is always continuous. -/
 lemma is_continuous_to_indiscrete {X Y: Type} [topological_space X]
 (f: X → Y) : @is_continuous _ _ _ (indiscrete Y) f :=
