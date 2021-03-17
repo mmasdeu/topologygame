@@ -42,10 +42,13 @@ begin
     exact hx U hUx,
   },
   {
-    simp,
-    intros x U hU hUx hn,
-    exact (h x U ⟨U, hU, hUx, rfl.subset⟩) (subset_compl_iff_disjoint.mp hn),
-  }
+    simp only [closure_eq_compl_of_interior_compl, compl_univ_iff],
+    simp only [ empty_iff, interior],
+    intro x,
+    intro hx,
+    refine h x Aᶜ hx _,
+    norm_num,
+  },
 end
 
 def boundary {X : Type} [topological_space X] (A : set X) := closure A ∩ closure Aᶜ
@@ -144,7 +147,8 @@ end }
 end hausdorff_space
 
 class T2_5_space : Prop :=
-(t2_5 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : (closure U) ∩ (closure V) = ∅), (x ∈ U) ∧ (y ∈ V))
+(t2_5 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X), is_open U ∧  is_open V
+  ∧ (closure U) ∩ (closure V) = ∅ ∧ x ∈ U ∧ y ∈ V)
 
 namespace T2_5_space
 

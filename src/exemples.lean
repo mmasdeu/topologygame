@@ -73,6 +73,14 @@ begin
   }
 end
 
+/-- A map from a discrete topology is always continuous. -/
+lemma is_continuous_from_discrete {X Y: Type} [topological_space Y]
+(f: X → Y) : @is_continuous _ _ (discrete X) _ f :=
+begin
+  intros V hV,
+  tauto,
+end
+
 /-- A map to an indiscrete topology is always continuous. -/
 lemma is_continuous_to_indiscrete {X Y: Type} [topological_space X]
 (f: X → Y) : @is_continuous _ _ _ (indiscrete Y) f :=
@@ -318,5 +326,31 @@ begin
   },
 end
 
+--finset, set.finite, fintype
+
+def three_point_topology_0 : topological_space (fin 3) := generate_from ∅
+
+def three_point_topology_1 : topological_space (fin 3) := generate_from {{0}, {0,1}, {0,2}}
+
+def three_point_topology_2 : topological_space (fin 3) := generate_from {{1}, {2}, {3}}
+
+def three_point_topology_3 (n : ℕ) [has_one (fin n)] : topological_space (fin n) := 
+  generate_from {{1}, {2,3}}
+
+
 
 -- definir una topologia per un conjunt de tres elements
+-- topologia cofinita
+-- topologia del punt particular x: λ (A : set X), A = ∅ ∨ x ∈ A
+-- topologia digital (a ℤ) {2n+1} tots oberts, {2n-1,2n,2n+1} obert
+-- definir espai projectiu
+-- definir la banda de Möbius
+
+def is_open_punt_particular (X : Type) (x : X) :=  λ (A : set X), A = ∅ ∨ x ∈ A
+
+lemma is_open_punt_particular.union {X : Type} :
+  ∀ (𝒴 : set (set X)),
+    (∀ (A : set X), A ∈ 𝒴 → Aᶜ.finite) → (⋃₀ 𝒴)ᶜ.finite :=
+begin
+  sorry
+end
