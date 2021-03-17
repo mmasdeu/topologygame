@@ -205,15 +205,12 @@ begin
   obtain ⟨A, B, hA, hB, hAB, hh2 ⟩ := regular x (closure V) (closure_is_closed V) hxcV,
   have t : closure A ∩ closure V = ∅,
   {
+    have hBc : is_closed Bᶜ, by simp[hB],
+    have hcA := subset.trans (subset_closed_inclusion_closure (subset_compl_iff_disjoint.mpr hAB) hBc) (compl_subset_compl.2 hh2.2),
     apply subset.antisymm,
     {
-      intros t ht,
-      rw ← hAB,
-      split,
-      {
-        sorry
-      },
-        exact hh2.2 ht.2,
+      rw ← compl_inter_self (closure V),
+      exact (closure V).inter_subset_inter_left hcA,
     },
       exact (closure A ∩ closure V).empty_subset,
   },
