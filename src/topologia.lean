@@ -144,9 +144,9 @@ namespace topological_space
 variables {X : Type}
 variables [topological_space X] (A B : set X)
 
-@[simp] def is_neighborhood (x : X) := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
+def is_neighborhood (x : X) := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
 
-@[simp] def interior := { x : X | is_neighborhood A x }
+def interior := { x : X | is_neighborhood A x }
 
 @[simp] lemma interior_is_subset: interior A ⊆ A :=
 begin
@@ -310,8 +310,6 @@ begin
 end
 
 
--- Afegir problemes al Game a partir dels exercicis de la secció 2.
-
 def is_open_map {X Y : Type} [topological_space X] [topological_space Y]
 (f : X → Y) :=  ∀ (V : set X), is_open V → is_open (f '' V)
 
@@ -381,7 +379,7 @@ end
 
 
 def homeomorphism {X Y: Type} [topological_space X] [topological_space Y] (f: X → Y)
-   := is_continuous f → function.bijective f → is_open_map f
+   := is_continuous f ∧ function.bijective f ∧ is_open_map f
 
 
 variables {Y: Type}
@@ -389,4 +387,22 @@ variables [topological_space Y]
 
 notation X `≅` Y := ∃ f : X → Y, homeomorphism f 
 
-end topological_space
+
+ -- definir subespai i espai quocient
+def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_space X :=
+{ is_open := λ A, ∃ V, is_open V ∧ f⁻¹' V = A,
+  univ_mem := ⟨univ,⟨univ_mem,by tauto⟩⟩,
+  union := sorry,
+  inter := sorry
+}
+
+def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_space Y :=
+{ is_open := λ V, is_open (f⁻¹' V),
+  univ_mem := sorry,
+  union := sorry,
+  inter := sorry
+}
+
+ 
+
+ end topological_space

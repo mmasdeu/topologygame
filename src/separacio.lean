@@ -144,7 +144,8 @@ end }
 end hausdorff_space
 
 class T2_5_space : Prop :=
-(t2_5 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X) (hU : is_open U) (hV : is_open V) (hUV : (closure U) ∩ (closure V) = ∅), (x ∈ U) ∧ (y ∈ V))
+(t2_5 : ∀ (x y : X) (h : y ≠ x), ∃ (U V: set X), is_open U ∧  is_open V
+  ∧ (closure U) ∩ (closure V) = ∅ ∧ x ∈ U ∧ y ∈ V)
 
 namespace T2_5_space
 
