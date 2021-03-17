@@ -399,8 +399,22 @@ notation X `≅` Y := ∃ f : X → Y, homeomorphism f
 def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_space X :=
 { is_open := λ A, ∃ V, is_open V ∧ f⁻¹' V = A,
   univ_mem := ⟨univ,⟨univ_mem,by tauto⟩⟩,
-  union := sorry,
-  inter := sorry
+  union := 
+  begin
+    sorry
+  end,
+  inter := 
+  begin
+    intros A B hA hB,
+    cases hA with U hU,
+    cases hB with V hV,
+    have h : f ⁻¹' (U ∩ V) = A ∩ B,
+    {
+      rw [← hV.2, ← hU.2],
+      refl,
+    },
+    exact ⟨U ∩ V, inter U V hU.1 hV.1, h⟩,
+  end
 }
 
 def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_space Y :=
