@@ -420,6 +420,27 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
     },
     {
       rw image_sUnion,
+      norm_num,
+      ext,
+      split,
+      {
+        norm_num,
+        intros V U hU hV hhV,
+        use U,
+        split,
+        {
+          tauto,
+        },
+        {
+          subst V,
+          specialize hA U hU,
+          cases hA,
+          cases hA_h,
+          subst U,
+          finish,
+        },
+      },
+      {
       sorry,
     },
   end,
