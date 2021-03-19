@@ -441,16 +441,17 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
         },
       },
       {
-      sorry,
+        sorry,
+      },
     },
   end,
   inter := 
   begin
     intros A B hA hB,
     cases hA with U hU,
-    cases hB with V hV,
-    have h : f ⁻¹' (U ∩ V) = A ∩ B,
-    {
+          sorry,
+        },
+      },
       rw [← hV.2, ← hU.2],
       refl,
     },
@@ -459,9 +460,9 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
 }
 
 /-- La topologia quocient donada per una aplicació f : X → Y -/
-def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_space Y :=
-{ is_open := λ V, is_open (f⁻¹' V),
-  univ_mem := sorry,
+    cases hB with V hV,
+    have h : f ⁻¹' (U ∩ V) = A ∩ B,
+    {
   union := sorry,
   inter := sorry
 }

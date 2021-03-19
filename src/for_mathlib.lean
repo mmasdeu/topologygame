@@ -136,3 +136,26 @@ lemma image_sUnion {X Y: Type} (A: set(set X)) (f: X → Y) : f '' (⋃₀ A) = 
       tauto,
     },
   end
+
+  lemma set.neq_empty_get_element {X: Type} (U: set X) (h: U ≠ ∅): ∃ x, x ∈ U :=
+  begin
+    let hh := @set.empty_iff X (λ x, x ∈ U),
+    finish,
+  end
+
+  lemma set.image_of_preimage{X Y: Type} (V: set Y)(f: X → Y )(h: f⁻¹' V ≠ ∅): f '' (f⁻¹' V) = V :=
+  begin
+    ext y,
+    split,
+    { 
+      simp only [mem_image, and_imp, mem_preimage, exists_imp_distrib],
+      intros x hx hhx,
+      subst y,
+      exact hx,
+    },
+    {
+      intro hy,
+      let hh := set.neq_empty_get_element (f⁻¹' V) h,
+      sorry,
+    },
+  end
