@@ -401,7 +401,27 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
   univ_mem := ⟨univ,⟨univ_mem,by tauto⟩⟩,
   union := 
   begin
-    sorry
+    rintros A hA,
+    use f '' (⋃₀ A),
+    split,
+    {
+      rw image_sUnion,
+      apply union,
+      intros B hB,
+      cases hB,
+      cases hB_h,
+      specialize hA hB_w,
+      subst B,
+      specialize hA hB_h_left,
+      cases hA,
+      cases hA_h,
+      subst hB_w,
+      sorry,
+    },
+    {
+      rw image_sUnion,
+      sorry,
+    },
   end,
   inter := 
   begin
