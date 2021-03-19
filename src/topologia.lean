@@ -256,6 +256,13 @@ begin
   simp only [compl_subset_compl, is_closed],
 end
 
+@[simp] lemma subset_closed_inclusion_closure [topological_space X] {A B : set X} (h : A ⊆ B) (hB : is_closed B) : closure A ⊆ B:=
+begin
+  intros x hx,
+  rw closure_def' at hx,
+  exact hx B ⟨hB, h⟩,
+end
+
 -- Not sure if this should be simp lemma. It is now solvable by simp.
 @[simp] lemma closure_is_closed: is_closed (closure A) :=
 begin
@@ -392,8 +399,22 @@ notation X `≅` Y := ∃ f : X → Y, homeomorphism f
 def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_space X :=
 { is_open := λ A, ∃ V, is_open V ∧ f⁻¹' V = A,
   univ_mem := ⟨univ,⟨univ_mem,by tauto⟩⟩,
-  union := sorry,
-  inter := sorry
+  union := 
+  begin
+    sorry
+  end,
+  inter := 
+  begin
+    intros A B hA hB,
+    cases hA with U hU,
+    cases hB with V hV,
+    have h : f ⁻¹' (U ∩ V) = A ∩ B,
+    {
+      rw [← hV.2, ← hU.2],
+      refl,
+    },
+    exact ⟨U ∩ V, inter U V hU.1 hV.1, h⟩,
+  end
 }
 
 /-- La topologia quocient donada per una aplicació f : X → Y -/
