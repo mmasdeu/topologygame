@@ -416,7 +416,20 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
       cases hA,
       cases hA_h,
       subst hB_w,
-      sorry,
+      by_cases h_empty: (f⁻¹' hA_w) = ∅,
+      {
+        rw h_empty,
+        simp only [empty_mem, image_empty],
+      },
+      {
+        rw set.image_of_preimage,
+        {
+          exact rfl.mpr hA_h_left,
+        },
+        {
+          tauto,
+        },
+      },
     },
     {
       rw image_sUnion,
@@ -437,11 +450,23 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
           cases hA,
           cases hA_h,
           subst U,
+          simp only [mem_preimage],
           finish,
         },
       },
       {
-        sorry,
+        intros hx,
+        cases hx,
+        norm_num,
+        use f '' hx_w,
+        split,
+        {
+          use hx_w,
+          tauto,
+        },
+        {
+          finish,
+        },  
       },
     },
   end,
@@ -449,9 +474,9 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
   begin
     intros A B hA hB,
     cases hA with U hU,
-          sorry,
-        },
-      },
+    cases hB with V hV,
+    have h : f ⁻¹' (U ∩ V) = A ∩ B,
+    {
       rw [← hV.2, ← hU.2],
       refl,
     },
@@ -460,9 +485,9 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
 }
 
 /-- La topologia quocient donada per una aplicació f : X → Y -/
-    cases hB with V hV,
-    have h : f ⁻¹' (U ∩ V) = A ∩ B,
-    {
+def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_space Y :=
+{ is_open := λ V, is_open (f⁻¹' V),
+  univ_mem := sorry,
   union := sorry,
   inter := sorry
 }
