@@ -119,3 +119,10 @@ end
 
 lemma inter_is_not_is_empty_intersection {X : Type} {x : X} {U V : set X}
   (hxU : x ∈ U) (hUV : U ∩ V = ∅ ) : x ∉ V := disjoint_left.1 (disjoint_iff_inter_eq_empty.2 hUV) hxU
+
+lemma neq_elements_prod {X Y : Type} {x y : X × Y} (h : x ≠ y) : x.1 ≠ y.1 ∨ x.2 ≠ y.2 :=
+begin
+  by_contradiction hh,
+  push_neg at hh,
+  exact h (prod.ext_iff.mpr hh),
+end
