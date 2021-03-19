@@ -120,6 +120,23 @@ end
 lemma inter_is_not_is_empty_intersection {X : Type} {x : X} {U V : set X}
   (hxU : x ∈ U) (hUV : U ∩ V = ∅ ) : x ∉ V := disjoint_left.1 (disjoint_iff_inter_eq_empty.2 hUV) hxU
 
+lemma image_sUnion {X Y: Type} (A: set(set X)) (f: X → Y) : f '' (⋃₀ A) = ⋃₀ { V: set Y | ∃ U: set X, U ∈ A ∧ V = f '' U}:=
+begin
+  ext1 y,
+  split,{
+    rintro ⟨x, ⟨U, hU, hx⟩, _⟩,
+    use f '' U,
+    simp only [mem_image, mem_set_of_eq],
+    tauto,
+  },
+  {
+    rintro ⟨_, ⟨⟨U, hU, _, _⟩, x, _⟩⟩,
+    use x,
+    simp only [exists_prop, mem_set_of_eq],
+    tauto,
+  },
+end
+
 lemma neq_elements_prod {X Y : Type} {x y : X × Y} (h : x ≠ y) : x.1 ≠ y.1 ∨ x.2 ≠ y.2 :=
 begin
   by_contradiction hh,
