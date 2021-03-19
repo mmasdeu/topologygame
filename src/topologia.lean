@@ -422,13 +422,8 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
         simp only [empty_mem, image_empty],
       },
       {
-        rw set.image_of_preimage,
-        {
-          exact rfl.mpr hA_h_left,
-        },
-        {
-          tauto,
-        },
+        have hhhh := image_preimage_subset f hA_w,
+        sorry,
       },
     },
     {
