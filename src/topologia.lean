@@ -163,7 +163,7 @@ begin
   tauto,
 end
 
-/--The interior of a set is always open.-/
+/--The interior of a set is open.-/
 @[simp] lemma interior_is_open : is_open (interior A) :=
 begin
   rw interior_def',
@@ -172,6 +172,7 @@ begin
   exact is_open_B,
 end
 
+/-- The interior of a set is the biggest open it contains. -/
 lemma interior_is_biggest_open: ∀ B, (B ⊆ A) → is_open B → B ⊆ interior A :=
 begin
   intros B hB is_open_B x x_in_B,
