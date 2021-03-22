@@ -446,9 +446,29 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
 /-- La topologia quocient donada per una aplicació f : X → Y -/
 def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_space Y :=
 { is_open := λ V, is_open (f⁻¹' V),
-  univ_mem := sorry,
-  union := sorry,
-  inter := sorry
+  univ_mem := 
+  begin
+    norm_num,
+  end,
+  union := 
+  begin
+    intros A hA,
+    rw preimage_sUnion,
+    apply union,
+    rintros U ⟨hU, _⟩,
+    subst U,
+    apply union,
+    rintros B ⟨hB, _⟩,
+    subst B,
+    exact hA hU hB,
+  end,
+  inter :=
+  begin
+    intros A B hA hB,
+    rw preimage_inter,
+    apply inter;
+    assumption,
+  end,
 }
 
  
