@@ -67,7 +67,7 @@ begin
   split; intro h,
   {
     intros U hU,
-    exact ⟨hx.1 U hU, hx.2 U hU⟩,
+    exact ⟨h.1 U hU, h.2 U hU⟩,
   },
   {
     have hx: (is_adherent_point A x) ∧ (is_adherent_point Aᶜ x), 
