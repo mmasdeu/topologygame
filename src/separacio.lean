@@ -64,7 +64,20 @@ end
 lemma mem_boundary_iff (A : set X) (x : X) :
   x ∈ boundary A ↔ ∀ U : set X, is_neighborhood U x → (U ∩ A ≠ ∅ ∧ U ∩ A.compl ≠ ∅) :=
 begin
-  sorry
+  split; intro h,
+  {
+    intros U hU,
+    exact ⟨hx.1 U hU, hx.2 U hU⟩,
+  },
+  {
+    have hx: (is_adherent_point A x) ∧ (is_adherent_point Aᶜ x), 
+    {
+      split; intros U hU,
+        exact (h U hU).1,
+        exact (h U hU).2,
+    },
+    exact ⟨hx.1, hx.2⟩,
+  }
 end
 
 class kolmogorov_space : Prop :=
