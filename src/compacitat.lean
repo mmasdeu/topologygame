@@ -24,7 +24,36 @@ end
 lemma finite_subset_is_compact (A : set X) (h : finite A) : is_compact_subset A :=
 begin
   intros I hI huniv,
-  sorry
+  have H : ∀ a ∈ A, ∃ ia ∈ I, a ∈ ia, by assumption,
+  let f : A → set X := λ a, classical.some (H a.1 a.2),
+  use f '' univ,
+  simp,
+  split,
+  {
+    intros i hi,
+    simp at hi,
+    obtain ⟨x, ⟨hx,h'⟩⟩ := hi,
+    subst h',
+    obtain ⟨h⟩ := classical.some_spec (H x hx),
+    solve_by_elim,
+  },
+  split,
+  {
+    haveI : fintype {x : X // x ∈ A} := finite.fintype h,
+    apply @finite_range _ _ f _,
+  },
+  {
+    unfold Union,
+    intros x hx,
+    unfold supr,
+    rw Sup_eq_supr,
+    simp,
+    use f ⟨x,hx⟩,
+    use x,
+    use hx,
+    obtain ⟨h⟩ := classical.some_spec (H x hx),
+    solve_by_elim,
+  }
 end
 
 lemma for_compact_exist_open_disjont {A : set X} [hausdorff_space X] (h : is_compact_subset A) : ∀ (y : X), y ∈ Aᶜ  → 
