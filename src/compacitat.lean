@@ -13,7 +13,7 @@ def is_compact :=
 
 def is_compact_subset {X : Type} [topological_space X] (S : set X):=
   ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) →
-  (⋃₀ 𝒰 = S) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ ⋃₀ℱ = S)
+  (S ⊆ ⋃₀ 𝒰) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ S ⊆ ⋃₀ℱ )
 
 lemma finite_set_is_compact (h : fintype X) : is_compact X :=
 begin
@@ -21,54 +21,76 @@ begin
   exact ⟨I, rfl.subset, finite.of_fintype I, huniv⟩,
 end
 
+lemma finite_subset_is_compact (A : set X) (h : finite A) : is_compact_subset A :=
+begin
+  intros I hI huniv,
+  sorry
+end
+
 lemma for_compact_exist_open_disjont {A : set X} [hausdorff_space X] (h : is_compact_subset A) : ∀ (y : X), y ∈ Aᶜ  → 
   (∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V) :=
 begin
   intros y hy,
-  let I := {V : set X | is_open V ∧ V ∩ A = ∅ ∧ y ∈ V},
-  have hA : ∃ (ℱ : set (set X)), ℱ ⊆ I ∧  finite ℱ,
+  unfold is_compact_subset at h,
+  let ter := {T : (set X) × (set X) | is_open T.1 ∧ is_open T.2 ∧ T.1 ∩ T.2 = ∅ ∧ A ∩ T.1 ≠ ∅ ∧ y ∈ T.2},
+  let ter1 := {U : set X | ∃(T : (set X) × (set X)), T ∈ ter ∧ T.1 = U},
+  have hh : A ⊆ ⋃₀ter1,
   {
-    unfold is_compact_subset at h,
-    have hIy : ∀ (B : set X), B ∈ I → is_open B, finish,
     sorry
   },
-  cases hA with ℱ hℱ,
-  have hℱo : ∀ (B : set X), B ∈ ℱ → is_open B,
+  have hter1open : ∀ (U : set X), U ∈ ter1 → is_open U,
   {
-    intros B hB,
-    have hIy : ∀ (B : set X), B ∈ I → is_open B, finish,
-    exact hIy B (hℱ.1 hB),
+    intros U hU,
+    cases hU with T hT,
+    rw← hT.2,
+    exact hT.1.1,
   },
-  have hℱy : ∀ (B : set X), B ∈ ℱ → y ∈ B,
+  obtain t := h ter1 hter1open hh,
+  rcases t with ⟨F, hF, hhF⟩,
+  let exter := {V : set X | ∃(T : (set X) × (set X)), T ∈ ter ∧ T.1 ∈ F ∧ T.2 = V},
+  have hexter : finite exter,
   {
-    intros B hB,
-    have hIy : ∀ (B : set X), B ∈ I → y ∈ B, finish,
-    exact hIy B (hℱ.1 hB),
+    sorry
   },
-    have hℱA : ⋂₀ ℱ ∩ A = ∅,
+  have hhexter : ∀ (s : set X), s ∈ exter → is_open s,
+  {
+    intros s hs,
+    cases hs with T hT,
+    rw ← hT.2.2,
+    exact hT.1.2.1,
+  },
+  have hAexter : ⋂₀exter ∩ A =∅,
+  {
+    have hexterF : ⋂₀exter ∩ ⋃₀ F = ∅,
     {
+      apply subset.antisymm,
+      {
+        intros x hx,
+        cases hx with hx1 hx2,
+        cases hx2 with B hB,
+        cases hB with hB1 hB2,
+        cases (hF hB1) with T hT,
+        rw [← hT.1.2.2.1, hT.2],
+        have hT1F : T.1 ∈ F, by rwa hT.2,
+        exact ⟨hB2, hx1 T.snd ⟨T, hT.1, hT1F, refl T.2⟩⟩,
+      },
+        exact (⋂₀exter ∩ ⋃₀ F).empty_subset,
+    },
     apply subset.antisymm,
     {
-      intros x hx,
-      have hh : x ∈ ⋂₀ I → x ∉ A,
-      {
-        intro hhx,
-        
-        sorry
-      },
-      have hIy : x ∈ ⋂₀ ℱ → x ∉ A,
-      {
-        intro hhx,
-        --finish,
-        sorry
-      },
-      --library_search!,
-      sorry
-      --exact false.rec (x ∈ ∅) (hIy hx.1 hx.2),
+      rw ← hexterF,
+      exact (⋂₀ exter).inter_subset_inter_right hhF.right,
     },
-    exact (⋂₀ ℱ ∩ A).empty_subset,
+    exact (⋂₀exter ∩ A).empty_subset,
   },
-  exact ⟨⋂₀ ℱ, open_of_finite_set_opens hℱ.2 hℱo, hℱA, mem_sInter.mpr hℱy⟩, 
+  have hyexter : y ∈ ⋂₀exter,
+  {
+    intros B hB,
+    cases hB with T hT,
+    rw ← hT.2.2,
+    exact hT.1.2.2.2.2,
+  },
+  exact ⟨⋂₀exter, open_of_finite_set_opens hexter hhexter, hAexter, hyexter⟩,  
 end
 
 lemma compact_in_T2_is_closed {A : set X} [hausdorff_space X] (h : is_compact_subset A) : is_closed A :=
