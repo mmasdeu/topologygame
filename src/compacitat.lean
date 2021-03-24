@@ -21,8 +21,40 @@ begin
   exact ⟨I, rfl.subset, finite.of_fintype I, huniv⟩,
 end
 
---lemma aa (A : set X) : is_compact_subset A ↔ is_compact 
---compacte i subespai compacte
+lemma union_of_compacts_is_compact {A B : set X} (hA : is_compact_subset A) (hB : is_compact_subset B) : is_compact_subset (A ∪ B) :=
+begin
+  intros I hI huI,
+  have hinclAB := union_subset_iff.1 huI,
+  obtain ⟨FA, hFA, hhFA⟩ := hA I hI hinclAB.1,
+  obtain ⟨FB, hFB, hhFB⟩ := hB I hI hinclAB.2,
+  have hunion : A ∪ B ⊆ ⋃₀(FA ∪ FB),
+  {
+    rw  (sUnion_union FA FB),
+    exact union_subset_union hhFA.right hhFB.right,
+  },
+  exact ⟨FA ∪ FB, union_subset hFA hFB, hhFA.left.union hhFB.left, hunion⟩,
+end
+
+lemma finite_union_of_compacts_is_compact {I : set(set X)} (h : ∀ s ∈ I, is_compact_subset s) (hI : finite I) : is_compact_subset (⋃₀I):=
+begin
+  revert h,
+  apply finite.induction_on hI,
+  {
+    intros I hI hhI hincl,
+    exact ⟨∅, empty_subset hI, finite_empty, refl ⋃₀∅⟩,    
+  },
+  {
+    intros V T hVT hT hUT hs,
+    have t : (⋃₀insert V T) = ⋃₀ T ∪ V, by finish,
+    have hsT: (∀ (s : set X), s ∈ T → is_compact_subset s),
+    {
+      intros s hhs,
+      exact hs s (mem_insert_of_mem V hhs),
+    },
+    rw t,
+    exact union_of_compacts_is_compact _ (hUT hsT) (hs V (mem_insert V T)),
+  }
+end
 
 lemma finite_subset_is_compact (A : set X) (h : finite A) : is_compact_subset A :=
 begin
