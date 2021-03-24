@@ -56,6 +56,22 @@ begin
   }
 end
 
+lemma singleton_is_compact (x : X) : is_compact_subset ({x} : set X) :=
+begin
+  intros I hI hIincl,
+  have t : ∃ (U : set X), U ∈ I ∧ x ∈ U,
+  {
+    sorry
+  },
+  cases t with U hU,
+  have hsingUI : {x} ⊆ ⋃₀{U},
+  {
+    rw (sUnion_singleton U),
+    exact singleton_subset_iff.mpr hU.right,
+  },
+  exact ⟨{U}, singleton_subset_iff.mpr hU.1, finite_singleton U, hsingUI⟩,  
+end
+
 lemma finite_subset_is_compact (A : set X) (h : finite A) : is_compact_subset A :=
 begin
   intros I hI huniv,
