@@ -59,11 +59,7 @@ end
 lemma singleton_is_compact (x : X) : is_compact_subset ({x} : set X) :=
 begin
   intros I hI hIincl,
-  have t : ∃ (U : set X), U ∈ I ∧ x ∈ U,
-  {
-    sorry
-  },
-  cases t with U hU,
+  cases (bex_def.mp (hIincl  rfl)) with U hU,
   have hsingUI : {x} ⊆ ⋃₀{U},
   {
     rw (sUnion_singleton U),
