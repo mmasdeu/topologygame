@@ -467,6 +467,15 @@ def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_
   end,
 }
 
- 
 
- end topological_space
+
+example (A B : set X) : A ⊆ B → interior A ⊆ interior B :=
+begin
+  sorry
+end
+
+end topological_space
+
+-- Lemes previs de Kuratowski clausura i interior preserva inclusió,...
+-- Definició de la banda de Möbius, via quocient i via subespai.
+--  - demostrar que són homeomorfes.

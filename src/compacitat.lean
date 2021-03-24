@@ -35,13 +35,21 @@ begin
   exact ⟨FA ∪ FB, union_subset hFA hFB, hhFA.left.union hhFB.left, hunion⟩,
 end
 
+lemma empty_is_compact : is_compact_subset (∅ : set X) :=
+begin
+  intros I hI hhI,
+  use ∅,
+  exact ⟨ empty_subset I, finite_empty, by tauto⟩,
+end
+
 lemma finite_union_of_compacts_is_compact {I : set(set X)} (h : ∀ s ∈ I, is_compact_subset s) (hI : finite I) : is_compact_subset (⋃₀I):=
 begin
   revert h,
   apply finite.induction_on hI,
   {
-    intros I hI hhI hincl,
-    exact ⟨∅, empty_subset hI, finite_empty, refl ⋃₀∅⟩,    
+    intros I,
+    rw sUnion_empty,
+    apply empty_is_compact,
   },
   {
     intros V T hVT hT hUT hs,
@@ -68,11 +76,35 @@ begin
   exact ⟨{U}, singleton_subset_iff.mpr hU.1, finite_singleton U, hsingUI⟩,  
 end
 
-lemma finite_subset_is_compact (A : set X) (h : finite A) : is_compact_subset A :=
+lemma finite_subset_is_compact (A : set X): finite A → is_compact_subset A :=
+begin
+  intro h,
+  apply finite.induction_on h,
+  apply empty_is_compact,
+  intros a s has hsfin hscpt,
+  apply union_of_compacts_is_compact,
+  apply singleton_is_compact,
+  assumption,
+end
+
+/-
+lemma finite_subset_is_compact_using_choice (A : set X) (h : finite A) : is_compact_subset A :=
 begin
   intros I hI huniv,
   have H : ∀ a ∈ A, ∃ ia ∈ I, a ∈ ia, by assumption,
-  let f : A → set X := λ a, classical.some (H a.1 a.2),
+  let f : A → set X := λ ⟨x, hxA⟩, classical.some (H x hxA),
+  have hf1 : ∀ (x : X) (hx : x ∈ A), x ∈ (f ⟨x, hx⟩),
+  {
+    intros x hx,
+    have hh := classical.some_spec (H x hx),
+    tauto,
+  },
+  have hf2 : ∀ (x : X) (hx : x ∈ A), (f ⟨x, hx⟩) ∈ I,
+  {
+    intros x hx,
+    have hh := classical.some_spec (H x hx),
+    tauto,
+  },
   use f '' univ,
   simp,
   split,
@@ -81,13 +113,12 @@ begin
     simp at hi,
     obtain ⟨x, ⟨hx,h'⟩⟩ := hi,
     subst h',
-    obtain ⟨h⟩ := classical.some_spec (H x hx),
-    solve_by_elim,
+    tauto,
   },
   split,
   {
     haveI : fintype {x : X // x ∈ A} := finite.fintype h,
-    apply @finite_range _ _ f _,
+    apply finite_range f,
   },
   {
     unfold Union,
@@ -98,11 +129,10 @@ begin
     use f ⟨x,hx⟩,
     use x,
     use hx,
-    obtain ⟨h⟩ := classical.some_spec (H x hx),
-    solve_by_elim,
+    tauto,
   }
 end
-
+ -/
 lemma for_compact_exist_open_disjont {A : set X} [hausdorff_space X] (h : is_compact_subset A) : ∀ (y : X), y ∈ Aᶜ  → 
   (∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V) :=
 begin
@@ -196,7 +226,4 @@ begin
 end
 
 /- Exemples de compacitat: topologica cofinita (definir-la) i demostrar compacitat -/
-/- Conjunt finit → compacte ✓-/
-/- Imatge contínua de compacte és compacte -/
-/- Compacte dins d'un Hausdorff és tancat -/
-/- Definir topologia de subespai -/
+
