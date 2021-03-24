@@ -59,23 +59,21 @@ begin
     rw ← hT.2.2,
     exact hT.1.2.1,
   },
+  have hexterF : ⋂₀exter ∩ ⋃₀ F = ∅,
+  {
+    apply subset.antisymm,
+    {
+      intros x hx,
+      rcases hx with ⟨hx1,⟨B ,⟨hB1, hB2⟩⟩⟩,
+      cases (hF hB1) with T hT,
+      rw [← hT.1.2.2.1, hT.2],
+      have hT1F : T.1 ∈ F, by rwa hT.2,
+      exact ⟨hB2, hx1 T.snd ⟨T, hT.1, hT1F, refl T.2⟩⟩,
+    },
+      exact (⋂₀exter ∩ ⋃₀ F).empty_subset,
+  },
   have hAexter : ⋂₀exter ∩ A =∅,
   {
-    have hexterF : ⋂₀exter ∩ ⋃₀ F = ∅,
-    {
-      apply subset.antisymm,
-      {
-        intros x hx,
-        cases hx with hx1 hx2,
-        cases hx2 with B hB,
-        cases hB with hB1 hB2,
-        cases (hF hB1) with T hT,
-        rw [← hT.1.2.2.1, hT.2],
-        have hT1F : T.1 ∈ F, by rwa hT.2,
-        exact ⟨hB2, hx1 T.snd ⟨T, hT.1, hT1F, refl T.2⟩⟩,
-      },
-        exact (⋂₀exter ∩ ⋃₀ F).empty_subset,
-    },
     apply subset.antisymm,
     {
       rw ← hexterF,
