@@ -21,6 +21,9 @@ begin
   exact ⟨I, rfl.subset, finite.of_fintype I, huniv⟩,
 end
 
+--lemma aa (A : set X) : is_compact_subset A ↔ is_compact 
+--compacte i subespai compacte
+
 lemma finite_subset_is_compact (A : set X) (h : finite A) : is_compact_subset A :=
 begin
   intros I hI huniv,
