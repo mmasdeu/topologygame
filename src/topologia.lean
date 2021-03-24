@@ -403,8 +403,7 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
   union := 
   begin
     rintros A hA,
-    let S := { V: set Y | ∃ B ∈ A, is_open V ∧ f⁻¹' V = B},
-    use ⋃₀S,
+    use ⋃₀{V : set Y | is_open V ∧ f⁻¹' V ∈ A},
     split,
     {
       rw sUnion,
@@ -417,17 +416,13 @@ def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_s
       ext,
       norm_num,
       split,
-      {
-        tauto,
-      },
-      {
-        rintros ⟨U, hU, hx⟩,
+      { tauto },
+      { rintros ⟨U, hU, hx⟩,
         specialize hA U hU,
         rcases hA with ⟨V, hV, hV₂⟩,
         use V,
         rw ←hV₂ at hx hU,
-        exact ⟨⟨hU, hV⟩, mem_preimage.mp hx⟩,
-      },
+        tauto },
     },
   end,
   inter := 
