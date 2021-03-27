@@ -354,3 +354,85 @@ lemma is_open_punt_particular.union {X : Type} :
 begin
   sorry
 end
+
+namespace Moebius
+open topological_space
+def Ioos := {B : set ℝ | ∃ a b : ℝ, B = Ico a b }
+
+instance ordinary_topology: topological_space ℝ := generate_from Ioos
+
+instance open_interval(a b: ℝ): topological_space (Ioo a b) := top_induced (Ioo a b) ℝ (λ x, ↑x)
+
+example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
+begin
+  use (λ x, ↑x / (1- abs(↑x))),
+  unfold homeomorphism,
+  -- Algú s'atreveix?
+  sorry,
+end
+
+/-- Square [0,1] × [0,1] used to construct quotients. -/
+def unit_square := (((Icc (0: ℝ) 1): Type) × (Icc (0: ℝ) 1))
+instance :has_lift_t unit_square (ℝ × ℝ) :=
+begin
+  fconstructor,
+  rintros ⟨x, y⟩,
+  exact ⟨x, y⟩,  
+end
+instance open_square: topological_space unit_square  := 
+  top_induced unit_square (ℝ × ℝ) (λ x, ↑x)
+
+/-- The Möbius strip, defined as a qutient in [0,1) × [0,1) -/
+def Moebius_quot: topological_space (((Icc (0: ℝ) 1): Type) × (Ico (0: ℝ) 1)) :=
+begin
+  apply top_quotient unit_square (( (Icc (0:ℝ) 1) :  Type) × (Ico (0:ℝ) 1)) _,
+  intro xy,
+  cases xy with x y,
+  by_cases h: y.1 = (1: ℝ),{
+    split,
+    {
+      use 1-x,
+      cases x,
+      norm_num,
+      finish,
+    },
+    {
+      use 0,
+      norm_num,
+    },
+  },
+  {
+    split,
+    {
+      use x,
+    },
+    cases y with y hy,
+    use y,
+    cases hy,
+    norm_num at h;
+    split,
+    {
+      linarith,
+    },
+    exact (ne.le_iff_lt h).mp hy_right,
+  },
+end  
+
+/-- The torus, defined as a quotient in [0,1) × [0,1) -/
+def torus: topological_space (((Ico (0: ℝ) 1): Type) × (Ico (0: ℝ) 1)) :=
+begin
+  apply top_quotient (ℝ × ℝ)  (( (Ico (0:ℝ) 1) :  Type) × (Ico (0:ℝ) 1)) _,
+  intro xy,
+  cases xy with x y,
+  split,
+  use fract x,
+  exact ⟨fract_nonneg _,fract_lt_one _⟩,
+  use fract y,
+  exact ⟨fract_nonneg _,fract_lt_one _⟩,
+end
+
+
+
+
+
+end Moebius
