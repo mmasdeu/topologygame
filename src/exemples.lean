@@ -3,6 +3,7 @@ import .bases
 import .productes
 import .metrics
 import data.real.ereal
+-- import data.complex.exponential -- sin and cos
 
 open set
 open topological_space
@@ -363,13 +364,19 @@ instance ordinary_topology: topological_space ℝ := generate_from Ioos
 
 instance open_interval(a b: ℝ): topological_space (Ioo a b) := top_induced (Ioo a b) ℝ (λ x, ↑x)
 
+-- Algú s'atreveix?
 example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
-begin
-  use (λ x, ↑x / (1- abs(↑x))),
-  unfold homeomorphism,
-  -- Algú s'atreveix?
-  sorry,
-end
+{ to_fun := (λ x, ↑x / (1- abs(↑x))),
+  inv_fun := 
+  begin
+    intro x,
+    use x/ (1+abs(x)),
+    sorry,
+  end,
+  left_inv := sorry,
+  right_inv := sorry,
+  continuous_to_fun := sorry,
+  continuous_inv_fun := sorry }
 
 /-- Square [0,1] × [0,1] used to construct quotients. -/
 def unit_square := (((Icc (0: ℝ) 1): Type) × (Icc (0: ℝ) 1))
@@ -383,29 +390,23 @@ instance open_square: topological_space unit_square  :=
   top_induced unit_square (ℝ × ℝ) (λ x, ↑x)
 
 /-- The Möbius strip, defined as a qutient in [0,1) × [0,1) -/
-def Moebius_quot: topological_space (((Icc (0: ℝ) 1): Type) × (Ico (0: ℝ) 1)) :=
+instance Moebius_quot: topological_space (((Icc (0: ℝ) 1): Type) × (Ico (0: ℝ) 1)) :=
 begin
   apply top_quotient unit_square (( (Icc (0:ℝ) 1) :  Type) × (Ico (0:ℝ) 1)) _,
   intro xy,
   cases xy with x y,
   by_cases h: y.1 = (1: ℝ),{
     split,
-    {
-      use 1-x,
+    { use 1-x,
       cases x,
       norm_num,
-      finish,
-    },
-    {
-      use 0,
-      norm_num,
-    },
+      finish },
+    { use 0,
+      norm_num },
   },
   {
     split,
-    {
-      use x,
-    },
+    { use x },
     cases y with y hy,
     use y,
     cases hy,
@@ -431,8 +432,45 @@ begin
   exact ⟨fract_nonneg _,fract_lt_one _⟩,
 end
 
+notation `ℝ³` := ℝ × ℝ × ℝ
+open real
 
+/- No se com importar sin i cos...
 
+def φ(u v: ℝ) : ℝ³ := ⟨(1+v*cos (u/2))*cos v, ⟨(1+v*cos (u/2))*sin u, v*sin(u/2)⟩⟩
+
+def Moebius :=  {x: ℝ³ // ∃ u v : ℝ, x = φ u v} 
+-- Es pot fer d'aluna manera semblant a això?
+-- def Moebius' := φ '' univ
+-- #check Moebius'
+
+instance Moebius.lift : has_lift_t Moebius ℝ³:=
+begin
+  fconstructor,
+  rintros ⟨x, hx⟩,
+  exact x,
+end
+
+/-- Möbius stip as a subspace of ℝ³ -/
+instance Moebius_sub: topological_space Moebius :=
+   top_induced Moebius ℝ³ (λ x, ↑x)
+
+lemma Moebius_equivalent: (((Icc (0: ℝ) 1): Type) × (Ico (0: ℝ) 1))  ≅ Moebius :=
+{ to_fun := 
+  begin
+    rintros ⟨⟨u, hu⟩, ⟨v, hv⟩⟩,
+    sorry,
+  end,
+  inv_fun := 
+  begin
+    rintros ⟨⟨x, y,z⟩, hxyz⟩,
+    sorry,
+  end,
+  left_inv := sorry,
+  right_inv := sorry,
+  continuous_to_fun := sorry,
+  continuous_inv_fun := sorry }
+-/
 
 
 end Moebius

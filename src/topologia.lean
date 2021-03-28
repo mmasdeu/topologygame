@@ -385,16 +385,12 @@ begin
   exact hg,
 end
 
+structure homeomorph (X Y : Type) [topological_space X] [topological_space Y]
+  extends X ≃ Y :=
+(continuous_to_fun  : is_continuous to_fun)
+(continuous_inv_fun : is_continuous inv_fun) -- is_open_map to_fun
 
-def homeomorphism {X Y: Type} [topological_space X] [topological_space Y] (f: X → Y)
-   := is_continuous f ∧ function.bijective f ∧ is_open_map f
-
-
-variables {Y: Type}
-variables [topological_space Y]
-
-notation X `≅` Y := ∃ f : X → Y, homeomorphism f 
-
+notation X `≅` Y := homeomorph X Y
 
  -- definir subespai i espai quocient
 def top_induced (X Y : Type) [topological_space Y] (f : X → Y) : topological_space X :=
@@ -471,10 +467,17 @@ def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_
 
 example (A B : set X) : A ⊆ B → interior A ⊆ interior B :=
 begin
-  sorry
+  intro h,
+  apply interior_is_biggest_open B (interior A),
+  { intros a ha, 
+    exact h (interior_is_subset A ha)},
+  { exact interior_is_open A }
 end
 
+
 end topological_space
+
+
 
 -- Lemes previs de Kuratowski clausura i interior preserva inclusió,...
 -- Definició de la banda de Möbius, via quocient i via subespai.
