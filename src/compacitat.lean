@@ -15,6 +15,15 @@ def is_compact_subset {X : Type} [topological_space X] (S : set X):=
   ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) →
   (S ⊆ ⋃₀ 𝒰) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ S ⊆ ⋃₀ℱ )
 
+lemma compact_space_iff_univ_compact :  is_compact X ↔ is_compact_subset (univ :set X) :=
+begin
+  split; intros h I hI hIX,
+  { obtain ⟨F, hF, hh⟩ := h I hI (univ_subset_iff.mp hIX),
+    exact ⟨F, hF, hh.1, hh.2.symm.subset⟩},
+  { obtain ⟨F, hF, hh⟩ := h I hI (eq.symm hIX).subset,
+    exact ⟨F, hF, hh.1, univ_subset_iff.mp hh.2⟩},
+end
+
 lemma finite_set_is_compact (h : fintype X) : is_compact X :=
 begin
   intros I hI huniv,
@@ -28,10 +37,8 @@ begin
   obtain ⟨FA, hFA, hhFA⟩ := hA I hI hinclAB.1,
   obtain ⟨FB, hFB, hhFB⟩ := hB I hI hinclAB.2,
   have hunion : A ∪ B ⊆ ⋃₀(FA ∪ FB),
-  {
-    rw  (sUnion_union FA FB),
-    exact union_subset_union hhFA.right hhFB.right,
-  },
+  { rw  (sUnion_union FA FB),
+    exact union_subset_union hhFA.right hhFB.right},
   exact ⟨FA ∪ FB, union_subset hFA hFB, hhFA.left.union hhFB.left, hunion⟩,
 end
 
@@ -46,22 +53,16 @@ lemma finite_union_of_compacts_is_compact {I : set(set X)} (h : ∀ s ∈ I, is_
 begin
   revert h,
   apply finite.induction_on hI,
-  {
-    intros I,
+  { intros I,
     rw sUnion_empty,
-    apply empty_is_compact,
-  },
-  {
-    intros V T hVT hT hUT hs,
+    apply empty_is_compact},
+  { intros V T hVT hT hUT hs,
     have t : (⋃₀insert V T) = ⋃₀ T ∪ V, by finish,
     have hsT: (∀ (s : set X), s ∈ T → is_compact_subset s),
-    {
-      intros s hhs,
-      exact hs s (mem_insert_of_mem V hhs),
-    },
+    { intros s hhs,
+      exact hs s (mem_insert_of_mem V hhs)},
     rw t,
-    exact union_of_compacts_is_compact _ (hUT hsT) (hs V (mem_insert V T)),
-  }
+    exact union_of_compacts_is_compact X (hUT hsT) (hs V (mem_insert V T))},
 end
 
 lemma singleton_is_compact (x : X) : is_compact_subset ({x} : set X) :=
@@ -69,10 +70,8 @@ begin
   intros I hI hIincl,
   cases (bex_def.mp (hIincl  rfl)) with U hU,
   have hsingUI : {x} ⊆ ⋃₀{U},
-  {
-    rw (sUnion_singleton U),
-    exact singleton_subset_iff.mpr hU.right,
-  },
+  { rw (sUnion_singleton U),
+    exact singleton_subset_iff.mpr hU.right},
   exact ⟨{U}, singleton_subset_iff.mpr hU.1, finite_singleton U, hsingUI⟩,  
 end
 
@@ -85,6 +84,32 @@ begin
   apply union_of_compacts_is_compact,
   apply singleton_is_compact,
   assumption,
+end
+
+lemma close_subset_of_compact_is_compact {A B : set X} (hA : is_closed A) (hB : is_compact_subset B) (hAB : A ⊆ B) : 
+  is_compact_subset A :=
+begin
+  intros I hI hIA,
+  have hF : ∀ (U : set X), U ∈ I ∪ {Aᶜ} → is_open U,
+  { intros U hU,
+    cases ((mem_union U I {Aᶜ}).mp hU) with h,
+      {exact hI U h},
+      {rwa (mem_singleton_iff.mp h)}},
+  have hUnionB : B ⊆ ⋃₀(I ∪ {Aᶜ}),
+  { rw [sUnion_union I {Aᶜ}, Aᶜ.sUnion_singleton, (union_diff_cancel hAB).symm],
+    exact union_subset_union hIA (inter_subset_right B Aᶜ)},
+  obtain ⟨F, hFA, hh⟩  := hB (I ∪ {Aᶜ}) hF hUnionB,
+  have hFI : F \ {Aᶜ} ⊆ I,
+  { intros x hx,
+    cases ((mem_union x I {Aᶜ}).mp (hFA ((diff_subset F {Aᶜ})  hx))) with h,
+      {exact h},
+      {exfalso,
+       exact (not_mem_of_mem_diff hx) h}},
+  have hsubsetU : A ⊆ ⋃₀(F \ {Aᶜ}),
+  { intros x hx,
+    rcases (mem_sUnion.1 ((subset.trans hAB hh.right) hx)) with ⟨V, ⟨hV1, hV2⟩⟩,
+    exact (@mem_sUnion X x (F \ {Aᶜ})).2 ⟨V, ⟨hV1, by finish⟩, hV2⟩},
+  exact ⟨F\{Aᶜ}, hFI, hh.left.subset (diff_subset F {Aᶜ}), hsubsetU⟩,
 end
 
 /-
@@ -200,27 +225,19 @@ end
 lemma compact_in_T2_is_closed {A : set X} [hausdorff_space X] (h : is_compact_subset A) : is_closed A :=
 begin
   have hAc : interior Aᶜ = Aᶜ,
-  {
-    apply subset.antisymm,
-      exact interior_is_subset Aᶜ,
-    {
-      intros x hxA,
+  { apply subset.antisymm,
+      {exact interior_is_subset Aᶜ},
+    { intros x hxA,
       cases (for_compact_exist_open_disjont X h) x hxA with V hV,
       have hVAc : V ⊆ Aᶜ,
-      {
-        intros y hy,
+      { intros y hy,
         have hynA : y ∉ A,
-        {
-          intro hyA,
+        { intro hyA,
           have hyVA : y ∈ V ∩ A, by exact ⟨hy, hyA⟩,
           have hIe : V ∩ A ≠ ∅, by finish,
-          exact hIe hV.2.1,
-        },
-        exact mem_compl hynA,
-      },
-      exact ⟨V, hV.1, hV.2.2, hVAc⟩,
-    },
-  },
+          exact hIe hV.2.1},
+        exact mem_compl hynA},
+      exact ⟨V, hV.1, hV.2.2, hVAc⟩}},
   rw [is_closed, ← hAc],
   exact (interior_is_open Aᶜ),
 end
