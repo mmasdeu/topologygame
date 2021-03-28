@@ -158,6 +158,7 @@ begin
   }
 end
  -/
+open hausdorff_space
 lemma for_compact_exist_open_disjont {A : set X} [hausdorff_space X] (h : is_compact_subset A) : ∀ (y : X), y ∈ Aᶜ  → 
   (∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V) :=
 begin
@@ -165,18 +166,29 @@ begin
   unfold is_compact_subset at h,
   let ter := {T : (set X) × (set X) | is_open T.1 ∧ is_open T.2 ∧ T.1 ∩ T.2 = ∅ ∧ A ∩ T.1 ≠ ∅ ∧ y ∈ T.2},
   let ter1 := {U : set X | ∃(T : (set X) × (set X)), T ∈ ter ∧ T.1 = U},
-  have hh : A ⊆ ⋃₀ter1,
-  {
-    sorry
-  },
+  have hAinUter1 : A ⊆ ⋃₀ter1,
+  { intros x hx,
+    have hxy : y ≠ x, by finish,
+    obtain ⟨U, V, hU, hV, hUV, hh⟩  := t2 x y hxy,
+    have prodUV : ∃ (T: (set X) × (set X)), T.1 = U ∧ T.2 = V, by finish,
+    have hAUne : A ∩ U ≠ ∅,
+    { intro p,
+      exact eq_empty_iff_forall_not_mem.mp p x ⟨hx, hh.1⟩},
+    cases prodUV with T hT,
+    have hTinter : T ∈ ter,
+    { simp,
+      rw [hT.1, hT.2],
+      exact ⟨hU, hV, hUV, hAUne, hh.2⟩},
+    have hTinter1 : U ∈ ter1,
+    { simp,
+      exact ⟨hU, V, hV, hUV, hAUne, hh.2⟩},
+    exact (subset_sUnion_of_mem hTinter1) hh.1},
   have hter1open : ∀ (U : set X), U ∈ ter1 → is_open U,
-  {
-    intros U hU,
+  { intros U hU,
     cases hU with T hT,
     rw← hT.2,
-    exact hT.1.1,
-  },
-  obtain t := h ter1 hter1open hh,
+    exact hT.1.1},
+  obtain t := h ter1 hter1open hAinUter1,
   rcases t with ⟨F, hF, hhF⟩,
   let exter := {V : set X | ∃(T : (set X) × (set X)), T ∈ ter ∧ T.1 ∈ F ∧ T.2 = V},
   have hexter : finite exter,
@@ -184,41 +196,29 @@ begin
     sorry
   },
   have hhexter : ∀ (s : set X), s ∈ exter → is_open s,
-  {
-    intros s hs,
+  { intros s hs,
     cases hs with T hT,
     rw ← hT.2.2,
-    exact hT.1.2.1,
-  },
+    exact hT.1.2.1},
   have hexterF : ⋂₀exter ∩ ⋃₀ F = ∅,
-  {
-    apply subset.antisymm,
-    {
-      intros x hx,
+  { apply subset.antisymm,
+    { intros x hx,
       rcases hx with ⟨hx1,⟨B ,⟨hB1, hB2⟩⟩⟩,
       cases (hF hB1) with T hT,
       rw [← hT.1.2.2.1, hT.2],
       have hT1F : T.1 ∈ F, by rwa hT.2,
-      exact ⟨hB2, hx1 T.snd ⟨T, hT.1, hT1F, refl T.2⟩⟩,
-    },
-      exact (⋂₀exter ∩ ⋃₀ F).empty_subset,
-  },
+      exact ⟨hB2, hx1 T.snd ⟨T, hT.1, hT1F, refl T.2⟩⟩},
+    { exact (⋂₀exter ∩ ⋃₀ F).empty_subset}},
   have hAexter : ⋂₀exter ∩ A =∅,
-  {
-    apply subset.antisymm,
-    {
-      rw ← hexterF,
-      exact (⋂₀ exter).inter_subset_inter_right hhF.right,
-    },
-    exact (⋂₀exter ∩ A).empty_subset,
-  },
+  { apply subset.antisymm,
+    { rw ← hexterF,
+      exact (⋂₀ exter).inter_subset_inter_right hhF.right},
+    { exact (⋂₀exter ∩ A).empty_subset}},
   have hyexter : y ∈ ⋂₀exter,
-  {
-    intros B hB,
+  { intros B hB,
     cases hB with T hT,
     rw ← hT.2.2,
-    exact hT.1.2.2.2.2,
-  },
+    exact hT.1.2.2.2.2},
   exact ⟨⋂₀exter, open_of_finite_set_opens hexter hhexter, hAexter, hyexter⟩,  
 end
 
