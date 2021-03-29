@@ -364,16 +364,93 @@ instance ordinary_topology: topological_space ℝ := generate_from Ioos
 
 instance open_interval(a b: ℝ): topological_space (Ioo a b) := top_induced (Ioo a b) ℝ (λ x, ↑x)
 
--- Algú s'atreveix?
+-- Es pot fer més curt?
 example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
 { to_fun := (λ x, ↑x / (1- abs(↑x))),
   inv_fun := 
   begin
     intro x,
-    use x/ (1+abs(x)),
-    sorry,
+    use x/(1+abs x),
+    have h1: 0 ≤ abs x := abs_nonneg x,
+    have h2: 0 < 1 + abs x := by linarith,  
+    have h3: 0 ≤ abs x + x,
+    {
+      by_cases 0 ≤ x,
+      { linarith },
+      {
+        norm_num at h,
+        rw abs_of_neg h,
+        linarith,
+      },
+    },
+    have h4: x ≤ abs x,
+    {
+      by_cases 0 ≤ x,
+      { rw abs_of_nonneg h },
+      { linarith },
+    },
+    split,
+    {
+      have h: (-1)*(1+ abs(x)) < x,
+      {
+        norm_num,
+        linarith,
+      },
+      exact (lt_div_iff h2).mpr h,
+    },
+    {
+      apply (div_lt_iff h2).mpr,
+      norm_num,
+      linarith,
+    },
   end,
-  left_inv := sorry,
+  left_inv := 
+  begin
+    rintro ⟨x, hx⟩,
+    by_cases x < 0,
+    {
+      ext,
+      norm_num,
+      rw abs_of_neg h,
+      have hhh : x / (1 + x) < 0,
+      {
+        cases hx,
+        have hhx : 0 < 1 + x,
+        { linarith },
+        apply (div_lt_iff hhx).mpr,
+        convert h,
+        simp,
+      },
+      norm_num,
+      rw abs_of_neg hhh,
+      have : 1 + x ≠ 0,
+      {
+        cases hx,
+        linarith,
+      },
+      field_simp
+    },
+    {
+      ext,
+      norm_num at *,
+      rw abs_of_nonneg h,
+      have hhh : x / (1 - x) ≥ 0,
+      {
+        cases hx,
+        have hhx : 0 < 1 - x,
+        { linarith },
+        apply (le_div_iff hhx).mpr,
+        linarith,
+      },
+      rw abs_of_nonneg hhh,
+      have : 1 - x ≠ 0,
+      {
+        cases hx,
+        linarith,
+      },
+      field_simp,
+    }
+  end,
   right_inv := sorry,
   continuous_to_fun := sorry,
   continuous_inv_fun := sorry }
