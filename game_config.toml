@@ -21,3 +21,13 @@ levels = [
 	"src/game/interior_world/level4.lean",
 	"src/game/interior_world/level5.lean",
 ]
+
+[[worlds]]
+name = "Separation world"
+id = 3
+parents = [2]
+levels = [
+	"src/game/separation_world/level1.lean",
+	"src/game/separation_world/level2.lean",
+	"src/game/separation_world/level3.lean",
+]
