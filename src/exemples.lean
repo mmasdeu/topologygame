@@ -1,9 +1,6 @@
-import .topologia
-import .bases
 import .productes
-import .metrics
 import data.real.ereal
--- import data.complex.exponential -- sin and cos
+-- import analysis.special_functions.trigonometric -- for sin and cos
 
 open set
 open topological_space
@@ -371,85 +368,43 @@ example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
   begin
     intro x,
     use x/(1+abs x),
-    have h1: 0 ≤ abs x := abs_nonneg x,
-    have h2: 0 < 1 + abs x := by linarith,  
-    have h3: 0 ≤ abs x + x,
-    {
-      by_cases 0 ≤ x,
-      { linarith },
-      {
-        norm_num at h,
-        rw abs_of_neg h,
-        linarith,
-      },
-    },
-    have h4: x ≤ abs x,
-    {
-      by_cases 0 ≤ x,
-      { rw abs_of_nonneg h },
-      { linarith },
-    },
-    split,
-    {
-      have h: (-1)*(1+ abs(x)) < x,
-      {
-        norm_num,
-        linarith,
-      },
-      exact (lt_div_iff h2).mpr h,
-    },
-    {
-      apply (div_lt_iff h2).mpr,
-      norm_num,
+    have h1: 0 < 1 + abs x := by linarith [abs_nonneg x],
+    have h2: 0 ≤ abs x + x := abs_add_nonneg x,
+    have h3: x ≤ abs x := le_abs_self x,
+    split;
+    { 
+      simp [lt_div_iff h1, div_lt_iff h1],
       linarith,
     },
   end,
   left_inv := 
   begin
     rintro ⟨x, hx⟩,
-    by_cases x < 0,
+    have h : 1 - abs x ≠ 0 := sorry,
+    simp,
+    by_cases H : 0 ≤ x,
     {
-      ext,
-      norm_num,
-      rw abs_of_neg h,
-      have hhh : x / (1 + x) < 0,
-      {
-        cases hx,
-        have hhx : 0 < 1 + x,
-        { linarith },
-        apply (div_lt_iff hhx).mpr,
-        convert h,
-        simp,
-      },
-      norm_num,
-      rw abs_of_neg hhh,
-      have : 1 + x ≠ 0,
-      {
-        cases hx,
-        linarith,
-      },
-      field_simp
+      rw abs_eq_self.2 H,
+      have hh : 0 < 1 -x, by linarith [hx.2],
+      have : 1 -x ≠ 0, by linarith,
+      rw abs_eq_self.2 (div_nonneg H (le_of_lt hh)),
+      field_simp,
     },
     {
-      ext,
-      norm_num at *,
-      rw abs_of_nonneg h,
-      have hhh : x / (1 - x) ≥ 0,
+      push_neg at H,
+      rw abs_of_neg H,
+      norm_num,
+      have hh: 0 < 1 + x, by linarith [hx.1],
+      have hh' : 1 + x ≠ 0 := ne_of_gt hh,
+      have h' : x / (1+x) < 0,
       {
-        cases hx,
-        have hhx : 0 < 1 - x,
-        { linarith },
-        apply (le_div_iff hhx).mpr,
-        linarith,
+        apply div_neg_iff.2,
+        tauto,
       },
-      rw abs_of_nonneg hhh,
-      have : 1 - x ≠ 0,
-      {
-        cases hx,
-        linarith,
-      },
+      rw abs_of_neg h',
+      norm_num,
       field_simp,
-    }
+    },
   end,
   right_inv := sorry,
   continuous_to_fun := sorry,

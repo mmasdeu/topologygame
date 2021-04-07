@@ -143,3 +143,11 @@ begin
   push_neg at hh,
   exact h (prod.ext_iff.mpr hh),
 end
+
+lemma abs_add_nonneg (x : ℝ) : 0 ≤ abs x + x :=
+begin
+  by_cases h : 0 ≤ x,
+  { linarith [abs_of_nonneg h] },
+  { push_neg at h,
+    linarith [abs_of_neg h] },
+end
