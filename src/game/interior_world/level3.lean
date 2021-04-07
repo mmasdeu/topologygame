@@ -1,4 +1,3 @@
-import game.interior_world.definition -- hide
 import game.interior_world.level2 --hide
 
 /-

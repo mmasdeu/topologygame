@@ -1,6 +1,4 @@
-import game.basic_defs_world.definition -- hide
-import game.interior_world.definition -- hide
-import game.separation_world.definition -- hide
+import game.separation_world.level1 -- hide
 
 /-
 # Level 2: Comparison between the definition given and common definition of T₁

@@ -1,5 +1,3 @@
-import game.basic_defs_world.definition -- hide
-import game.interior_world.definition -- hide
 import game.separation_world.definition -- hide
 
 /- Axiom : A topological space is a T₀ space if, from any two points in the topology, there exist and open set that contains one point and not the other

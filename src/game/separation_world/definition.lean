@@ -1,4 +1,4 @@
-import game.basic_defs_world.level1 --hide
+import game.interior_world.definition -- hide
 
 namespace topological_space -- hide
 
@@ -18,10 +18,5 @@ def is_closed {X : Type} [topological_space X] := λ (C : set X), @is_open X _ (
 
 theorem subset.antisymm {a b : set X} (h₁ : a ⊆ b) (h₂ : b ⊆ a) : a = b :=
 set.ext $ λ x, ⟨@h₁ _, @h₂ _⟩
-
-theorem mem_singleton_iff {a b : X} : a ∈ ({b} : set X) ↔ a = b := iff.rfl
-
-lemma mem_compl_singleton_iff {a x : X} : x ∈ ({a} : set X)ᶜ ↔ x ≠ a :=
-not_congr mem_singleton_iff
 
 end topological_space -- hide

@@ -1,6 +1,4 @@
-import game.basic_defs_world.definition -- hide
-import game.interior_world.definition -- hide
-import game.separation_world.definition -- hide
+import game.separation_world.level2 -- hide
 
 /-
 # Level 3: Characterisation of Frechet spaces
@@ -10,6 +8,7 @@ variables {X : Type} -- hide
 variables [topological_space X] -- hide
 
 namespace topological_space -- hide
+open set -- hide
 
 /- Lemma
 Let τ be a topological space. τ is a frechet space if only if for all the points in the topology, their singletons are closed sets.
