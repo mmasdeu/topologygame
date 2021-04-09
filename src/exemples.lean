@@ -335,23 +335,47 @@ def three_point_topology_2 : topological_space (fin 3) := generate_from {{1}, {2
 def three_point_topology_3 (n : ℕ) [has_one (fin n)] : topological_space (fin n) := 
   generate_from {{1}, {2,3}}
 
-
-
--- definir una topologia per un conjunt de tres elements
--- topologia cofinita
--- topologia del punt particular x: λ (A : set X), A = ∅ ∨ x ∈ A
--- topologia digital (a ℤ) {2n+1} tots oberts, {2n-1,2n,2n+1} obert
--- definir espai projectiu
--- definir la banda de Möbius
-
-def is_open_punt_particular (X : Type) (x : X) :=  λ (A : set X), A = ∅ ∨ x ∈ A
-
-lemma is_open_punt_particular.union {X : Type} :
-  ∀ (𝒴 : set (set X)),
-    (∀ (A : set X), A ∈ 𝒴 → Aᶜ.finite) → (⋃₀ 𝒴)ᶜ.finite :=
-begin
-  sorry
-end
+/-- A topology where all opens are around a given point x -/
+def distinguished_point_topology {X : Type} (x : X) : topological_space X := {
+  is_open := λ (A : set X), A = ∅ ∨ x ∈ A,
+  univ_mem := by tauto,
+  union := 
+  begin
+    intros 𝒴 h,
+    by_cases H : ∃ A ∈ 𝒴, A ≠ ∅,
+    { right,
+      obtain ⟨A, ⟨hA1, hA2⟩⟩ := H,
+      use A,
+      split,
+      { assumption },
+      specialize h A hA1,
+      tauto },
+    { push_neg at H,
+      left,
+      exact sUnion_eq_empty.mpr H }
+  end,
+  inter := 
+  begin
+    intros A B hA hB,
+    cases hA,
+    {
+      left,
+      subst hA,
+      exact empty_inter B,
+    },
+    {
+      cases hB,
+      {
+        left,
+        subst hB,
+        exact inter_empty A,
+      },
+      {
+        right,
+        exact mem_inter hA hB,
+      }
+    }
+  end }
 
 namespace Moebius
 open topological_space
@@ -361,7 +385,6 @@ instance ordinary_topology: topological_space ℝ := generate_from Ioos
 
 instance open_interval(a b: ℝ): topological_space (Ioo a b) := top_induced (Ioo a b) ℝ (λ x, ↑x)
 
--- Es pot fer més curt?
 example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
 { to_fun := (λ x, ↑x / (1- abs(↑x))),
   inv_fun := 
@@ -380,7 +403,22 @@ example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
   left_inv := 
   begin
     rintro ⟨x, hx⟩,
-    have h : 1 - abs x ≠ 0 := sorry,
+    have h : 1 - abs x ≠ 0,
+    {
+      unfold Ioo at hx,
+      simp at hx,
+      by_cases habs : 0 ≤ x,
+      {
+        simp [abs_eq_self.2 habs],
+        linarith
+      },
+      {
+        push_neg at habs,
+        replace habs := le_of_lt habs,
+        rw abs_of_nonpos habs,
+        linarith,
+      }
+    },
     simp,
     by_cases H : 0 ≤ x,
     {

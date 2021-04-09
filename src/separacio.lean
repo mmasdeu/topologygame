@@ -8,14 +8,18 @@ variables (X : Type) [topological_space X]
 /-- Kuratowski's problem -/
 example (A : set X) : closure (interior (closure( interior A))) = closure (interior A) :=
 begin
-  sorry,
+  apply subset.antisymm,
+  { apply subset_closed_inclusion_closure' (closure_is_closed (interior A)),
+    apply interior_subset_self (closure (interior A)) },
+  { apply subset_closed_inclusion_closure'  (closure_is_closed (interior (closure (interior A)))),
+    suffices : interior A ⊆ interior (closure (interior A)),
+      by exact subset.trans this (closure_supset_self (interior (closure (interior A)))),
+    have H : interior A ⊆ closure (interior A) := closure_supset_self (interior A),
+    apply interior_is_biggest_open',
+    { exact interior_is_open A },
+    { exact H } }
 end
 
-/-- Kuratowski's problem -/
-example (A : set X) : interior (closure( interior (closure A))) = interior (closure A) :=
-begin
-  sorry,
-end
 
 def is_dense {X : Type} [topological_space X] (A : set X) : Prop := closure A = univ
 
@@ -176,7 +180,7 @@ begin
     {
       intros t h,
       rw ← hUV,
-      exact ⟨(set_in_closure U) h.1, (set_in_closure V) h.2 ⟩, 
+      exact ⟨(closure_supset_self U) h.1, (closure_supset_self V) h.2 ⟩,
     },
     {
       exact (U ∩ V).empty_subset,
@@ -216,20 +220,20 @@ begin
   have hxcV : x ∉ closure V,
   {
     rw closure_eq_compl_of_interior_compl V,
-    have hxint := (@interior_is_biggest_open X _inst_1 Vᶜ U (subset_compl_iff_disjoint.mpr hUV) hU) x hh.1,
-    exact not_not.mpr hxint,
+    have hxint := (interior_is_biggest_open' Vᶜ U hU (subset_compl_iff_disjoint.mpr hUV)),
+    tauto,
   },
   obtain ⟨A, B, hA, hB, hAB, hh2 ⟩ := regular x (closure V) (closure_is_closed V) hxcV,
   have t : closure A ∩ closure V = ∅,
   {
     have hBc : is_closed Bᶜ, by simp[hB],
-    have hcA := subset.trans (subset_closed_inclusion_closure (subset_compl_iff_disjoint.mpr hAB) hBc) (compl_subset_compl.2 hh2.2),
+    have hcA := subset.trans (subset_closed_inclusion_closure'  hBc (subset_compl_iff_disjoint.mpr hAB)) (compl_subset_compl.2 hh2.2),
     apply subset.antisymm,
     {
       rw ← compl_inter_self (closure V),
       exact (closure V).inter_subset_inter_left hcA,
     },
-      exact (closure A ∩ closure V).empty_subset,
+    exact (closure A ∩ closure V).empty_subset,
   },
   exact ⟨A, V, hA, hV, t, hh2.1, hh.2⟩,
 end }

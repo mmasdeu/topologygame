@@ -5,41 +5,32 @@ open set
 
 noncomputable theory
 
-
 @[simp]
-lemma set.univ_iff {α : Type} {p : α → Prop} : {x : α | p x} = univ ↔ ∀ x, p x :=
+lemma set.univ_iff {α : Type} (p : α → Prop) : {x : α | p x} = univ ↔ ∀ x, p x :=
 begin
   split,
-  {
-    intros h x,
+  { intros h x,
     have h1 := mem_univ x,
     rw ← h at h1,
-    exact h1,
-  },
-  {
-    intros h,
+    exact h1 },
+  { intros h,
     ext,
-    simp,
-    exact h x,
-  }
+    norm_num,
+    exact h x }
 end
 
 @[simp]
 lemma set.empty_iff {α : Type} {p : α → Prop} : {x : α | p x} = ∅ ↔ ∀ x, ¬ p x :=
 begin
   split,
-  {
-    intros h x,
+  { intros h x,
     have h1 := mem_empty_eq x,
     rw ← h at h1,
-    simpa using h1,
-  },
-  {
-    intros h,
+    norm_num at h1 },
+  { intros h,
     ext,
-    simp,
-    exact h x,
-  }
+    norm_num,
+    exact h x }
 end
 
 
@@ -47,8 +38,7 @@ lemma sUnion_eq_of_pointwise {X : Type} {U : set X} {ℬ : set (set X)} :
   ( ∃ J ⊆ ℬ, U = ⋃₀ J ) ↔  (∀ x ∈ U, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U) :=
 begin
   split,
-  { 
-    intros h x hx,
+  { intros h x hx,
     obtain ⟨J, ⟨hJ1, hJ2⟩⟩ := h,
     subst hJ2,
     rw mem_sUnion at hx,
@@ -57,16 +47,13 @@ begin
     repeat {split},
     { tauto },
     { tauto },
-    { exact subset_sUnion_of_mem ht1 },
-  },
-  {
-    intro h,
+    { exact subset_sUnion_of_mem ht1 } },
+  { intro h,
     use {W ∈ ℬ | W ⊆ U},
     split,
     { apply sep_subset },
     apply eq_of_subset_of_subset,
-    all_goals {intros x hx, simp at hx ⊢, try {specialize h x hx}, tauto },
-  }
+    all_goals {intros x hx, simp at hx ⊢, try {specialize h x hx}, tauto } }
 end
 
 lemma lift_to_real {x : ereal} (h : x ≠ ⊥) (h' : x ≠ ⊤) :
@@ -93,28 +80,20 @@ lemma ereal_top (x : ereal) (h : ∀ (y : ℝ), (y : ereal) < x) : x = ⊤ :=
 begin
   by_contradiction hc,
   by_cases hb : x = ⊥,
-  {
-    subst hb,
-    finish,
-  },
+  { subst hb,
+    simpa [not_lt_bot] using (h 0) },
   obtain ⟨z, hz⟩ := lift_to_real hb hc,
-  specialize h z,
-  rw hz at h,
-  finish,
+  simpa [hz] using (h z),
 end
 
 lemma ereal_bot (x : ereal) (h : ∀ (y : ℝ), x < (y : ereal)) : x = ⊥ :=
 begin
   by_contradiction hc,
   by_cases ht : x = ⊤,
-  {
-    subst ht,
-    finish,
-  },
+  { subst ht,
+    simpa [not_lt_bot] using (h 0) },
   obtain ⟨z, hz⟩ := lift_to_real hc ht,
-  specialize h z,
-  rw hz at h,
-  finish,
+  simpa [hz] using (h z),
 end
 
 lemma inter_is_not_is_empty_intersection {X : Type} {x : X} {U V : set X}

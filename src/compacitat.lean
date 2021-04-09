@@ -226,7 +226,7 @@ lemma compact_in_T2_is_closed {A : set X} [hausdorff_space X] (h : is_compact_su
 begin
   have hAc : interior Aᶜ = Aᶜ,
   { apply subset.antisymm,
-      {exact interior_is_subset Aᶜ},
+      {exact interior_subset_self Aᶜ},
     { intros x hxA,
       cases (for_compact_exist_open_disjont X h) x hxA with V hV,
       have hVAc : V ⊆ Aᶜ,

@@ -141,20 +141,21 @@ topological_space X := {
 end topological_space
 
 namespace topological_space
-variables {X : Type}
-variables [topological_space X] (A B : set X)
+variables {X : Type} [topological_space X]
+variables (A B : set X)
+open set
 
 def is_neighborhood (x : X) := ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
 
 def interior := { x : X | is_neighborhood A x }
 
-@[simp] lemma interior_is_subset: interior A ⊆ A :=
+@[simp] lemma interior_subset_self : interior A ⊆ A :=
 begin
   rintros x ⟨_, _⟩,
   tauto,
 end
 
-open set
+
 lemma interior_def' : interior A = ⋃₀ {U : set X | is_open U ∧ U ⊆ A} :=
 begin
   simp only [interior, is_neighborhood, sUnion],
@@ -173,35 +174,39 @@ begin
 end
 
 /-- The interior of a set is the biggest open it contains. -/
-lemma interior_is_biggest_open: ∀ B, (B ⊆ A) → is_open B → B ⊆ interior A :=
+lemma interior_is_biggest_open (hB : is_open B) : B ⊆ interior A ↔ (B ⊆ A) :=
 begin
-  intros B hB is_open_B x x_in_B,
-  rw interior_def',
-  use B,
-  exact ⟨⟨is_open_B,hB⟩, x_in_B⟩,
+  split,
+  { have := interior_subset_self A,
+    tauto },
+  { intros h x x_in_B,
+    rw interior_def',
+    use B,
+    exact ⟨⟨hB,h⟩, x_in_B⟩ }
 end 
 
-/-These three properties characterize the interior-/
+lemma interior_is_biggest_open' (hB : is_open B) : B ⊆ A →  B ⊆ interior A  :=
+  (interior_is_biggest_open A B hB).mpr
 
+/-These three properties characterize the interior-/
 lemma interior_def'': is_open B ∧ B ⊆ A ∧ (∀ U, U ⊆ A → is_open U → U ⊆ B) ↔ B = interior A :=   
 begin
   split,
   {
     rintros ⟨is_open_B, ⟨B_subset_A, B_is_biggest_open⟩⟩,
-    ext1,
-    split,
+    apply subset.antisymm,
     {
-      apply interior_is_biggest_open A B B_subset_A is_open_B,
+      simpa [interior_is_biggest_open A B is_open_B],
     },
     {
-      intro ha,
-      exact B_is_biggest_open (interior A) (interior_is_subset A) (interior_is_open A) ha,
+      intros x ha,
+      exact B_is_biggest_open (interior A) (interior_subset_self A) (interior_is_open A) ha,
     },
   },
   {
     intro,
     subst B,
-    exact ⟨interior_is_open A, ⟨interior_is_subset A, interior_is_biggest_open A⟩⟩,
+    exact ⟨interior_is_open A, ⟨interior_subset_self A, λ U hUA hU, interior_is_biggest_open' A U hU hUA⟩⟩,
   },
 end 
 
@@ -217,7 +222,7 @@ def is_adherent_point (x : X) := ∀ N, is_neighborhood N x → N ∩ A ≠ ∅
 /-- The closure of A is the set of all the adherent points of A -/
 def closure:= {x | is_adherent_point A x}
 
-@[simp] lemma set_in_closure: A ⊆ closure A :=
+@[simp] lemma closure_supset_self : A ⊆ closure A :=
 begin
   intros x hx,
   have hhx : is_adherent_point A x,
@@ -257,12 +262,24 @@ begin
   simp only [compl_subset_compl, is_closed],
 end
 
-@[simp] lemma subset_closed_inclusion_closure [topological_space X] {A B : set X} (h : A ⊆ B) (hB : is_closed B) : closure A ⊆ B:=
+@[simp]
+lemma subset_closed_inclusion_closure [topological_space X] {A B : set X}  (hB : is_closed B) :
+  closure A ⊆ B ↔ A ⊆ B :=
 begin
-  intros x hx,
-  rw closure_def' at hx,
-  exact hx B ⟨hB, h⟩,
+  split,
+  { 
+    have := closure_supset_self A,
+    tauto,
+  },
+  {
+    intros h x hx,
+    rw closure_def' at hx,
+    exact hx B ⟨hB, h⟩
+  }
 end
+
+lemma subset_closed_inclusion_closure' [topological_space X] {A B : set X}  (hB : is_closed B) :
+  A ⊆ B → closure A ⊆ B  := (subset_closed_inclusion_closure hB).mpr
 
 -- Not sure if this should be simp lemma. It is now solvable by simp.
 @[simp] lemma closure_is_closed: is_closed (closure A) :=
@@ -468,10 +485,10 @@ def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_
 example (A B : set X) : A ⊆ B → interior A ⊆ interior B :=
 begin
   intro h,
-  apply interior_is_biggest_open B (interior A),
-  { intros a ha, 
-    exact h (interior_is_subset A ha)},
-  { exact interior_is_open A }
+  refine (interior_is_biggest_open B (interior A) _).2 _,
+  { simp only [interior_is_open] },
+  have := interior_subset_self A,
+  tauto,
 end
 
 
