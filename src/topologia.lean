@@ -39,7 +39,7 @@ end
 lemma univ_mem' {X : Type} [topological_space X] : is_open (univ : set X) := univ_mem
 
 /-- The union of two open sets is open -/
-lemma open_of_open_union_open {X : Type} [topological_space X] {U V : set X}
+lemma open_of_union {X : Type} [topological_space X] {U V : set X}
 (hU : is_open U) (hV : is_open V): is_open (U ∪ V) :=
 begin
   let I : set (set X) := {U, V},
