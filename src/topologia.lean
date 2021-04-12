@@ -317,12 +317,6 @@ begin
   simp only [compl_compl, eq_interior_iff_is_open, closure_eq_compl_of_interior_compl, is_closed],
 end
 
--- Can we simplify this proof?
-@[simp] lemma interior_interior: interior (interior A) = interior A :=
-begin
-  exact ((eq_interior_iff_is_open (interior A)).mpr (interior_is_open A)).symm,
-end
-
 @[simp] lemma closure_closure: closure (closure A) = closure A :=
 begin
   simp only [compl_compl, closure_eq_compl_of_interior_compl, interior_interior],
