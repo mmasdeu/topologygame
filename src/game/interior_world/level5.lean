@@ -34,7 +34,7 @@ begin
   {
     intro,
     subst B,
-    exact ⟨interior_is_open A, ⟨interior_is_subset A, interior_is_biggest_open A⟩⟩,
+    exact ⟨interior_is_open A, ⟨interior_is_subset A, interior_maximal A⟩⟩,
   },
 
 
