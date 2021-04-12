@@ -15,7 +15,7 @@ namespace topological_space -- hide
 /- Lemma
 The interior of a set ...
 -/
-lemma interior_is_biggest_open (B : set X) (h : B ⊆ A) (hopen : is_open B):
+lemma interior_maximal (B : set X) (h : B ⊆ A) (hopen : is_open B):
   B ⊆ interior A :=
 begin
   intros x x_in_B,

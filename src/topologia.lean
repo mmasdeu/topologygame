@@ -173,20 +173,25 @@ begin
   exact is_open_B,
 end
 
+lemma interior_maximal (hB : is_open B) (h: B ⊆ A ):  B ⊆ interior A  :=
+begin
+  intros x x_in_B,
+  rw interior_def',
+  use B,
+  exact ⟨⟨hB, h⟩, x_in_B⟩,
+end
+
 /-- The interior of a set is the biggest open it contains. -/
 lemma interior_is_biggest_open (hB : is_open B) : B ⊆ interior A ↔ (B ⊆ A) :=
 begin
   split,
   { have := interior_subset_self A,
     tauto },
-  { intros h x x_in_B,
-    rw interior_def',
-    use B,
-    exact ⟨⟨hB,h⟩, x_in_B⟩ }
+  {
+    apply interior_maximal,
+    exact hB,
+  }
 end 
-
-lemma interior_is_biggest_open' (hB : is_open B) : B ⊆ A →  B ⊆ interior A  :=
-  (interior_is_biggest_open A B hB).mpr
 
 /-These three properties characterize the interior-/
 lemma interior_def'': is_open B ∧ B ⊆ A ∧ (∀ U, U ⊆ A → is_open U → U ⊆ B) ↔ B = interior A :=   
@@ -206,7 +211,7 @@ begin
   {
     intro,
     subst B,
-    exact ⟨interior_is_open A, ⟨interior_subset_self A, λ U hUA hU, interior_is_biggest_open' A U hU hUA⟩⟩,
+    exact ⟨interior_is_open A, ⟨interior_subset_self A, λ U hUA hU, interior_maximal A U hU hUA⟩⟩,
   },
 end 
 
