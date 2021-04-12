@@ -5,20 +5,6 @@ open set
 
 variables (X : Type) [topological_space X]
 
-/-- Kuratowski's problem -/
-example (A : set X) : closure (interior (closure( interior A))) = closure (interior A) :=
-begin
-  apply subset.antisymm,
-  { apply subset_closed_inclusion_closure' (closure_is_closed (interior A)),
-    apply interior_subset_self (closure (interior A)) },
-  { apply subset_closed_inclusion_closure'  (closure_is_closed (interior (closure (interior A)))),
-    suffices : interior A ⊆ interior (closure (interior A)),
-      by exact subset.trans this (closure_supset_self (interior (closure (interior A)))),
-    have H : interior A ⊆ closure (interior A) := closure_supset_self (interior A),
-    apply interior_is_biggest_open',
-    { exact interior_is_open A },
-    { exact H } }
-end
 
 
 def is_dense {X : Type} [topological_space X] (A : set X) : Prop := closure A = univ

@@ -385,6 +385,22 @@ instance ordinary_topology: topological_space ℝ := generate_from Ioos
 
 instance open_interval(a b: ℝ): topological_space (Ioo a b) := top_induced (Ioo a b) ℝ (λ x, ↑x)
 
+/-- Kuratowski's problem -/
+example {X : Type} [topological_space X] (A : set X) : closure (interior (closure( interior A))) = closure (interior A) :=
+begin
+  apply subset.antisymm,
+  { apply subset_closed_inclusion_closure' (closure_is_closed (interior A)),
+    apply interior_subset_self (closure (interior A)) },
+  { apply subset_closed_inclusion_closure'  (closure_is_closed (interior (closure (interior A)))),
+    suffices : interior A ⊆ interior (closure (interior A)),
+      by exact subset.trans this (closure_supset_self (interior (closure (interior A)))),
+    have H : interior A ⊆ closure (interior A) := closure_supset_self (interior A),
+    apply interior_is_biggest_open',
+    { exact interior_is_open A },
+    { exact H } }
+end
+
+
 example : (Ioo (- 1: ℝ) 1) ≅ ℝ :=
 { to_fun := (λ x, ↑x / (1- abs(↑x))),
   inv_fun := 

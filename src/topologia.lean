@@ -308,7 +308,7 @@ lemma interior_inter: interior (A ∩ B) = interior A ∩ interior B :=
 begin
   unfold interior is_neighborhood,
   ext,
-  simp,
+  simp only [mem_inter_eq, mem_set_of_eq, subset_inter_iff],
   split,
   {
     intro h,
@@ -485,10 +485,9 @@ def top_quotient (X Y : Type) [topological_space X] (f : X → Y) : topological_
 example (A B : set X) : A ⊆ B → interior A ⊆ interior B :=
 begin
   intro h,
-  refine (interior_is_biggest_open B (interior A) _).2 _,
-  { simp only [interior_is_open] },
-  have := interior_subset_self A,
-  tauto,
+  apply (interior_is_biggest_open B (interior A) (interior_is_open _)).2,
+  have h':= interior_subset_self A,
+  tauto
 end
 
 
