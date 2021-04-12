@@ -188,8 +188,7 @@ begin
   { have := interior_subset_self A,
     tauto },
   {
-    apply interior_maximal,
-    exact hB,
+    exact interior_maximal A B hB,
   }
 end 
 
@@ -219,6 +218,26 @@ end
 begin
   rw ← interior_def'',
   tauto,
+end
+
+lemma interior_empty: interior (∅: set X) = ∅ :=
+begin
+  apply symm,
+  apply (eq_interior_iff_is_open ∅).mpr,
+  simp,
+end
+
+lemma interior_univ: interior (univ: set X) = univ :=
+begin
+  apply symm,
+  apply (eq_interior_iff_is_open univ).mpr,
+  simp,
+end
+
+-- Can we simplify this proof?
+@[simp] lemma interior_interior: interior (interior A) = interior A :=
+begin
+  exact ((eq_interior_iff_is_open (interior A)).mpr (interior_is_open A)).symm,
 end
 
 /-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
