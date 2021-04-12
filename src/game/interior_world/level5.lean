@@ -24,7 +24,7 @@ begin
     ext1,
     split,
     {
-      apply interior_is_biggest_open A B B_subset_A is_open_B,
+      apply interior_maximal A B B_subset_A is_open_B,
     },
     {
       intro ha,
