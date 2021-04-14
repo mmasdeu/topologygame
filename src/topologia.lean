@@ -70,6 +70,24 @@ begin
   }
 end
 
+open set
+
+lemma open_of_finite_set_opens' {X α: Type} [topological_space X] {ι : α → set X } (S : set α)
+  (hfin : finite S) (h : ∀ s ∈ S, is_open (ι s)) : is_open (⋂ (s ∈ S), ι s) :=
+begin
+  set Us := ι '' S with hUs,
+  have H : is_open ⋂₀ Us,
+  { apply open_of_finite_set_opens,
+    { exact finite.image ι hfin },
+    { finish } },
+  have eqsets : (⋂ (s : α) (H : s ∈ S), ι s) = ⋂₀ Us,
+  { finish },
+  rw eqsets,
+  assumption,
+end
+
+
+
 /-- The open sets of the least topology containing a collection of basic sets -/
 inductive generated_open (X : Type) (g : set (set X)) : set X → Prop
 | univ : generated_open univ

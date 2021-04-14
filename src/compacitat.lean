@@ -86,7 +86,7 @@ begin
   assumption,
 end
 
-lemma close_subset_of_compact_is_compact {A B : set X} (hA : is_closed A) (hB : is_compact_subset B) (hAB : A ⊆ B) : 
+lemma closed_subset_of_compact_is_compact {A B : set X} (hA : is_closed A) (hB : is_compact_subset B) (hAB : A ⊆ B) : 
   is_compact_subset A :=
 begin
   intros I hI hIA,
@@ -159,67 +159,120 @@ begin
 end
  -/
 open hausdorff_space
-lemma for_compact_exist_open_disjont {A : set X} [hausdorff_space X] (h : is_compact_subset A) : ∀ (y : X), y ∈ Aᶜ  → 
-  (∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V) :=
+
+lemma tmp_lemma {X : Type} {A : set X} (F : set A) (hF1 : F.finite) : 
+{x : X | ∃ (h : x ∈ A), (⟨x, h⟩ : A) ∈ F}.finite :=
 begin
-  intros y hy,
-  unfold is_compact_subset at h,
-  let ter := {T : (set X) × (set X) | is_open T.1 ∧ is_open T.2 ∧ T.1 ∩ T.2 = ∅ ∧ A ∩ T.1 ≠ ∅ ∧ y ∈ T.2},
-  let ter1 := {U : set X | ∃(T : (set X) × (set X)), T ∈ ter ∧ T.1 = U},
-  have hAinUter1 : A ⊆ ⋃₀ter1,
-  { intros x hx,
-    have hxy : y ≠ x, by finish,
-    obtain ⟨U, V, hU, hV, hUV, hh⟩  := t2 x y hxy,
-    have prodUV : ∃ (T: (set X) × (set X)), T.1 = U ∧ T.2 = V, by finish,
-    have hAUne : A ∩ U ≠ ∅,
-    { intro p,
-      exact eq_empty_iff_forall_not_mem.mp p x ⟨hx, hh.1⟩},
-    cases prodUV with T hT,
-    have hTinter : T ∈ ter,
-    { simp,
-      rw [hT.1, hT.2],
-      exact ⟨hU, hV, hUV, hAUne, hh.2⟩},
-    have hTinter1 : U ∈ ter1,
-    { simp,
-      exact ⟨hU, V, hV, hUV, hAUne, hh.2⟩},
-    exact (subset_sUnion_of_mem hTinter1) hh.1},
-  have hter1open : ∀ (U : set X), U ∈ ter1 → is_open U,
-  { intros U hU,
-    cases hU with T hT,
-    rw← hT.2,
-    exact hT.1.1},
-  obtain t := h ter1 hter1open hAinUter1,
-  rcases t with ⟨F, hF, hhF⟩,
-  let exter := {V : set X | ∃(T : (set X) × (set X)), T ∈ ter ∧ T.1 ∈ F ∧ T.2 = V},
-  have hexter : finite exter,
+  sorry
+end
+
+lemma is_compact_set' {A : set X} {I : Type*} (h : is_compact_subset A) (U : I → set X) (hU : ∀ i, is_open (U i))
+(hcov : A ⊆ ⋃₀ (U '' univ)): ∃ (F : set I), F.finite ∧ (A ⊆ ⋃₀ (U '' F)) :=
+begin
+  sorry
+end
+
+-- X : Type, i A : set X
+-- per cada a ∈ A, triem Ua, Va oberts amb a ∈ Ua, y ∈ Va, Ua ∩ Va = ∅.
+-- A ⊆ ⋃ Ua. A compacte -> subrecobriment finit Ua1,..., Uan.
+-- V = ⋂ Vai. obert perquè intersecció finita. Aquest V funciona.
+-- U : {a : X // a ∈ A} → set X, a ↦ Ua
+lemma for_compact_exist_open_disjont{A : set X} [hausdorff_space X] (h : is_compact_subset A) (y : X) (hyA : ¬ y ∈ A) : 
+  ∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V :=
+begin
+  have UV : ∀ a ∈ A, ∃ UVa : set X × set X,
+    is_open UVa.fst ∧ is_open UVa.snd ∧ UVa.fst ∩ UVa.snd = ∅ ∧ a ∈ UVa.fst ∧ y ∈ UVa.snd,
   {
-    sorry
+    intros a ha,
+    have hya : y ≠ a,
+    {
+      finish,
+    },
+    obtain ⟨U, V, H⟩ := t2 a y hya,
+    exact ⟨⟨U, V⟩, by tauto⟩,
   },
-  have hhexter : ∀ (s : set X), s ∈ exter → is_open s,
-  { intros s hs,
-    cases hs with T hT,
-    rw ← hT.2.2,
-    exact hT.1.2.1},
-  have hexterF : ⋂₀exter ∩ ⋃₀ F = ∅,
-  { apply subset.antisymm,
-    { intros x hx,
-      rcases hx with ⟨hx1,⟨B ,⟨hB1, hB2⟩⟩⟩,
-      cases (hF hB1) with T hT,
-      rw [← hT.1.2.2.1, hT.2],
-      have hT1F : T.1 ∈ F, by rwa hT.2,
-      exact ⟨hB2, hx1 T.snd ⟨T, hT.1, hT1F, refl T.2⟩⟩},
-    { exact (⋂₀exter ∩ ⋃₀ F).empty_subset}},
-  have hAexter : ⋂₀exter ∩ A =∅,
-  { apply subset.antisymm,
-    { rw ← hexterF,
-      exact (⋂₀ exter).inter_subset_inter_right hhF.right},
-    { exact (⋂₀exter ∩ A).empty_subset}},
-  have hyexter : y ∈ ⋂₀exter,
-  { intros B hB,
-    cases hB with T hT,
-    rw ← hT.2.2,
-    exact hT.1.2.2.2.2},
-  exact ⟨⋂₀exter, open_of_finite_set_opens hexter hhexter, hAexter, hyexter⟩,  
+  let U : A → set X := λ a, (classical.some (UV a.1 a.2)).fst,
+  have hU : ∀ (a : A), is_open (U ⟨a.1, a.2⟩)
+   := λ a, (classical.some_spec (UV a.1 a.2)).1,
+  let V : A → set X := λ a, (classical.some (UV a.1 a.2)).snd,
+  have hV : ∀ (a : A), is_open (V ⟨a.1, a.2⟩)
+   := λ a, (classical.some_spec (UV a.1 a.2)).2.1,
+  have hUV : ∀ (a : A), (U ⟨a.1, a.2⟩ ∩ V ⟨a.1, a.2⟩ = ∅)
+   := λ a, (classical.some_spec (UV a.1 a.2)).2.2.1,
+  have hUVa : ∀ (a : A), (a.1 ∈ U ⟨a.1, a.2⟩)
+   := λ a, (classical.some_spec (UV a.1 a.2)).2.2.2.1,
+  have hUVy : ∀ (a : A), (y ∈ V ⟨a.1, a.2⟩)
+   := λ a, (classical.some_spec (UV a.1 a.2)).2.2.2.2,
+  have hAcov : A ⊆ ⋃₀ (U '' univ),
+  {
+    intros a ha,
+    specialize hUVa ⟨a, ha⟩,
+    simp,
+    use a,
+    use ha,
+    simp [hUVa],
+  },
+  have hfin : ∃ (F : set X), F.finite ∧ (A ⊆ ⋃₀ (U '' {x : A | x.1 ∈ F})),
+  {
+    obtain ⟨F, ⟨hF1,hF2⟩⟩ := is_compact_set' _ h U hU hAcov,
+    use {x : X | ∃ f ∈ F, (f : X) = x},
+    simp,
+    split,
+    {
+      apply tmp_lemma,
+      exact hF1,
+    },
+    {
+      intros a ha,
+      simpa using hF2 ha,
+    }
+  },
+  obtain ⟨F, ⟨hf, h'⟩⟩ := hfin,
+  have : fintype {a // a ∈ F},
+  {
+    apply fintype.of_finset (finite.to_finset hf),
+    finish,
+  },
+  haveI: fintype {a // a ∈ F} := this,
+  use ⋂₀ (V '' {x : A | x.1 ∈ F}),
+  repeat {split},
+  {
+    apply open_of_finite_set_opens,
+    {
+      apply finite.image,
+      refine finite.preimage _ hf,
+      dsimp,
+      intros x2 hx2 aa haa htmp,
+      exact subtype.eq htmp,
+    },
+    intros s hs,
+    simp at hs,
+    obtain ⟨x, ⟨hx1, ⟨hxA, rfl⟩⟩⟩ := hs,
+    finish,
+  },
+  {
+    ext,
+    simp,
+    intros hx,
+    intro hxA,
+    specialize h' hxA,
+    simp at h',
+    obtain ⟨z, ⟨hz1, ⟨hz2, hz3⟩⟩⟩ := h',
+    specialize hx z hz2 hz1,
+    specialize hUV ⟨z, hz2⟩,
+    simp at hUV,
+    suffices : (U ⟨z, hz2⟩ ∩ V ⟨z, hz2⟩).nonempty,
+    {
+      replace this := nonempty.ne_empty this,
+      tauto,
+    },
+    use x,
+    exact ⟨hz3, hx⟩,
+  },
+  {
+    simp,
+    exact λ x hx1 hx2, hUVy ⟨x, hx1⟩,
+  }
 end
 
 lemma compact_in_T2_is_closed {A : set X} [hausdorff_space X] (h : is_compact_subset A) : is_closed A :=
