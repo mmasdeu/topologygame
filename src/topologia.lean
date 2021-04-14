@@ -39,7 +39,7 @@ end
 lemma univ_mem' {X : Type} [topological_space X] : is_open (univ : set X) := univ_mem
 
 /-- The union of two open sets is open -/
-lemma open_of_open_union_open {X : Type} [topological_space X] {U V : set X}
+lemma open_of_union {X : Type} [topological_space X] {U V : set X}
 (hU : is_open U) (hV : is_open V): is_open (U ∪ V) :=
 begin
   let I : set (set X) := {U, V},
@@ -191,20 +191,24 @@ begin
   exact is_open_B,
 end
 
+lemma interior_maximal (hB : is_open B) (h: B ⊆ A ):  B ⊆ interior A  :=
+begin
+  intros x x_in_B,
+  rw interior_def',
+  use B,
+  exact ⟨⟨hB, h⟩, x_in_B⟩,
+end
+
 /-- The interior of a set is the biggest open it contains. -/
 lemma interior_is_biggest_open (hB : is_open B) : B ⊆ interior A ↔ (B ⊆ A) :=
 begin
   split,
   { have := interior_subset_self A,
     tauto },
-  { intros h x x_in_B,
-    rw interior_def',
-    use B,
-    exact ⟨⟨hB,h⟩, x_in_B⟩ }
+  {
+    exact interior_maximal A B hB,
+  }
 end 
-
-lemma interior_is_biggest_open' (hB : is_open B) : B ⊆ A →  B ⊆ interior A  :=
-  (interior_is_biggest_open A B hB).mpr
 
 /-These three properties characterize the interior-/
 lemma interior_def'': is_open B ∧ B ⊆ A ∧ (∀ U, U ⊆ A → is_open U → U ⊆ B) ↔ B = interior A :=   
@@ -224,7 +228,7 @@ begin
   {
     intro,
     subst B,
-    exact ⟨interior_is_open A, ⟨interior_subset_self A, λ U hUA hU, interior_is_biggest_open' A U hU hUA⟩⟩,
+    exact ⟨interior_is_open A, ⟨interior_subset_self A, λ U hUA hU, interior_maximal A U hU hUA⟩⟩,
   },
 end 
 
@@ -232,6 +236,26 @@ end
 begin
   rw ← interior_def'',
   tauto,
+end
+
+lemma interior_empty: interior (∅: set X) = ∅ :=
+begin
+  apply symm,
+  apply (eq_interior_iff_is_open ∅).mpr,
+  simp,
+end
+
+lemma interior_univ: interior (univ: set X) = univ :=
+begin
+  apply symm,
+  apply (eq_interior_iff_is_open univ).mpr,
+  simp,
+end
+
+-- Can we simplify this proof?
+@[simp] lemma interior_interior: interior (interior A) = interior A :=
+begin
+  exact ((eq_interior_iff_is_open (interior A)).mpr (interior_is_open A)).symm,
 end
 
 /-- A point x is an adherent point of A if every neighborhood of x intersects A.-/
@@ -309,12 +333,6 @@ end
 begin
   rw ←compl_inj_iff,
   simp only [compl_compl, eq_interior_iff_is_open, closure_eq_compl_of_interior_compl, is_closed],
-end
-
--- Can we simplify this proof?
-@[simp] lemma interior_interior: interior (interior A) = interior A :=
-begin
-  exact ((eq_interior_iff_is_open (interior A)).mpr (interior_is_open A)).symm,
 end
 
 @[simp] lemma closure_closure: closure (closure A) = closure A :=

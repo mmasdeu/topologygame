@@ -8,6 +8,7 @@ name = "Basic definitions"
 id = 1
 levels = [
 	"src/game/basic_defs_world/level1.lean",
+	"src/game/basic_defs_world/level2.lean",
 ]
 
 [[worlds]]

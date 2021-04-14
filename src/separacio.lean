@@ -206,7 +206,7 @@ begin
   have hxcV : x ∉ closure V,
   {
     rw closure_eq_compl_of_interior_compl V,
-    have hxint := (interior_is_biggest_open' Vᶜ U hU (subset_compl_iff_disjoint.mpr hUV)),
+    have hxint := (interior_maximal Vᶜ U hU (subset_compl_iff_disjoint.mpr hUV)),
     tauto,
   },
   obtain ⟨A, B, hA, hB, hAB, hh2 ⟩ := regular x (closure V) (closure_is_closed V) hxcV,

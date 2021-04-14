@@ -395,7 +395,7 @@ begin
     suffices : interior A ⊆ interior (closure (interior A)),
       by exact subset.trans this (closure_supset_self (interior (closure (interior A)))),
     have H : interior A ⊆ closure (interior A) := closure_supset_self (interior A),
-    apply interior_is_biggest_open',
+    apply interior_maximal,
     { exact interior_is_open A },
     { exact H } }
 end
