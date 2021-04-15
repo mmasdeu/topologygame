@@ -15,6 +15,64 @@ def is_compact_subset {X : Type} [topological_space X] (S : set X):=
   ∀ 𝒰 : set (set X), (∀ U ∈ 𝒰, is_open U) →
   (S ⊆ ⋃₀ 𝒰) → (∃ ℱ ⊆ 𝒰, finite ℱ ∧ S ⊆ ⋃₀ℱ )
 
+lemma is_compact_set' {A : set X} {I : Type*} (h : is_compact_subset A) (U : I → set X)
+(hU : ∀ i, is_open (U i)) (hcov : A ⊆ ⋃₀ (U '' univ)):
+  ∃ (F : set I), F.finite ∧ (A ⊆ ⋃₀ (U '' F)) :=
+begin
+  unfold is_compact_subset at h,
+  set 𝒰 := U '' univ with 𝒰def,
+  have exists_preimage : ∀ Ui ∈ 𝒰, ∃ i : I, (U i) = Ui, by finish,
+  let map_inverse : 𝒰 → I := λ Ui, classical.some (exists_preimage Ui.1 Ui.2),
+  have map_inverse_spec : ∀ Ui, U (map_inverse Ui) = Ui :=
+    λ Ui, classical.some_spec (exists_preimage Ui.1 Ui.2),
+  have hU' : ∀ Ui ∈ 𝒰, is_open Ui,
+  {
+    intros Ui hUi,
+    obtain ⟨i, hi⟩ := exists_preimage Ui hUi,
+    rw ←hi,
+    tauto,
+  },
+  obtain ⟨FF, ⟨hFF1, ⟨hFF2,hFF3⟩⟩⟩ := h 𝒰 hU' hcov,
+  clear h,
+  set F := map_inverse '' (coe ⁻¹' FF) with Fdef,
+  use F,
+  have Ffin : F.finite,
+  {
+    rw Fdef,
+    refine finite.image map_inverse _,
+    refine finite.preimage _ hFF2,
+    intros x hx y hy,
+    exact subtype.eq,
+  },
+  have hcov'' : U '' F = FF,
+  {
+    rw Fdef,
+    ext V,
+    split,
+    {
+      intro hV,
+      simp at hV,
+      obtain ⟨i, ⟨⟨Ui,⟨hUiF, ⟨⟨j, haj⟩, hh'⟩⟩⟩,h⟩⟩ := hV,
+      subst h,
+      suffices : U i = Ui, by simpa [this] using hUiF,
+      apply (congr_arg U (eq.symm hh')).trans,
+      apply map_inverse_spec,
+    },
+    {
+      intro hV,
+      simp only [mem_image, set_coe.exists, mem_univ, mem_preimage, subtype.coe_mk],
+      have VinU : V ∈ 𝒰 := hFF1 hV,
+      set i := map_inverse ⟨V, VinU⟩,
+      use i, use V,
+      { exact ⟨VinU, ⟨hV, rfl⟩⟩ },
+      { exact_mod_cast map_inverse_spec ⟨V, VinU⟩ }
+    }
+  },
+  simp [hcov''],
+  tauto,
+end
+
+
 lemma compact_space_iff_univ_compact :  is_compact X ↔ is_compact_subset (univ :set X) :=
 begin
   split; intros h I hI hIX,
@@ -160,35 +218,22 @@ end
  -/
 open hausdorff_space
 
-lemma tmp_lemma {X : Type} {A : set X} (F : set A) (hF1 : F.finite) : 
-{x : X | ∃ (h : x ∈ A), (⟨x, h⟩ : A) ∈ F}.finite :=
-begin
-  sorry
-end
-
-lemma is_compact_set' {A : set X} {I : Type*} (h : is_compact_subset A) (U : I → set X) (hU : ∀ i, is_open (U i))
-(hcov : A ⊆ ⋃₀ (U '' univ)): ∃ (F : set I), F.finite ∧ (A ⊆ ⋃₀ (U '' F)) :=
-begin
-  sorry
-end
 
 -- X : Type, i A : set X
 -- per cada a ∈ A, triem Ua, Va oberts amb a ∈ Ua, y ∈ Va, Ua ∩ Va = ∅.
 -- A ⊆ ⋃ Ua. A compacte -> subrecobriment finit Ua1,..., Uan.
 -- V = ⋂ Vai. obert perquè intersecció finita. Aquest V funciona.
 -- U : {a : X // a ∈ A} → set X, a ↦ Ua
-lemma for_compact_exist_open_disjont{A : set X} [hausdorff_space X] (h : is_compact_subset A) (y : X) (hyA : ¬ y ∈ A) : 
-  ∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V :=
+lemma for_compact_exist_open_disjont {A : set X} [hausdorff_space X] (h : is_compact_subset A)
+  (y : X) (hyA : ¬ y ∈ A) :  ∃ (V : set X), is_open V ∧ V ∩ A = ∅ ∧ y ∈ V :=
 begin
   have UV : ∀ a ∈ A, ∃ UVa : set X × set X,
     is_open UVa.fst ∧ is_open UVa.snd ∧ UVa.fst ∩ UVa.snd = ∅ ∧ a ∈ UVa.fst ∧ y ∈ UVa.snd,
   {
     intros a ha,
     have hya : y ≠ a,
-    {
-      finish,
-    },
-    obtain ⟨U, V, H⟩ := t2 a y hya,
+    { intro h, subst h, contradiction },
+    obtain ⟨U, V, _⟩ := t2 a y hya,
     exact ⟨⟨U, V⟩, by tauto⟩,
   },
   let U : A → set X := λ a, (classical.some (UV a.1 a.2)).fst,
@@ -207,25 +252,14 @@ begin
   {
     intros a ha,
     specialize hUVa ⟨a, ha⟩,
-    simp,
-    use a,
-    use ha,
-    simp [hUVa],
+    simp only [mem_Union, sUnion_range, image_univ, set_coe.exists],
+    exact ⟨a, ha, by simp [hUVa]⟩,
   },
   have hfin : ∃ (F : set X), F.finite ∧ (A ⊆ ⋃₀ (U '' {x : A | x.1 ∈ F})),
   {
     obtain ⟨F, ⟨hF1,hF2⟩⟩ := is_compact_set' _ h U hU hAcov,
-    use {x : X | ∃ f ∈ F, (f : X) = x},
-    simp,
-    split,
-    {
-      apply tmp_lemma,
-      exact hF1,
-    },
-    {
-      intros a ha,
-      simpa using hF2 ha,
-    }
+    use coe '' F,
+    simpa [finite.image coe hF1] using hF2,
   },
   obtain ⟨F, ⟨hf, h'⟩⟩ := hfin,
   have : fintype {a // a ∈ F},
@@ -253,26 +287,16 @@ begin
   {
     ext,
     simp,
-    intros hx,
-    intro hxA,
+    intros hx hxA,
     specialize h' hxA,
-    simp at h',
+    simp only [exists_prop, mem_Union, sUnion_image, set_coe.exists] at h',
     obtain ⟨z, ⟨hz1, ⟨hz2, hz3⟩⟩⟩ := h',
-    specialize hx z hz2 hz1,
-    specialize hUV ⟨z, hz2⟩,
-    simp at hUV,
-    suffices : (U ⟨z, hz2⟩ ∩ V ⟨z, hz2⟩).nonempty,
-    {
-      replace this := nonempty.ne_empty this,
-      tauto,
-    },
-    use x,
-    exact ⟨hz3, hx⟩,
+    specialize hUV ⟨z, hz1⟩,
+    suffices : (U ⟨z, hz1⟩ ∩ V ⟨z, hz1⟩) ≠ ∅, by contradiction,
+    apply nonempty.ne_empty,
+    exact ⟨x, ⟨hz3, hx z hz1 hz2⟩⟩,
   },
-  {
-    simp,
-    exact λ x hx1 hx2, hUVy ⟨x, hx1⟩,
-  }
+  { simpa using λ x hx1 hx2, hUVy ⟨x, hx1⟩ }
 end
 
 lemma compact_in_T2_is_closed {A : set X} [hausdorff_space X] (h : is_compact_subset A) : is_closed A :=
@@ -294,6 +318,3 @@ begin
   rw [is_closed, ← hAc],
   exact (interior_is_open Aᶜ),
 end
-
-/- Exemples de compacitat: topologica cofinita (definir-la) i demostrar compacitat -/
-

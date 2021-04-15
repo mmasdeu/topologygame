@@ -5,8 +5,6 @@ open set
 
 variables (X : Type) [topological_space X]
 
-
-
 def is_dense {X : Type} [topological_space X] (A : set X) : Prop := closure A = univ
 
 lemma dense_iff (A : set X) : is_dense A ↔ (interior (A.compl) = ∅) := -- why not Aᶜ?, then the refl, line it's not necesary
