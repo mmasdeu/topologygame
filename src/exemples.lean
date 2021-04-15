@@ -87,7 +87,7 @@ begin
   rw indiscrete_is_open_iff at hV,
   cases hV; rw hV,
   {
-    apply empty_mem,
+    apply is_open_empty,
   },
   {
     apply univ_mem,
