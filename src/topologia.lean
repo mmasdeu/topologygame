@@ -26,9 +26,12 @@ class topological_space (X : Type) :=
 
 namespace topological_space
 
+variables {X : Type} [topological_space X]
+variables (A B : set X)
+
 /-- The empty set is open -/
 @[simp]
-lemma empty_mem {X : Type} [topological_space X] : is_open (∅ : set X) :=
+lemma is_open_empty : is_open (∅ : set X) :=
 begin
   rw ←sUnion_empty,
   apply union,
@@ -36,16 +39,22 @@ begin
 end
 
 @[simp]
-lemma univ_mem' {X : Type} [topological_space X] : is_open (univ : set X) := univ_mem
+lemma is_open_univ : is_open (univ : set X) := univ_mem
+
+lemma is_open_inter (h_A: is_open A) (h_B : is_open B) : is_open (A ∩ B) :=
+  inter A B h_A h_B
+
+lemma is_open_sUnion {s : set (set X)} (h : ∀ A ∈ s, is_open A) : is_open (⋃₀ s) :=
+  union s h
 
 /-- The union of two open sets is open -/
-lemma open_of_union {X : Type} [topological_space X] {U V : set X}
+lemma is_open_union {X : Type} [topological_space X] {U V : set X}
 (hU : is_open U) (hV : is_open V): is_open (U ∪ V) :=
 begin
   let I : set (set X) := {U, V},
   have H : ⋃₀ I = U ∪ V := sUnion_pair U V,
   rw ←H,
-  apply union I,
+  apply is_open_sUnion,
   intros B hB,
   replace hB : B = U ∨ B = V, by tauto,
   cases hB; {rw hB, assumption},
@@ -65,7 +74,7 @@ begin
       finish,
     },
     rw h, 
-    apply topological_space.inter;
+    apply is_open_inter;
     finish
   }
 end
@@ -118,10 +127,10 @@ lemma generated_open_is_coarsest {X : Type} (g : set (set X)) [τ : topological_
 begin
   intros U hU,
   induction hU,
-  { exact univ_mem },
+  { exact is_open_univ },
   { apply h, assumption },
-  { apply union; assumption },
-  { apply inter; assumption },
+  { apply is_open_sUnion; assumption },
+  { apply is_open_inter; assumption },
 end
 
 end topological_space
@@ -140,7 +149,7 @@ def mk_closed_sets
   (union : ∀ (A B ∈ σ), A ∪ B ∈ σ) :
 topological_space X := {
   is_open :=  λ U, compl U ∈ σ,
-  univ_mem := by simpa using empty_mem,
+  univ_mem := by simpa,
   union := 
   begin
     intros Y hY,
@@ -412,7 +421,7 @@ begin
     tauto,
   },
   {
-    convert empty_mem,
+    convert is_open_empty,
     ext,
     tauto,
   },
