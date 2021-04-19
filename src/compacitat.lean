@@ -271,7 +271,7 @@ begin
   use ⋂₀ (V '' {x : A | x.1 ∈ F}),
   repeat {split},
   {
-    apply open_of_finite_set_opens,
+    apply is_open_sInter,--open_of_finite_set_opens,
     {
       apply finite.image,
       refine finite.preimage _ hf,
