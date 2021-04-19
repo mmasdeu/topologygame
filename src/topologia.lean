@@ -61,7 +61,7 @@ begin
 end
 
 /-- The intersection of a finite collection of open sets is open -/
-lemma open_of_finite_set_opens {X : Type} [topological_space X] {S : set (set X)} (hfin : finite S)
+lemma is_open_sInter {X : Type} [topological_space X] {S : set (set X)} (hfin : finite S)
 (h : ∀ s ∈ S, is_open s) : is_open (sInter S) :=
 begin
   revert h,
@@ -81,12 +81,12 @@ end
 
 open set
 
-lemma open_of_finite_set_opens' {X α: Type} [topological_space X] {ι : α → set X } (S : set α)
+lemma is_open_bInter {X α: Type} [topological_space X] {ι : α → set X } (S : set α)
   (hfin : finite S) (h : ∀ s ∈ S, is_open (ι s)) : is_open (⋂ (s ∈ S), ι s) :=
 begin
   set Us := ι '' S with hUs,
   have H : is_open ⋂₀ Us,
-  { apply open_of_finite_set_opens,
+  { apply is_open_sInter,
     { exact finite.image ι hfin },
     { finish } },
   have eqsets : (⋂ (s : α) (H : s ∈ S), ι s) = ⋂₀ Us,
