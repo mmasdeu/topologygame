@@ -4,8 +4,21 @@ extra_files = "extras"
 intro = "src/game/intro.lean"
 
 [[worlds]]
-name = "Basic definitions"
+name = "Set theory"
 id = 1
+levels = [
+	"src/game/set_theory_world/level1.lean",
+	"src/game/set_theory_world/level2.lean",
+	"src/game/set_theory_world/level3.lean",
+	"src/game/set_theory_world/level4.lean",
+	"src/game/set_theory_world/level5.lean",
+	"src/game/set_theory_world/level6.lean"
+]
+
+[[worlds]]
+name = "Basic definitions"
+id = 2
+parents = [1]
 levels = [
 	"src/game/basic_defs_world/level1.lean",
 	"src/game/basic_defs_world/level2.lean",
@@ -13,8 +26,8 @@ levels = [
 
 [[worlds]]
 name = "Interior world"
-id = 2
-parents = [1]
+id = 3
+parents = [2]
 levels = [
 	"src/game/interior_world/level1.lean",
 	"src/game/interior_world/level2.lean",
@@ -25,8 +38,8 @@ levels = [
 
 [[worlds]]
 name = "Separation world"
-id = 3
-parents = [2]
+id = 4
+parents = [3]
 levels = [
 	"src/game/separation_world/level1.lean",
 	"src/game/separation_world/level2.lean",
