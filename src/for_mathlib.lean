@@ -15,7 +15,7 @@ begin
     exact h1 },
   { intros h,
     ext,
-    norm_num,
+    simp only [mem_univ, mem_set_of_eq, iff_true],
     exact h x }
 end
 
