@@ -16,27 +16,22 @@ Let τ be a topological space. τ is a frechet space if only if for all the poin
 lemma T1_characterisation : T1_space X ↔ (∀ (x : X), is_closed ({x} : set X)) :=
 begin
   split,
-  { intros h x,
+  { introI t1, intro x,
     unfold is_closed,
     let I := {U : set X | (x ∉ U) ∧ (is_open U)},
     have p : ⋃₀ I = {x}ᶜ,
     { apply subset.antisymm; intros t ht, 
       { rcases ht with ⟨A,⟨hxA, hA⟩, htA⟩,
-        simp,
+        rw [mem_compl_eq, mem_singleton_iff],
         intro htx,
-        rw htx at htA,
+        subst htx,
         exact hxA htA},
-      { have htx := (mem_compl_singleton_iff.mp ht).symm,
-        replace h := h.t1,
-        obtain ⟨U, hU, hh⟩ := h t x htx,
+      { obtain ⟨U, hU, hh⟩ := T1_space.t1 t x (mem_compl_singleton_iff.mp ht).symm,
         exact ⟨U, ⟨hh.2, hU⟩, hh.1⟩}},
     rw ← p,
-    have c : ∀ B ∈ I, is_open B, by finish,
-    exact topological_space.union I c},
-  { intros h,
-    fconstructor,
-    intros x y hxy,
-    exact ⟨{y}ᶜ,h y, mem_compl_singleton_iff.mpr (ne.symm hxy), not_not.mpr rfl⟩}
+    exact topological_space.union I (λ B hB, hB.2)},
+  { intro h, 
+    exact ⟨λ x y hxy, ⟨{y}ᶜ,h y, mem_compl_singleton_iff.mpr (ne.symm hxy), not_not.mpr rfl⟩⟩}
 end
 
 end topological_space -- hide
