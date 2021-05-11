@@ -23,11 +23,10 @@ Let τ be a topological space. If τ is a frechet space is also a T₀.
 -/
 lemma T1_is_T0: T1_space X → T0_space X :=
 begin
-  intro h,
+  introI t1,
   fconstructor,
   intros x y hxy,
-  obtain ht1 := h.t1,
-  obtain ⟨U, hU, hh⟩:= ht1 x y hxy,
+  obtain ⟨U, hU, hh⟩:= T1_space.t1 x y hxy,
   exact ⟨U, hU, or.inl hh⟩,
 
 

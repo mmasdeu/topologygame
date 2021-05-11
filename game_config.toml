@@ -44,4 +44,7 @@ levels = [
 	"src/game/separation_world/level1.lean",
 	"src/game/separation_world/level2.lean",
 	"src/game/separation_world/level3.lean",
+	"src/game/separation_world/level4.lean",
+	"src/game/separation_world/level5.lean",
+	"src/game/separation_world/level6.lean",
 ]
