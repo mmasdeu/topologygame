@@ -1,32 +1,37 @@
-import topology.constructions
-import topology.separation
-import topology.basic 
-import for_mathlib
 import topology.metric_space.basic
 
 open set
 
-lemma bolz (a b : ℝ) (hab : a < b) (f: ℝ → ℝ) (hf : continuous_on f (Icc a b)) (ha : (f a)<0 ∧ (f b)>0) : ∃ c ∈ (Icc a b),f(c)=0 :=
+lemma Inf.closure (I : set ℝ) (h : ∃ a, ∀ b∈ I, a ≤ b) : Inf I ∈ closure I :=
 begin
-  have h1 : ∃ (x : ℝ), x ∈ {x ∈ Icc a b | f x ≥ 0}, 
-  { exact ⟨b, right_mem_Icc.2 (le_of_lt hab), ge_iff_le.1 (le_of_lt ha.2)⟩ },
-  have hb : Inf {x ∈ Icc a b | f x ≥ 0} ≤ b,
-  { exact real.Inf_le {x ∈ Icc a b | f x ≥ 0} ⟨a, (λ y hy, (mem_Icc.1 hy.1).1)⟩ ⟨right_mem_Icc.2 (le_of_lt hab), ge_iff_le.2 (le_of_lt ha.2)⟩ },
-  let I := {x ∈ Icc a b | f x ≥ 0},
-  cases ha with ha1 ha2,
-  have hclosu : ∀ x ∈ closure I , 0 ≤ (f x),
+  intros F hF,
+  by_contradiction,
+  have hIF : Inf I ∈ Fᶜ, by exact mem_compl h,  
+  obtain ⟨ε, hε, H⟩  := metric.is_open_iff.1 (is_open_compl_iff.2 hF.1) (Inf I) hIF,
+  --have hI : Inf I < Inf I + ε/2, by linarith,
+  have hInf : Inf I + ε/2 ≤ Inf I,
   {
+    obtain := real.le_Inf,
     sorry
   },
+  linarith,
+end
+
+lemma bolz (a b : ℝ) (hab : a < b) (f: ℝ → ℝ) (hf : continuous_on f (Icc a b)) (ha : (f a)<0 ∧ (f b)>0) : ∃ c ∈ (Icc a b),f(c)=0 :=
+begin
+  let I := {x ∈ Icc a b | f x ≥ 0},
+  have h1 : ∃ (x : ℝ), x ∈ I, by exact ⟨b, right_mem_Icc.2 (le_of_lt hab), ge_iff_le.1 (le_of_lt ha.2)⟩,
+  have hb : Inf I ≤ b, by exact real.Inf_le {x ∈ Icc a b | f x ≥ 0} ⟨a, (λ y hy, (mem_Icc.1 hy.1).1)⟩ ⟨right_mem_Icc.2 (le_of_lt hab), ge_iff_le.2 (le_of_lt ha.2)⟩,
+  cases ha with ha1 ha2,
+  have hIIci : I = f⁻¹'(Ici 0) ∩ (Icc a b), by exact subset.antisymm (λ x hx, ⟨hx.2, hx.1⟩) (λ x hx, ⟨hx.2, hx.1⟩),
+  have hII : is_closed I,
+  { obtain ⟨U, hU⟩ := continuous_on_iff_is_closed.1 hf (Ici 0) (is_closed_Ici) ,
+    rw [hIIci, hU.2],
+    exact is_closed_inter hU.1 (is_closed_Icc) },
   have himI : 0 ≤ f (Inf I),
-  {
-    have h : Inf I ∈ closure I,
-    {
-      
-      sorry
-    },
-    exact hclosu (Inf I) h,
-  },
+  { obtain hx := Inf.closure I ⟨a, (λ y hy, (mem_Icc.1 hy.1).1)⟩,
+    rw (is_closed.closure_eq hII) at hx,
+    exact hx.2 },
   have ha : a < Inf {x ∈ Icc a b | f x ≥ 0},
   { have h3 : a ≠ Inf I,
     { intro hax,
@@ -69,9 +74,8 @@ end
 theorem bolzano (a b : ℝ) (hab : a < b) (f: ℝ → ℝ) (hf : continuous_on f (Icc a b)) (ha : (f a)*(f b)<0) : ∃ c ∈ (Icc a b), f(c)=0 :=
 begin
   cases (mul_neg_iff.1 ha),
-  {
-    
-    sorry
-  },
+  { let g := λ (α : ℝ ), -α, 
+    obtain ⟨c, H, hc⟩  := bolz a b hab (g ∘ f) (continuous_on.neg hf) ⟨neg_lt_zero.mpr h.1, neg_pos.mpr h.2⟩,
+    exact ⟨c, H, neg_eq_zero.1 hc⟩ },
   { exact bolz a b hab f hf h }
 end
