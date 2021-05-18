@@ -2,19 +2,25 @@ import topology.metric_space.basic
 
 open set
 
-lemma Inf.closure (I : set ℝ) (h : ∃ a, ∀ b∈ I, a ≤ b) : Inf I ∈ closure I :=
+lemma Inf.closure (I : set ℝ) (h1 : ∃ a, a ∈ I) (h2 : ∃ (x : ℝ), ∀ (y : ℝ), y ∈ I → x ≤ y) : Inf I ∈ closure I :=
 begin
   intros F hF,
-  by_contradiction,
-  have hIF : Inf I ∈ Fᶜ, by exact mem_compl h,  
+  by_contradiction hhF,
+  have hIF : Inf I ∈ Fᶜ, by exact mem_compl hhF,  
   obtain ⟨ε, hε, H⟩  := metric.is_open_iff.1 (is_open_compl_iff.2 hF.1) (Inf I) hIF,
-  --have hI : Inf I < Inf I + ε/2, by linarith,
-  have hInf : Inf I + ε/2 ≤ Inf I,
-  {
-    obtain := real.le_Inf,
-    sorry
-  },
-  linarith,
+  have hIε : ∀ x ∈ I, Inf I + ε/2 ≤ x,
+  { intros x hx,
+    cases le_or_lt (Inf I + ε / 2) x,
+    { exact h },
+    { cases le_or_lt (Inf I - ε / 2) x,
+      { exfalso,
+        have hxB : x ∈ metric.ball (Inf I) ε,
+        { rw [metric.mem_ball',real.dist_eq],
+          exact abs_lt.2 ⟨by linarith, by linarith⟩ },
+        exact (H hxB) (hF.2 hx) },
+      { exfalso,      
+        linarith [(real.Inf_lt I h1 h2).2 ⟨x, hx, h_1⟩] } } },
+  linarith [(real.le_Inf I h1 h2).2 hIε],
 end
 
 lemma bolz (a b : ℝ) (hab : a < b) (f: ℝ → ℝ) (hf : continuous_on f (Icc a b)) (ha : (f a)<0 ∧ (f b)>0) : ∃ c ∈ (Icc a b),f(c)=0 :=
@@ -29,7 +35,7 @@ begin
     rw [hIIci, hU.2],
     exact is_closed_inter hU.1 (is_closed_Icc) },
   have himI : 0 ≤ f (Inf I),
-  { obtain hx := Inf.closure I ⟨a, (λ y hy, (mem_Icc.1 hy.1).1)⟩,
+  { obtain hx := Inf.closure I h1 ⟨a, (λ y hy, (mem_Icc.1 hy.1).1)⟩,
     rw (is_closed.closure_eq hII) at hx,
     exact hx.2 },
   have ha : a < Inf {x ∈ Icc a b | f x ≥ 0},
