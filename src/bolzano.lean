@@ -5,9 +5,8 @@ open set
 lemma Inf.closure (I : set ℝ) (h1 : ∃ a, a ∈ I) (h2 : ∃ (x : ℝ), ∀ (y : ℝ), y ∈ I → x ≤ y) : Inf I ∈ closure I :=
 begin
   intros F hF,
-  by_contradiction hhF,
-  have hIF : Inf I ∈ Fᶜ, by exact mem_compl hhF,  
-  obtain ⟨ε, hε, H⟩  := metric.is_open_iff.1 (is_open_compl_iff.2 hF.1) (Inf I) hIF,
+  by_contradiction hhF, 
+  obtain ⟨ε, hε, H⟩  := metric.is_open_iff.1 (is_open_compl_iff.2 hF.1) (Inf I) (by exact mem_compl hhF),
   have hIε : ∀ x ∈ I, Inf I + ε/2 ≤ x,
   { intros x hx,
     cases le_or_lt (Inf I + ε / 2) x,
