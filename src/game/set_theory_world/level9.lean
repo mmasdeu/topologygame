@@ -1,8 +1,7 @@
 import data.set.basic -- hide
-import data.set.finite -- hide
 open set -- hide
 /-
-We will use the following lemma when we start proving facts about topological spaces.
+The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics.
 -/
 
 /- Hint : Click here for a hint, in case you get stuck.
@@ -12,27 +11,49 @@ We will use the following lemma when we start proving facts about topological sp
 variables {X Y : Type} -- hide
 
 /- Lemma : no-side-bar
-If P is a property of sets which is closed under pairwise intersection then it is also closed under
-arbitrary finite interesctions.
+The distributive property of ∩ with respect to ∪.
 -/
-lemma sInter_of_inter (P : set X → Prop) (huniv : P univ) (hinter : ∀ A B : set X, P A → P B → P (A ∩ B))
-(S : set (set X)) (hfin : finite S) (hS : ∀ s ∈ S, P s) : P ( sInter S ) :=
+lemma inter_union (A B C : set X) : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
 begin
-  revert hS,
-  apply finite.induction_on hfin,
-  { 
-    simp,
-    exact huniv,
+  ext,
+  split,
+  {
+    intro h,
+    cases h,
+    cases h_right,
+    {
+      left,
+      split;
+      assumption,
+    },
+    {
+      right,
+      split;
+      assumption,
+    }
   },
   {
-    intros U S hUS hSfin hind h,
-    have h : ⋂₀ insert U S = (⋂₀ S) ∩ U,
+    intro h,
+    cases h,
     {
-      finish,
+      split,
+      {
+        exact h.1,
+      },
+      {
+        left,
+        exact h.2,
+      },
     },
-    rw h,
-    apply hinter;
-    finish,
+    {
+      split,
+      {
+        exact h.1,
+      },
+      {
+        right,
+        exact h.2,
+      }
+    }
   }
 end
-

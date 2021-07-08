@@ -1,35 +1,48 @@
-import data.set.basic
-open set
+import data.set.basic -- hide
+open set -- hide
+/- Tactic : apply
+
+## Summary
+
+If `h : P → Q` is a hypothesis, and the goal is `⊢ Q` then
+`apply h` changes the goal to `⊢ P`. 
+
+## Details
+
+If you have a function `h : P → Q` and your goal is `⊢ Q`
+then `apply h` changes the goal to `⊢ P`. The logic is
+simple: if you are trying to create a term of type `Q`,
+but `h` is a function which turns terms of type `P` into
+terms of type `Q`, then it will suffice to construct a
+term of type `P`. A mathematician might say: "we need
+to construct an element of $Q$, but we have a function $h:P\to Q$
+so it suffices to construct an element of $P$". Or alternatively
+"we need to prove $Q$, but we have a proof $h$ that $P\implies Q$
+so it suffices to prove $P$".
+
+-/
 
 /-
-There is an equivalence between set theory and logic, and Lean identifies these two.
-
-In this equivalence, a logic statement P : X → true/false corresponds to the set
-$A = \{ x : X | P(x) \}$. Under this equivalence, logical implications P → Q translate into
-set inclusions A ⊆ B, and so on.
-
-The goal of this lemma is to prove transitivity of set inclusion, giving almost the same
-proof as in the previous lemma.
+In this level we introduce the new tactic `apply`. Look at what it does and try to solve it!
 -/
 
 /- Hint : Click here for a hint, in case you get stuck.
-Start with `intro x,`, then do exactly as in the previous level.
+Start with an `intro`, then try to `apply` the right hypothesis.
 -/
 
 variables {X Y : Type} -- hide
 
 /- Lemma : no-side-bar
-If A, B and C are sets and, and we know A ⊆ B and B ⊆ C, then
-we have A ⊆ C.
+If A, B and C are sets and x ∈ A, and we know that x ∈ A → x ∈ B and that x ∈ B → x ∈ C, then
+we can deduce that x ∈ C.
 -/
-lemma subset_transitive (A B C : set X) (hAB : A ⊆ B) (hBC : B ⊆ C) :
-  A ⊆ C :=
+lemma subset_transitive_basic (A B C : set X) (x : X) (hAB : x ∈ A → x ∈ B) (hBC : x ∈ B → x ∈ C) :
+  x ∈ A → x ∈ C :=
 begin
-  intro x,
-  intro hA,
+  intro h,
   apply hBC,
   apply hAB,
-  exact hA,
+  exact h,
 
   
 end

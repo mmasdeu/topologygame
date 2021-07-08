@@ -12,7 +12,11 @@ levels = [
 	"src/game/set_theory_world/level3.lean",
 	"src/game/set_theory_world/level4.lean",
 	"src/game/set_theory_world/level5.lean",
-	"src/game/set_theory_world/level6.lean"
+	"src/game/set_theory_world/level6.lean",
+	"src/game/set_theory_world/level7.lean",
+	"src/game/set_theory_world/level8.lean",
+	"src/game/set_theory_world/level9.lean",
+	"src/game/set_theory_world/level10.lean",
 ]
 
 [[worlds]]
