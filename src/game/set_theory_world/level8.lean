@@ -1,62 +1,37 @@
-import data.set.basic --
-open set
-/-
-The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics.
+import data.set.basic -- hide
+open set -- hide
 
-If you are lazy, the `finish` tactic will take the fun out of this exercise. So try to not use it.
+/- Tactic : exfalso
+
+## Summary
+
+Changes the goal to `⊢ false`.
+
+## Details
+
+This may seem hard to prove,
+but it is useful when we have a contradiction in the hypotheses.
+
+For example, if we have `h : ¬ P` as a hypothesis and we apply `exfalso`
+we can then `apply h` to transform the goal into `⊢ P`.
 -/
 
+
 /- Hint : Click here for a hint, in case you get stuck.
-Remember that `x ∈ A ∩ B` is "the same as" `x ∈ A ∧ x ∈ B`. Therefore if you have a hypothesis
-of the form `h : x ∈ A ∩ B` and your goal is `⊢ x ∈ B`, you win by `exact h.2`.
+In Lean, the  negation `¬ P` of a statement is a shorthand for `P → false`. Therefore
+start with `exfalso`, and remember that negation is the same as `→ false`.
 -/
 
 variables {X Y : Type} -- hide
 
 /- Lemma : no-side-bar
-The distributive property of ∩ with respect to ∪.
+We can prove that 1 equals 0 if we have a contradiction in our hypotheses.
 -/
-lemma inter_union (A B C : set X) : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
+lemma one_eq_zero_of_contradiction (A : set X) (x : X) (h1 : x ∈ A) (h2 : x ∉ A): 1 = 0 :=
 begin
-  ext,
-  split,
-  {
-    intro h,
-    cases h,
-    cases h_right,
-    {
-      left,
-      split;
-      assumption,
-    },
-    {
-      right,
-      split;
-      assumption,
-    }
-  },
-  {
-    intro h,
-    cases h,
-    {
-      split,
-      {
-        exact h.1,
-      },
-      {
-        left,
-        exact h.2,
-      },
-    },
-    {
-      split,
-      {
-        exact h.1,
-      },
-      {
-        right,
-        exact h.2,
-      }
-    }
-  }
+  exfalso,
+  apply h2,
+  exact h1,
+
+  
 end

@@ -234,7 +234,7 @@ lemma T0_and_regular_is_T3 [kolmogorov_space X] (h: is_regular X) :
     {
       have hUc : is_closed Uᶜ,
       {
-        simp,
+        rw [is_closed, compl_compl],
         exact hU,
       },
       have hy_not_Uc : y ∉ Uᶜ,

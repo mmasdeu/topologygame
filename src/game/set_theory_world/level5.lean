@@ -1,49 +1,56 @@
-import data.set.basic -- hide
-open set -- hide
-/- Tactic : apply
+/- Tactic : intro
 
-## Summary
+## Summary:
 
-If `h : P → Q` is a hypothesis, and the goal is `⊢ Q` then
-`apply h` changes the goal to `⊢ P`. 
+`intro p` will turn a goal `⊢ P → Q` into a hypothesis `p : P`
+and goal `⊢ Q`. If `P` and `Q` are sets `intro p` means "let $p$ be an arbitrary element of $P$".
+If `P` and `Q` are propositions then `intro p` says "assume $P$ is true". 
 
 ## Details
 
-If you have a function `h : P → Q` and your goal is `⊢ Q`
-then `apply h` changes the goal to `⊢ P`. The logic is
-simple: if you are trying to create a term of type `Q`,
-but `h` is a function which turns terms of type `P` into
-terms of type `Q`, then it will suffice to construct a
-term of type `P`. A mathematician might say: "we need
-to construct an element of $Q$, but we have a function $h:P\to Q$
-so it suffices to construct an element of $P$". Or alternatively
-"we need to prove $Q$, but we have a proof $h$ that $P\implies Q$
-so it suffices to prove $P$".
+If your goal is a function or an implication `⊢ P → Q` then `intro`
+will always make progress. `intro p` turns
 
+`⊢ P → Q`
+
+into 
+
+```
+p : P
+⊢ Q
+```
+
+The opposite tactic to intro is `revert`; given the situation
+just above, `revert p` turns the goal back into `⊢ P → Q`.
+
+## Example
+
+If your goal is an implication $P\implies Q$ then Lean writes
+this as `⊢ P → Q`, and `intro p,` can be thought of as meaning
+"let $p$ be a proof of $P$", or more informally "let's assume that
+$P$ is true". The goal changes to `⊢ Q` and the hypothesis `p : P`
+appears in the local context.
 -/
 
 /-
-In this level we introduce the new tactic `apply`. Look at what it does and try to solve it!
+In this level we introduce the tactic `intro`. You will need it to get started.
 -/
 
 /- Hint : Click here for a hint, in case you get stuck.
-Start with an `intro`, then try to `apply` the right hypothesis.
+Try something like `intro h1,` and go from there.
 -/
 
-variables {X Y : Type} -- hide
+variables {X : Type} -- hide
 
 /- Lemma : no-side-bar
-If A, B and C are sets and x ∈ A, and we know that x ∈ A → x ∈ B and that x ∈ B → x ∈ C, then
-we can deduce that x ∈ C.
+If A, B and C are sets and A = B, then A ∪ C = B ∪ C.
 -/
-lemma subset_transitive_basic (A B C : set X) (x : X) (hAB : x ∈ A → x ∈ B) (hBC : x ∈ B → x ∈ C) :
-  x ∈ A → x ∈ C :=
+lemma example_on_intro (A B : set X) (x : X) (h : A = B) : x ∈ A → x ∈ B :=
 begin
-  intro h,
-  apply hBC,
-  apply hAB,
-  exact h,
-
+  intro h1,
+  rw ← h,
+  exact h1,
+  
   
 end
 
