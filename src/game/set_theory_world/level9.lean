@@ -3,10 +3,18 @@ import data.set.finite -- hide
 open set -- hide
 /-
 We will use the following lemma when we start proving facts about topological spaces.
+It seems clear that we want to use induction, so we can try to apply the `finite.induction_on`
+lemma. But be careful on how you apply it, or you will be left with an impossible goal.
+
+For the inductive step, the lemmas `sInter_insert`, `mem_insert_iff` and `forall_eq_or_imp`
+may be useful, as well as the `simp` tactic.
 -/
 
 /- Hint : Click here for a hint, in case you get stuck.
-
+The `finite.induction_on` lemma allows to prove something of the form `P S` for all finite sets `S`.
+So apply `finite.induction_on hfin` looks like it's making progress. However, the induction
+hypothesis you will be left with is too weak. Try instead starting with `revert hS`, and
+see why this helps.
 -/
 
 variables {X Y : Type} -- hide
@@ -26,13 +34,17 @@ begin
   },
   {
     intros U S hUS hSfin hind h,
-    have h : ⋂₀ insert U S = (⋂₀ S) ∩ U,
+    rw sInter_insert U S,
+    simp_rw mem_insert_iff at h,
+    rw forall_eq_or_imp at h,
+    apply hinter,
     {
-      finish,
+      exact h.1,
     },
-    rw h,
-    apply hinter;
-    finish,
+    {
+      apply hind,
+      exact h.2,
+    }
   }
 end
 

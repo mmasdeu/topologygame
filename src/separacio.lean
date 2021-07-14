@@ -30,8 +30,8 @@ begin
     exact hx U hUx,
   },
   {
-    simp only [closure_eq_compl_of_interior_compl, compl_univ_iff],
-    simp only [ empty_iff, interior],
+    simp only [closure_eq_compl_of_interior_compl, compl_univ_iff,
+      set.eq_empty_iff_forall_not_mem, interior],
     intro x,
     intro hx,
     refine h x Aᶜ hx _,

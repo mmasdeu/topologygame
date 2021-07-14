@@ -6,54 +6,27 @@ open set
 noncomputable theory
 
 @[simp]
-lemma set.univ_iff {α : Type} (p : α → Prop) : {x : α | p x} = univ ↔ ∀ x, p x :=
-begin
-  split,
-  { intros h x,
-    have h1 := mem_univ x,
-    rw ← h at h1,
-    exact h1 },
-  { intros h,
-    ext,
-    simp only [mem_univ, mem_set_of_eq, iff_true],
-    exact h x }
-end
+lemma set.eq_univ_iff_forall' {α : Type} (p : α → Prop) : {x : α | p x} = univ ↔ ∀ x, p x :=
+set.eq_univ_iff_forall
 
 @[simp]
-lemma set.empty_iff {α : Type} {p : α → Prop} : {x : α | p x} = ∅ ↔ ∀ x, ¬ p x :=
-begin
-  split,
-  { intros h x,
-    have h1 := mem_empty_eq x,
-    rw ← h at h1,
-    norm_num at h1 },
-  { intros h,
-    ext,
-    norm_num,
-    exact h x }
-end
-
+lemma set.eq_empty_iff_forall_not_mem' {α : Type} {p : α → Prop} : {x : α | p x} = ∅ ↔ ∀ x, ¬ p x :=
+set.eq_empty_iff_forall_not_mem
 
 lemma sUnion_eq_of_pointwise {X : Type} {U : set X} {ℬ : set (set X)} :
   ( ∃ J ⊆ ℬ, U = ⋃₀ J ) ↔  (∀ x ∈ U, ∃ W ∈ ℬ, x ∈ W ∧ W ⊆ U) :=
 begin
   split,
-  { intros h x hx,
-    obtain ⟨J, ⟨hJ1, hJ2⟩⟩ := h,
-    subst hJ2,
-    rw mem_sUnion at hx,
-    obtain ⟨t, ht1, ht2⟩ := hx,
-    use t,
-    repeat {split},
-    { tauto },
-    { tauto },
-    { exact subset_sUnion_of_mem ht1 } },
+  { rintros ⟨J, hJ1, rfl⟩ x ⟨t, ht1, ht2⟩,
+    exact ⟨t, hJ1 ht1, ht2, subset_sUnion_of_mem ht1⟩, },
   { intro h,
-    use {W ∈ ℬ | W ⊆ U},
-    split,
-    { apply sep_subset },
+    refine ⟨{W ∈ ℬ | W ⊆ U}, sep_subset _ _, _⟩,
     apply eq_of_subset_of_subset,
-    all_goals {intros x hx, simp at hx ⊢, try {specialize h x hx}, tauto } }
+    { intros x hx,
+      obtain ⟨W, hWB, hXw, hwu⟩ := h x hx,
+      exact ⟨W, ⟨hWB, hwu⟩, hXw⟩, },
+    { rintros x ⟨W, ⟨-, hWU⟩, hXw⟩,
+      exact hWU hXw, }, }
 end
 
 lemma lift_to_real {x : ereal} (h : x ≠ ⊥) (h' : x ≠ ⊤) :
