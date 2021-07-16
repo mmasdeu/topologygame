@@ -49,8 +49,7 @@ jobs:
           pip3 install -e .
 
       - name: Make game
-        run: |
-          ~/.local/bin/make-lean-game
+        run: make-lean-game
       
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
