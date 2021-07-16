@@ -3,7 +3,7 @@
 
 ## By the Barcelona Lean Seminar
 
-Learn topology with Lean!
+Learn topology with LEAN!
 
 # What is this game?
 
