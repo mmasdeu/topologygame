@@ -27,7 +27,7 @@ jobs:
           python-version: '3.8'
 
       - name: Update packages
-        run: sudo apt install -y make nodejs gettext build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
+        run: sudo apt install -y unzip make nodejs gettext build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
  
       - name: Install elan
         run: |
@@ -48,6 +48,12 @@ jobs:
           cd ../..
           pip3 install -e .
 
+      - name : Get server files
+        run: |
+          wget https://github.com/leanprover-community/lean/releases/download/v3.30.0/lean-3.30.0--browser.zip
+          unzip lean-3.30.o--browser.zip
+          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.30.0/"
+          
       - name: Make game
         run: make-lean-game
       
