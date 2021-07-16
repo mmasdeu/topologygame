@@ -52,6 +52,7 @@ jobs:
         run: |
           wget https://github.com/leanprover-community/lean/releases/download/v3.30.0/lean-3.30.0--browser.zip
           unzip lean-3.30.0--browser.zip
+          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.30.0/"
           cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.30.0/"
           
       - name: Make game
