@@ -11,10 +11,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      test:
-        description: 'Deploy to test subfolder (default)'
+      production:
+        description: 'Deploy to production (default: false). If false, will deploy to test subfolder.'
         required: false
-        default: true
+        default: false
 jobs:
   deploy:
     runs-on: ubuntu-18.04
@@ -69,7 +69,7 @@ jobs:
               
       - name: Deploy Production
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ !github.event.inputs.test }}
+        if: ${{ github.event.inputs.production }}
         with:
           github_token: ${{ secrets.github_token }}
           keep_files : true
@@ -77,7 +77,7 @@ jobs:
 
       - name: Deploy Test
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event.inputs.test }}
+        if: ${{ !github.event.inputs.production }}
         with:
           github_token: ${{ secrets.github_token }}
           keep_files : true
