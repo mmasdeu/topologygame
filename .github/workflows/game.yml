@@ -39,6 +39,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip requests markdown2 toml mathlibtools toposort invoke
 
+      - name: upgrade Lean and dependencies
+        uses: leanprover-contrib/lean-upgrade-action@master
+        with:
+          repo: ${{ github.repository }}
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Install Game maker
         run: |
           git clone https://github.com/mpedramfar/Lean-game-maker.git
@@ -50,10 +56,10 @@ jobs:
 
       - name : Get server files
         run: |
-          wget https://github.com/leanprover-community/lean/releases/download/v3.30.0/lean-3.30.0--browser.zip
-          unzip lean-3.30.0--browser.zip
-          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.30.0/"
-          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.30.0/"
+          wget https://github.com/leanprover-community/lean/releases/download/v3.31.0/lean-3.31.0--browser.zip
+          unzip lean-3.31.0--browser.zip
+          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.31.0/"
+          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.31.0/"
           
       - name: Make game
         run: make-lean-game
