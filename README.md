@@ -1,4 +1,4 @@
-BARCELONA LEAN SEMINAR
+TOPOLOGY GAME
 ======================
 
-We will add more later.
+Learn topology and LEAN!
