@@ -11,6 +11,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
+      test:
+        description: 'Deploy to test subfolder (default)'
+        required: false
+        default: true
       debug_enabled:
         description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
         required: false
@@ -68,12 +72,22 @@ jobs:
       - name: Make game
         run: make-lean-game
               
-      - name: deploy
+      - name: Deploy Production
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.github_token }}
           keep_files : true
           publish_dir: ./html
+
+      - name: Deploy Test
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event.inputs.test }}
+        with:
+          github_token: ${{ secrets.github_token }}
+          keep_files : true
+          publish_dir: ./html
+          destination_dir : test/
+
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       # - name: Setup tmate session
