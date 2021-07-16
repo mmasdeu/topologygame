@@ -27,7 +27,8 @@ jobs:
           sudo ln -s $HOME/.elan/bin/* /usr/local/bin;
 
       - name: Install python Lean dependencies
-        run: python -m pip install --upgrade pip requests markdown2 toml mathlibtools toposort invoke
+        run: |
+          python -m pip install --upgrade pip requests markdown2 toml mathlibtools toposort invoke
 
       - name: Install Game maker
         run: |
