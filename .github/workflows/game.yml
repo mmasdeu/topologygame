@@ -72,6 +72,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.github_token }}
+          keep_files : true
           publish_dir: ./html
 
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
