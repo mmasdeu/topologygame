@@ -25,3 +25,35 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
+
+      - name: Update packages
+        run: sudo apt install -y make nodejs gettext build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
+ 
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl https://raw.githubusercontent.com/Kha/elan/master/elan-init.sh -sSf | sh -s -- -v -y
+          sudo ln -s $HOME/.elan/bin/* /usr/local/bin;
+
+      - name: Install python Lean dependencies
+        run: |
+          python -m pip install --upgrade pip requests markdown2 toml mathlibtools toposort invoke
+
+      - name: Install Game maker
+        run: |
+          git clone https://github.com/mpedramfar/Lean-game-maker.git
+          cd Lean-game-maker/src/interactive_interface
+          npm install .
+          ./node_modules/.bin/webpack --mode=production
+          cd ../..
+          pip3 install -e .
+
+      - name: Make game
+        run: |
+          ~/.local/bin/make-lean-game
+      
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.github_token }}
+          publish_dir: ./html
