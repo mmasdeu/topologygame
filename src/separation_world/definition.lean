@@ -1,4 +1,4 @@
-import game.interior_world.definition -- hide
+import interior_world.definition -- hide
 
 namespace topological_space -- hide
 

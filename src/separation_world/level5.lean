@@ -1,4 +1,4 @@
-import game.separation_world.level4 -- hide
+import separation_world.level4 -- hide
 
 /-
 # Level 5: Every T₂ space is also T₁

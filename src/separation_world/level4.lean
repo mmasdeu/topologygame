@@ -1,4 +1,4 @@
-import game.separation_world.level3 -- hide
+import separation_world.level3 -- hide
 
 /-
 # Level 4: Characterisation of Frechet spaces

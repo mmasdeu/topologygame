@@ -1,9 +1,8 @@
 [package]
-name = "barcelonaleanseminar"
+name = "topologygame"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.30.0"
+lean_version = "leanprover-community/lean:3.31.0"
 path = "src"
 
 [dependencies]
-
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "48104c3a22ae4b35d92b8ad30831eb1591049958"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "e6ff367d7b3033e64e143c35d3458e70e9e550cd"}

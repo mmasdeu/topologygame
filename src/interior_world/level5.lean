@@ -1,4 +1,4 @@
-import game.interior_world.level4 --hide
+import interior_world.level4 --hide
 /-
 
 # Level 5: Characterization of the interior

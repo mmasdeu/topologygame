@@ -1,4 +1,4 @@
-import game.basic_defs_world.level1 --hide
+import basic_defs_world.level1 --hide
 
 namespace topological_space -- hide
 

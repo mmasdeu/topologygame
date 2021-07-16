@@ -1,4 +1,4 @@
-import game.separation_world.level2 -- hide
+import separation_world.level2 -- hide
 
 /-
 # Level 3: Lemma about intersection of open sets

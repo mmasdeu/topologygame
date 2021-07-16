@@ -1,4 +1,4 @@
-import game.interior_world.definition -- hide
+import interior_world.definition -- hide
 
 /- Axiom : A set A is the neighborhood of a point x if there is an open U such that $x \in U \subseteq A$.
 is_neighborhood : ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A

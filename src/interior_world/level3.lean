@@ -1,4 +1,4 @@
-import game.interior_world.level2 --hide
+import interior_world.level2 --hide
 
 /-
 

@@ -1,4 +1,4 @@
-import game.separation_world.definition -- hide
+import separation_world.definition -- hide
 
 /- Axiom : A topological space is a T₀ space if, from any two points in the topology, there exist and open set that contains one point and not the other
 t0 : ∀ (x y : X) (h : y ≠ x) , ∃ (U : set X) (hU : is_open U), ((x ∈ U) ∧ (y ∉ U)) ∨ ((x ∉ U) ∧ (y ∈ U))

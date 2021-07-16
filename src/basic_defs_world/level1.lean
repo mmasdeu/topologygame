@@ -1,4 +1,4 @@
-import game.basic_defs_world.definition -- hide
+import basic_defs_world.definition -- hide
 
 /- Axiom : The total set (called `univ`) is open.
 univ_mem : is_open set.univ

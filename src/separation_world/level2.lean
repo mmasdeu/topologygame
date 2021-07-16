@@ -1,4 +1,4 @@
-import game.separation_world.level1 -- hide
+import separation_world.level1 -- hide
 
 /-
 # Level 2: Comparison between the definition given and common definition of T₁

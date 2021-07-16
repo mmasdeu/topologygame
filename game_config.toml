@@ -1,22 +1,22 @@
 name = "Lean Topology game"
 version = "1.0.0"
 extra_files = "extras"
-intro = "src/game/intro.lean"
+intro = "src/intro.lean"
 
 [[worlds]]
 name = "Set theory"
 id = 1
 levels = [
-	"src/game/set_theory_world/level1.lean",
-	"src/game/set_theory_world/level2.lean",
-	"src/game/set_theory_world/level3.lean",
-	"src/game/set_theory_world/level4.lean",
-	"src/game/set_theory_world/level5.lean",
-	"src/game/set_theory_world/level6.lean",
-	"src/game/set_theory_world/level7.lean",
-	"src/game/set_theory_world/level8.lean",
-	"src/game/set_theory_world/level9.lean",
-	"src/game/set_theory_world/level10.lean",
+	"src/set_theory_world/level1.lean",
+	"src/set_theory_world/level2.lean",
+	"src/set_theory_world/level3.lean",
+	"src/set_theory_world/level4.lean",
+	"src/set_theory_world/level5.lean",
+	"src/set_theory_world/level6.lean",
+	"src/set_theory_world/level7.lean",
+	"src/set_theory_world/level8.lean",
+	"src/set_theory_world/level9.lean",
+	"src/set_theory_world/level10.lean",
 ]
 
 [[worlds]]
@@ -24,8 +24,8 @@ name = "Basic definitions"
 id = 2
 parents = [1]
 levels = [
-	"src/game/basic_defs_world/level1.lean",
-	"src/game/basic_defs_world/level2.lean",
+	"src/basic_defs_world/level1.lean",
+	"src/basic_defs_world/level2.lean",
 ]
 
 [[worlds]]
@@ -33,11 +33,11 @@ name = "Interior world"
 id = 3
 parents = [2]
 levels = [
-	"src/game/interior_world/level1.lean",
-	"src/game/interior_world/level2.lean",
-	"src/game/interior_world/level3.lean",
-	"src/game/interior_world/level4.lean",
-	"src/game/interior_world/level5.lean",
+	"src/interior_world/level1.lean",
+	"src/interior_world/level2.lean",
+	"src/interior_world/level3.lean",
+	"src/interior_world/level4.lean",
+	"src/interior_world/level5.lean",
 ]
 
 [[worlds]]
@@ -45,10 +45,10 @@ name = "Separation world"
 id = 4
 parents = [3]
 levels = [
-	"src/game/separation_world/level1.lean",
-	"src/game/separation_world/level2.lean",
-	"src/game/separation_world/level3.lean",
-	"src/game/separation_world/level4.lean",
-	"src/game/separation_world/level5.lean",
-	"src/game/separation_world/level6.lean",
+	"src/separation_world/level1.lean",
+	"src/separation_world/level2.lean",
+	"src/separation_world/level3.lean",
+	"src/separation_world/level4.lean",
+	"src/separation_world/level5.lean",
+	"src/separation_world/level6.lean",
 ]
