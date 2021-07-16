@@ -69,6 +69,7 @@ jobs:
               
       - name: Deploy Production
         uses: peaceiris/actions-gh-pages@v3
+        if: ${{ !github.event.inputs.test }}
         with:
           github_token: ${{ secrets.github_token }}
           keep_files : true
