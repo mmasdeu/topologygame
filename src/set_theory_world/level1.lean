@@ -2,7 +2,7 @@
 
 ## Summary
 
-`refl` proves goals of the form `X = X`.
+`refl` is a tactic which proves goals of the form `X = X`.
 
 ## Details
 
