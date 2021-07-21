@@ -3,10 +3,12 @@
 ## Summary
 
 If `h` is a proof of `X = Y`, then `rw h,` will change
-all `X`s in the goal to `Y`s. Variants: `rw ← h` (changes
-`Y` to `X`) and
-`rw h at h2` (changes `X` to `Y` in hypothesis `h2` instead
-of the goal).
+all `X`s in the goal to `Y`s. 
+
+Variants: `rw ← h` changes
+`Y` to `X` and
+`rw h at h2` changes `X` to `Y` in hypothesis `h2` instead
+of the goal.
 
 ## Details
 
@@ -31,7 +33,7 @@ statement itself, not the proof.
 If `h : P = Q` is its proof, then `rw h` will work.
 
 Pro tip 1: If `h : A = B` and you want to change
-`B`s to `A`s instead, try `rw ←h` (get the arrow with `\l` and
+`B`s to `A`s instead, try `rw ←h` (get the arrow with `\l`,
 note that this is a small letter L, not a number 1).
 
 ### Example:
