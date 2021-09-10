@@ -35,10 +35,7 @@ begin
   },
   {
     intros U S hUS hSfin hind h,
-    have h : ⋂₀ insert U S = (⋂₀ S) ∩ U,
-    {
-      finish,
-    },
+    have h : ⋂₀ insert U S = (⋂₀ S) ∩ U, by finish,
     rw h,
     apply hinter;
     finish,
