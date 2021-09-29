@@ -1,8 +1,8 @@
 [package]
 name = "topologygame"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.31.0"
+lean_version = "leanprover-community/lean:3.33.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "8062521eae443a0896b164f9f3679f28c065bf15"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "e1506687785abf647fb2fff67ef019611de704ad"}
