@@ -1,6 +1,6 @@
-import basic_defs_world.level1 -- hide
+import basic_defs_world.level1 --hide
 open set --hide
-namespace topological_space -- hide
+namespace topological_space --hide
 
 
 /-
