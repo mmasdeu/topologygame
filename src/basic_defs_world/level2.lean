@@ -1,4 +1,4 @@
-import .level1 -- hide
+import level1 -- hide
 open set --hide
 namespace topological_space -- hide
 
