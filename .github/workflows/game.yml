@@ -59,10 +59,11 @@ jobs:
 
       - name : Get server files
         run: |
-          wget https://github.com/leanprover-community/lean/releases/download/v3.31.0/lean-3.31.0--browser.zip
-          unzip lean-3.31.0--browser.zip
-          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.31.0/"
-          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:3.31.0/"
+          curl -s https://api.github.com/repos/leanprover-community/lean/releases/latest | grep "browser.zip" | grep -v name | cut -d : -f 2,3 | tr -d \"  | wget -qi -
+          unzip *.zip
+          VER=`ls *zip | cut -c 6-11`
+          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
+          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
           
       - name: Make game
         run: make-lean-game
