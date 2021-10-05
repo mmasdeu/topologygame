@@ -67,20 +67,22 @@ jobs:
           
       - name: Make game
         run: make-lean-game
-              
+
       - name: Deploy Production
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@4.1.5
         if: ${{ github.event.inputs.production }}
         with:
-          github_token: ${{ secrets.github_token }}
-          keep_files : true
-          publish_dir: ./html
+          token: ${{ secrets.github_token }}
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ./html # The folder the action should deploy.
+          single-commit: true
 
       - name: Deploy Test
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@4.1.5
         if: ${{ !github.event.inputs.production }}
         with:
-          github_token: ${{ secrets.github_token }}
-          keep_files : true
-          publish_dir: ./html
-          destination_dir : test/
+          token: ${{ secrets.github_token }}
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ./html # The folder the action should deploy.
+          target-folder: test/
+          single-commit: true
