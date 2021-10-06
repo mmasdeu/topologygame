@@ -69,13 +69,12 @@ jobs:
         run: make-lean-game
 
       - name: Deploy Production
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event.inputs.production }}
         with:
-          token: ${{ secrets.github_token }}
-          branch: gh-pages # The branch the action should deploy to.
-          folder: ./html # The folder the action should deploy.
-          single-commit: "true"
+          github_token: ${{ secrets.github_token }}
+          keep_files : true
+          publish_dir: ./html
 
       - name: Deploy Test
         uses: JamesIves/github-pages-deploy-action@4.1.5
