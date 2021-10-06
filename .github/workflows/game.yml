@@ -85,5 +85,5 @@ jobs:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./html # The folder the action should deploy.
           target-folder: test/
-          single-commit: "true"
+          single-commit: "false"
 
