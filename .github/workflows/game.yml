@@ -50,7 +50,7 @@ jobs:
           
       - name: Install Game maker
         run: |
-          git clone https://github.com/mpedramfar/Lean-game-maker.git
+          git clone https://github.com/mmasdeu/Lean-game-maker.git
           cd Lean-game-maker/src/interactive_interface
           npm install .
           ./node_modules/.bin/webpack --mode=production
