@@ -2,7 +2,12 @@ import data.set.basic -- hide
 open set -- hide
 
 /-
-The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics.
+The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics. 
+
+- `ext` allows us to prove `A=B` taking an element of each set.  `x ∈ A ↔ x ∈ B`
+- `split` divides the current goal `P ∧ Q` into several subgoals.#check
+- `cases h` divides a combined hypothesis `h: P ∧ Q` or `h: P ∨ Q` into separated assumptions. 
+- `left/right` allows us to prove `P ∨ Q` by proving either `P` or `Q`.
 
 If you are lazy, the `finish` tactic will take the fun out of this exercise. So try to not use it.
 -/
