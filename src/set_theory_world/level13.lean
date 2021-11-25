@@ -13,3 +13,11 @@ begin
   intros x hx,
   exact ⟨hA hx.1, hB hx.2⟩,
 end
+/-
+begin
+  intros x hx,
+  {
+    sorry
+  }
+end 
+-/
