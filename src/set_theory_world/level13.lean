@@ -12,7 +12,7 @@ lemma sInter_of_inter {A₁ A₂ : set X} {B₁ B₂ : set Y} (hA : A₁ ⊇ A�
 begin
   intros x hx,
   exact ⟨hA hx.1, hB hx.2⟩,
-/- proof hint
+/- hint
   intros x hx,
   {
     sorry
