@@ -29,6 +29,7 @@ parents = [1]
 levels = [
 	"src/basic_defs_world/level1.lean",
 	"src/basic_defs_world/level2.lean",
+	"src/basic_defs_world/level3.lean",
 ]
 
 [[worlds]]
