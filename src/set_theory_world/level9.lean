@@ -33,13 +33,123 @@ A B : set X
 x : X
 ⊢ x ∈ A ↔ x ∈ B
 ```
+-/
+
+/- Tactic : split
+
+## Summary:
+
+If the goal is `P ∧ Q` or `P ↔ Q` then `split` will break it into two goals.
+
+## Details
+
+If `P Q : Prop` and the goal is `⊢ P ∧ Q`, then `split` will change it into
+two goals, namely `⊢ P` and `⊢ Q`. 
+
+If `P Q : Prop` and the goal is `⊢ P ↔ Q`, then `split` will change it into
+two goals, namely `⊢ P → Q` and `⊢ Q → P`.  
+
+## Example:
+
+If your local context (the top right window) looks like this
+```
+X : Type
+A B : set X
+x : X
+⊢ x ∈ A ↔ x ∈ B
+```
+
+then after
+
+`split,`
+
+it will look like this:
+
+```
+2 goals
+X : Type
+A B : set X
+x : X
+⊢ x ∈ A → x ∈ B
+
+
+X : Type
+A B : set X
+x : X
+⊢ x ∈ B → x ∈ A
+
+-/
+
+/- Tactic : left and right
+
+## Summary
+
+`left` and `right` work on the goal, and they change
+`⊢ P ∨ Q` to `⊢ P` and `⊢ Q` respectively.
+
+## Details
+
+The tactics `left` and `right` work on a goal which is a type with
+two constructors, the classic example being `P ∨ Q`. 
+To prove `P ∨ Q` it suffices to either prove `P` or prove `Q`,
+and once you know which one you are going for you can change
+the goal with `left` or `right` to the appropriate choice.
+-/
+
+/- Tactic : cases
+
+## Summary:
+
+`cases` is a tactic which works on hypotheses.
+If `h : P ∧ Q` or `h : P ↔ Q` is a hypothesis then `cases h with h1 h2` will remove `h`
+from the list of hypotheses and replace it with the "ingredients" of `h`,
+i.e. `h1 : P` and `h2 : Q`, or `h1 : P → Q` and `h2 : Q → P`. Also
+works with `h : P ∨ Q` and `n : mynat`. 
+
+## Details
+
+How does one prove `P ∧ Q`? The way to do it is to prove `P` and to
+prove `Q`. There are hence two ingredients which go into a proof of
+`P ∧ Q`, and the `cases` tactic extracts them. 
+
+More precisely, if the local context contains
+```
+h : P ∧ Q`
+```
+
+then after the tactic `cases h with p q,` the local context will
+change to
+```
+p : P,
+q : Q
+```
+and `h` will disappear. 
+
+Similarly `h : P ↔ Q` is proved by proving `P → Q` and `Q → P`,
+and `cases h with hpq hqp` will delete our assumption `h` and
+replace it with
+```
+hpq : P → Q,
+hqp : Q → P
+```
+
+Be warned though -- `rw h` works with `h : P ↔ Q` (`rw` works with
+`=` and `↔`), whereas you cannot rewrite with an implication.
+
+`cases` also works with hypotheses of the form `P ∨ Q` and even
+with `n : mynat`. Here the situation is different however. 
+To prove `P ∨ Q` you need to give either a proof of `P` *or* a proof
+of `Q`, so if `h : P ∨ Q` then `cases h with p q` will change one goal
+into two, one with `p : P` and the other with `q : Q`. Similarly, each
+natural is either `0` or `succ(d)` for `d` another natural, so if
+`n : mynat` then `cases n with d` also turns one goal into two,
+one with `n = 0` and the other with `d : mynat` and `n = succ(d)`.
+-/
+
 
 /-
-The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics. 
-
-- `split` divides the current goal `P ∧ Q` into several subgoals.#check
-- `cases h` divides a combined hypothesis `h: P ∧ Q` or `h: P ∨ Q` into separated assumptions. 
-- `left/right` allows us to prove `P ∨ Q` by proving either `P` or `Q`.
+The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics. Learn what
+they do in the side-bar, and use them to clear this goal.
 
 If you are lazy, the `finish` tactic will take the fun out of this exercise. So try to not use it.
 -/
