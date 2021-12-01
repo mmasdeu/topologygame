@@ -1,10 +1,42 @@
 import data.set.basic -- hide
 open set -- hide
 
+/- Tactic : ext
+
+## Summary
+
+If `A` and `B` are sets and the goal is `A = B`, then
+using the `ext` tactic will change it to `x ∈ A ↔ x ∈ B`.
+
+Variant: `ext y` will change the goal to `y ∈ A ↔ y ∈ B`.
+
+## Details
+
+This tactic applies the "extensionality" axiom of set theory,
+which says that two sets are equal iff for all `x`, `x` belongs
+to the first iff `x` belongs to the second.
+
+### Example:
+If it looks like this in the top right hand box:
+```
+A B : set X
+⊢ A = B
+```
+
+then
+
+`ext,`
+
+will change the goal into
+```
+A B : set X
+x : X
+⊢ x ∈ A ↔ x ∈ B
+```
+
 /-
 The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics. 
 
-- `ext` allows us to prove `A=B` taking an element of each set.  `x ∈ A ↔ x ∈ B`
 - `split` divides the current goal `P ∧ Q` into several subgoals.#check
 - `cases h` divides a combined hypothesis `h: P ∧ Q` or `h: P ∨ Q` into separated assumptions. 
 - `left/right` allows us to prove `P ∨ Q` by proving either `P` or `Q`.
@@ -65,4 +97,26 @@ begin
       }
     }
   }
+/- hint
+ext,
+split,
+{
+  intro h,
+  cases h,
+  cases h_right,
+  {
+    left,
+    split;
+    assumption,
+  },
+  {
+    right,
+    split;
+    assumption,
+  }
+},
+{
+  sorry,
+}
+-/
 end
