@@ -48,8 +48,6 @@ begin
 
 
 
-
-
 end
 
 end topological_space -- hide

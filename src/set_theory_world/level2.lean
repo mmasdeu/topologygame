@@ -1,4 +1,4 @@
-/- Tactic : rw
+/- Tactic : rw / rwa
 
 ## Summary
 
@@ -9,6 +9,10 @@ Variants: `rw ← h` changes
 `Y` to `X` and
 `rw h at h2` changes `X` to `Y` in hypothesis `h2` instead
 of the goal.
+
+Variant (rw and assumption): If instead you use `rwa h` or `rw ← h`, Lean does performs
+the `rw` and then looks whether
+the goal is exactly one of your assumptions, in which case it closes it.
 
 ## Details
 
@@ -60,13 +64,17 @@ h2 : B ∪ A = D
 ⊢ D = B
 ```
 then `rw h1 at h2` will turn `h2` into `h2 : B ∪ B ∩ C = D` (remember operator precedence).
+
 -/
 
 
 /-
 The next tactic we will learn is *rw* (from rewrite). It rewrites equalities. That is,
-if we have a proof `h : x = 3` and we want to prove `⊢ x + 1 = 4`, then after `rw h` the goal
-will become `⊢ 3 + 1 = 4`, which seems reasonable.
+if we have a proof `h : A = B` and we want to prove `⊢ A ∩ C = B ∩ C`, then after `rw h` the goal
+will become `⊢ A ∩ C = A ∩ C`, which seems reasonable.
+
+After many tactics (and `rw` is one of them) Lean tries to apply `refl`. This is why
+in the following proof you may get away with only one tactic application.
 
 -/
 

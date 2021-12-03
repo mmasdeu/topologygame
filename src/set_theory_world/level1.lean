@@ -12,8 +12,8 @@ where `A` and `B` are *exactly the same thing*.
 ### Example:
 If it looks like this in the top right hand box:
 ```
-a b c d : mynat
-⊢ (a + b) * (c + d) = (a + b) * (c + d)
+A B : set X
+⊢ A ∪ B = A ∪ B
 ```
 
 then
