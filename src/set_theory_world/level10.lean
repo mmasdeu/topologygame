@@ -107,11 +107,6 @@ they do in the side-bar, and use them to clear this goal.
 If you are lazy, the `finish` tactic will take the fun out of this exercise. So try to not use it.
 -/
 
-/- Hint : Click here for a hint, in case you get stuck.
-Remember that `x ∈ A ∩ B` is "the same as" `x ∈ A ∧ x ∈ B`. Therefore if you have a hypothesis
-of the form `h : x ∈ A ∩ B` and your goal is `⊢ x ∈ B`, you win by `exact h.2`.
--/
-
 variables {X Y : Type} -- hide
 
 /- Lemma : no-side-bar
@@ -160,26 +155,4 @@ begin
       }
     }
   }
-/- hint
-ext,
-split,
-{
-  intro h,
-  cases h,
-  cases h_right,
-  {
-    left,
-    split;
-    assumption,
-  },
-  {
-    right,
-    split;
-    assumption,
-  }
-},
-{
-  sorry,
-}
--/
 end
