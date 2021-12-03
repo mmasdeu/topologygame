@@ -18,8 +18,6 @@ levels = [
 	"src/set_theory_world/level9.lean",
 	"src/set_theory_world/level10.lean",
 	"src/set_theory_world/level11.lean",
-	"src/set_theory_world/level12.lean",
-	"src/set_theory_world/level13.lean",
 ]
 
 [[worlds]]
