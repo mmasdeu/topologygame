@@ -109,7 +109,7 @@ If you are lazy, the `finish` tactic will take the fun out of this exercise. So 
 
 variables {X Y : Type} -- hide
 
-/- Lemma : no-side-bar
+/- Lemma :
 The distributive property of ∩ with respect to ∪.
 -/
 lemma inter_union (A B C : set X) : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=

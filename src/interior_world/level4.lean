@@ -2,7 +2,7 @@ import interior_world.level3 --hide
 
 /-
 
-# Level 4: The interior is ...
+# Level 4: The interior is the maximal open subset
 
 
 
@@ -13,7 +13,7 @@ variables [topological_space X] (x : X)  (A : set X) -- hide
 namespace topological_space -- hide
 
 /- Lemma
-The interior of a set ...
+If B is an open set contained in A, then B is contained in the interior of A.
 -/
 lemma interior_maximal (B : set X) (h : B ⊆ A) (hopen : is_open B):
   B ⊆ interior A :=
