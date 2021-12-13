@@ -53,8 +53,8 @@ variables {X Y : Type} -- hide
 If P is a property of sets which is closed under pairwise intersection then it is also closed under
 arbitrary finite intersections.
 -/
-lemma sInter_of_inter (P : set X → Prop) (huniv : P univ) (hinter : ∀ A B : set X, P A → P B → P (A ∩ B))
-(S : set (set X)) (hfin : finite S) : (∀ s ∈ S, P s) → P ( sInter S ) :=
+lemma sInter_of_inter {S : set (set X)} {P : set X → Prop} (hfin : finite S) (huniv : P univ) (hinter : ∀ A B : set X, P A → P B → P (A ∩ B))
+ : (∀ s ∈ S, P s) → P ( sInter S ) :=
 begin
   apply finite.induction_on hfin,
   { 
