@@ -67,9 +67,9 @@ jobs:
 
       - name: Build project
         run: |
-          pwd
-          sudo chmod -R 775 ./_target/deps/mathlib/.git/
+          cd topologygame
           leanproject build
+          cd ..
 
       - name: Make game
         run: make-lean-game
