@@ -65,12 +65,6 @@ jobs:
           mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
           cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
 
-      - name: Build project
-        run: |
-          cd topologygame
-          leanproject build
-          cd ..
-
       - name: Make game
         run: make-lean-game
 
