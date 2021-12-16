@@ -64,7 +64,10 @@ jobs:
           VER=`ls *zip | cut -c 6-11`
           mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
           cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
-          
+
+      - name: Build project
+        run: leanproject build
+
       - name: Make game
         run: make-lean-game
 
