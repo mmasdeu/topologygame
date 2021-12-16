@@ -1,4 +1,4 @@
-import interior_world.definition -- hide
+import basic_defs_world.definition -- hide
 
 /- Axiom : A set A is the neighborhood of a point x if there is an open U such that x ∈ U ⊆ A.
 is_neighborhood : ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
