@@ -10,7 +10,7 @@ Variants: `rw ← h` changes
 `rw h at h2` changes `X` to `Y` in hypothesis `h2` instead
 of the goal.
 
-Variant (rw and assumption): If instead you use `rwa h` or `rw ← h`, Lean does performs
+Variant (rw and assumption): If instead you use `rwa h` or `rwa ← h`, Lean does performs
 the `rw` and then looks whether
 the goal is exactly one of your assumptions, in which case it closes it.
 
