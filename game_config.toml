@@ -25,6 +25,7 @@ name = "Functions"
 id = 2
 levels = [
 	"src/function_world/level1.lean",
+	"src/function_world/level2.lean",
 ]
 
 [[worlds]]
