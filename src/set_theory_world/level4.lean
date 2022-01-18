@@ -1,14 +1,5 @@
-/- Tactic : rwa
-
-
-`rwa` uses the rewrite tactic and then uses `exact` with all 
-the assumptions of the proof.
-
--/
-
-
 /- 
-The next tactic we will learn is `rwa` which applies rewrite tactic and then uses `exact` with all the hypotheses.
+Try to solve this level with exactly one line, using the `rwa` tactic.
 -/
 
 

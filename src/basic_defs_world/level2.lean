@@ -16,7 +16,7 @@ begin
   let I : set (set X) := {U, V},
   have H : ⋃₀ I = U ∪ V := sUnion_pair U V,
   rw ←H,
-  apply union I,
+  apply union,
   intros B hB,
   replace hB : B = U ∨ B = V, by tauto,
   cases hB; {rw hB, assumption},

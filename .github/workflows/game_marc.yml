@@ -1,12 +1,15 @@
 # This is a basic workflow to help you get started with Actions
 
-name: MakeGame
+name: MakeGame -- Marc's version
 
 # Controls when the workflow will run
 on:
+  schedule:
+    - cron: '0 2 * * *' # every day
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ master ]
+    
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -47,10 +50,12 @@ jobs:
         with:
           repo: ${{ github.repository }}
           access-token: ${{ secrets.GITHUB_TOKEN }}
-          
+      
+      - run: git pull --no-rebase
+      
       - name: Install Game maker
         run: |
-          git clone https://github.com/mpedramfar/Lean-game-maker.git
+          git clone https://github.com/mmasdeu/Lean-game-maker.git
           cd Lean-game-maker/src/interactive_interface
           npm install .
           ./node_modules/.bin/webpack --mode=production
@@ -64,7 +69,7 @@ jobs:
           VER=`ls *zip | cut -c 6-11`
           mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
           cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
-          
+
       - name: Make game
         run: make-lean-game
 
@@ -86,4 +91,3 @@ jobs:
           folder: ./html # The folder the action should deploy.
           target-folder: test/
           single-commit: "false"
-

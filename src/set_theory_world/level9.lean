@@ -1,68 +1,70 @@
 import data.set.basic -- hide
+import data.set.prod --hide
 open set -- hide
-
-/-
-The following lemma can be proved using `ext`, `split`, `cases`, `left`, `right` tactics. 
-
-- `ext` allows us to prove `A=B` taking an element of each set.  `x ∈ A ↔ x ∈ B`
-- `split` divides the current goal `P ∧ Q` into several subgoals.#check
-- `cases h` divides a combined hypothesis `h: P ∧ Q` or `h: P ∨ Q` into separated assumptions. 
-- `left/right` allows us to prove `P ∨ Q` by proving either `P` or `Q`.
-
-If you are lazy, the `finish` tactic will take the fun out of this exercise. So try to not use it.
--/
-
-/- Hint : Click here for a hint, in case you get stuck.
-Remember that `x ∈ A ∩ B` is "the same as" `x ∈ A ∧ x ∈ B`. Therefore if you have a hypothesis
-of the form `h : x ∈ A ∩ B` and your goal is `⊢ x ∈ B`, you win by `exact h.2`.
--/
 
 variables {X Y : Type} -- hide
 
-/- Lemma : no-side-bar
-The distributive property of ∩ with respect to ∪.
+/- Tactic : split
+
+## Summary:
+
+If the goal is `P ∧ Q` or `P ↔ Q` then `split` will break it into two goals.
+
+## Details
+
+If `P Q : Prop` and the goal is `⊢ P ∧ Q`, then `split` will change it into
+two goals, namely `⊢ P` and `⊢ Q`. 
+
+If `P Q : Prop` and the goal is `⊢ P ↔ Q`, then `split` will change it into
+two goals, namely `⊢ P → Q` and `⊢ Q → P`.  
+
+## Example:
+
+If your local context (the top right window) looks like this
+```
+X : Type
+A B : set X
+x : X
+⊢ x ∈ A ↔ x ∈ B
+```
+
+then after
+
+`split,`
+
+it will look like this:
+
+```
+2 goals
+X : Type
+A B : set X
+x : X
+⊢ x ∈ A → x ∈ B
+
+
+X : Type
+A B : set X
+x : X
+⊢ x ∈ B → x ∈ A
+```
 -/
-lemma inter_union (A B C : set X) : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
+
+/-
+In this level we will learn the `split` tactic. It breaks a goal `P ∧ Q` into two goals (proving `P`, and then proving `Q`),
+and also breaks goals of the form `P ↔ Q` into proving each of the implications separately.
+
+You will need to use both features to accomplish this proof.
+-/
+/- Lemma : no-side-bar
+Giving an element `p` of a product type `X × Y` and two subsets `A ⊆ X` `B ⊆ Y`. The element 
+`p` is the set `A × B` (as sets) if only if the first component of `p` is in `A` and the second in `B`.
+-/
+lemma mem_prod_iff {p : X × Y} (A: set X) (B : set Y): p ∈ A ×ˢ B ↔ p.1 ∈ A ∧ p.2 ∈ B :=
 begin
-  ext,
-  split,
-  {
-    intro h,
-    cases h,
-    cases h_right,
-    {
-      left,
-      split;
-      assumption,
-    },
-    {
-      right,
-      split;
-      assumption,
-    }
-  },
-  {
-    intro h,
-    cases h,
-    {
-      split,
-      {
-        exact h.1,
-      },
-      {
-        left,
-        exact h.2,
-      },
-    },
-    {
-      split,
-      {
-        exact h.1,
-      },
-      {
-        right,
-        exact h.2,
-      }
-    }
-  }
+  split;
+  intro h;
+  exact ⟨h.1, h.2⟩
+
+
+
 end

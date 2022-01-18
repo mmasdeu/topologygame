@@ -1,6 +1,6 @@
-import interior_world.definition -- hide
+import basic_defs_world.definition -- hide
 
-/- Axiom : A set A is the neighborhood of a point x if there is an open U such that $x \in U \subseteq A$.
+/- Axiom : A set A is the neighborhood of a point x if there is an open U such that x ∈ U ⊆ A.
 is_neighborhood : ∃ U, is_open U ∧ x ∈ U ∧ U ⊆ A
 -/
 
@@ -9,7 +9,7 @@ is_interior_point : is_neighborhood x A
 -/
 
 /- Axiom : The interior of a set A is the set of all its interior points. 
-interior : { x : X | is_interior_point x A }
+interior := { x : X | is_interior_point x A }
 -/
 
 /-
