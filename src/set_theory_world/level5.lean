@@ -23,6 +23,9 @@ p : P
 The opposite tactic to intro is `revert`; given the situation
 just above, `revert p` turns the goal back into `⊢ P → Q`.
 
+**Variant:** Instead of calling `intro` multiple times, you can use
+`intros`. That is, `intros h₁ h₂` is equivalent to `intro h₁, intro h₂`.
+
 ## Example
 
 If your goal is an implication $P\implies Q$ then Lean writes
@@ -30,6 +33,7 @@ this as `⊢ P → Q`, and `intro p,` can be thought of as meaning
 "let $p$ be a proof of $P$", or more informally "let's assume that
 $P$ is true". The goal changes to `⊢ Q` and the hypothesis `p : P`
 appears in the local context.
+
 -/
 
 /-

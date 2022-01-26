@@ -5,12 +5,12 @@
 If `h` is a proof of `X = Y`, then `rw h,` will change
 all `X`s in the goal to `Y`s. 
 
-Variants: `rw ← h` changes
+**Variants:** `rw ← h` changes
 `Y` to `X` and
 `rw h at h2` changes `X` to `Y` in hypothesis `h2` instead
 of the goal.
 
-Variant (rw and assumption): If instead you use `rwa h` or `rwa ← h`, Lean does performs
+**Variant (rw and assumption):** If instead you use `rwa h` or `rwa ← h`, Lean does performs
 the `rw` and then looks whether
 the goal is exactly one of your assumptions, in which case it closes it.
 
@@ -28,7 +28,7 @@ will change them all to `B`'s.
 which are equalities (look for them in the drop down
 menu on the left, within Theorem Statements).
 
-Important note: if `h` is not a proof of the form `A = B`
+**Important note:** if `h` is not a proof of the form `A = B`
 or `A ↔ B` (for example if `h` is a function, an implication,
 or perhaps even a proposition itself rather than its proof),
 then `rw` is not the tactic you want to use. For example,
@@ -36,7 +36,7 @@ then `rw` is not the tactic you want to use. For example,
 statement itself, not the proof.
 If `h : P = Q` is its proof, then `rw h` will work.
 
-Pro tip 1: If `h : A = B` and you want to change
+**Pro tip 1:** If `h : A = B` and you want to change
 `B`s to `A`s instead, try `rw ←h` (get the arrow with `\l`,
 note that this is a small letter L, not a number 1).
 

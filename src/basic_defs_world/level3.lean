@@ -18,10 +18,20 @@ The intersection of a finite set of open sets is open.
 lemma is_open_sInter {X : Type} [topological_space X] {S : set (set X)}
 (hfin : finite S) (h : ∀ s ∈ S, is_open s): is_open (sInter S) :=
 begin
-  exact sInter_of_inter hfin univ_mem (λ A B hA hB, inter hA hB) h,
-
-
-
+  apply sInter_of_inter,
+  {
+    exact hfin,
+  },
+  {
+    exact univ_mem,
+  },
+  {
+    intros A B hA hB,
+    exact inter hA hB,
+  },
+  {
+    exact h,
+  }
 
 
 
