@@ -1,5 +1,5 @@
-import data.set.basic
-import tactic
+import data.set.basic -- hide
+import tactic -- hide
 
 /-
 # Level 1: The image of a union
