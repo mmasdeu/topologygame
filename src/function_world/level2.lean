@@ -10,10 +10,10 @@ This level is similar to the previous one. You can use a similar strategy.
 The tactic *obtain* can be useful. 
 -/
 
-/- Lemma : no-side-bar
+/- Lemma
 If f is a function and A_i are sets, then f(⋃ A_i)=⋃ f(A_i)
 -/
-lemma function_union_is_union (f: X → Y) ( A: I → set X) : f ''(⋃ i, A i)=⋃ i, f '' A i :=
+lemma image_Union (f: X → Y) ( A : I → set X) : f '' ( ⋃ i, A i ) = ⋃ i, f '' A i :=
 begin 
   ext y,
   split,

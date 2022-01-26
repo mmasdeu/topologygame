@@ -1,12 +1,19 @@
 import data.set.basic
 import tactic
 
-open set
-variables{X Y: Type}
-variable f : X → Y
-variables A B : set X
+/-
+# Level 1: The image of a union
 
-example : f '' (A ∪ B) = f '' A ∪ f '' B :=
+In this level we prove that the image of a union of two sets if the union of their images.
+-/
+
+open set -- hide
+variables{X Y: Type} -- hide
+
+/- Lemma
+$ f(A ∪ B) = f(A) ∪ f(B) $
+-/
+lemma image_union (f : X → Y) (A B : set X) : f '' (A ∪ B) = f '' A ∪ f '' B :=
 begin
   ext y,
   split,
