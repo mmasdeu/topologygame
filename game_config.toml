@@ -23,6 +23,7 @@ levels = [
 [[worlds]]
 name = "Functions"
 id = 2
+parents = [1]
 levels = [
 	"src/function_world/level1.lean",
 	"src/function_world/level2.lean",
@@ -31,7 +32,7 @@ levels = [
 [[worlds]]
 name = "Basic definitions"
 id = 3
-parents = [1]
+parents = [2]
 levels = [
 	"src/basic_defs_world/level1.lean",
 	"src/basic_defs_world/level2.lean",
@@ -41,7 +42,7 @@ levels = [
 [[worlds]]
 name = "Interior world"
 id = 4
-parents = [2]
+parents = [3]
 levels = [
 	"src/interior_world/level1.lean",
 	"src/interior_world/level2.lean",
@@ -53,7 +54,7 @@ levels = [
 [[worlds]]
 name = "Separation world"
 id = 5
-parents = [3]
+parents = [4]
 levels = [
 	"src/separation_world/level1.lean",
 	"src/separation_world/level2.lean",
