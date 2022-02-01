@@ -4,12 +4,12 @@ name: MakeGame -- Marc's version
 
 # Controls when the workflow will run
 on:
-  schedule:
-    - cron: '0 2 * * *' # every day
+  # schedule:
+  #   - cron: '0 2 * * *' # every day
   # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main, test ]
-
+  # push:
+  #   branches: [ main ]
+    
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -50,7 +50,7 @@ jobs:
         with:
           repo: ${{ github.repository }}
           access-token: ${{ secrets.GITHUB_TOKEN }}
-            
+
       - name: Install Game maker
         run: |
           git clone --depth=1 https://github.com/mmasdeu/Lean-game-maker.git
