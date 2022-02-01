@@ -50,10 +50,10 @@ jobs:
         with:
           repo: ${{ github.repository }}
           access-token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Install Game maker
         run: |
-          git clone https://github.com/mmasdeu/Lean-game-maker.git
+          git clone --depth=1 https://github.com/mmasdeu/Lean-game-maker.git
           cd Lean-game-maker/src/interactive_interface
           npm install .
           ./node_modules/.bin/webpack --mode=production
@@ -71,9 +71,52 @@ jobs:
       - name: Make game
         run: make-lean-game
 
+    ## Now we generate the editor ##
+
+      - name: Get Lean version
+        run: |
+          set -o pipefail
+          LATEST_BROWSER_LEAN=$(curl -s -N https://raw.githubusercontent.com/leanprover-community/mathlib/master/leanpkg.toml | grep -m1 lean_version | cut -d'"' -f2 | cut -d':' -f2)
+          elan self update
+          elan toolchain install leanprover-community/lean:$LATEST_BROWSER_LEAN
+          echo "LATEST_BROWSER_LEAN=$LATEST_BROWSER_LEAN" >> $GITHUB_ENV
+
+      - name: Install lean editor
+        run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
+
+      - name : Get server files
+        run: |
+          mkdir -p dist
+          mv build/shell/* dist/
+
+      - name: generate library.zip
+        run: ./generate-library.sh
+
+      - name: upload library.zip artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: library
+          path: ./dist/library.zip
+
+      - name: upload librart_meta.zip artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: library_meta
+          path: ./dist/library.*.json
+
+      - name: build
+        run: |
+          mv dist lean-web-editor/
+          cd lean-web-editor
+          npm install
+          NODE_ENV=production ./node_modules/.bin/webpack
+  
+      - name: place editor in the website
+        run: mv lean-web-editor/dist html/editor
+
       - name: Deploy Production
         uses: JamesIves/github-pages-deploy-action@4.1.5
-        if: ${{ github.event.inputs.production }}
+        if: ${{ github.event.inputs.production && github.event.ref == 'master' }}
         with:
           token: ${{ secrets.github_token }}
           branch: gh-pages # The branch the action should deploy to.
@@ -83,7 +126,7 @@ jobs:
 
       - name: Deploy Test
         uses: JamesIves/github-pages-deploy-action@4.1.5
-        if: ${{ !github.event.inputs.production }}
+        if: ${{ !github.event.inputs.production || github.ref_name == 'test' }}
         with:
           token: ${{ secrets.github_token }}
           branch: gh-pages # The branch the action should deploy to.
