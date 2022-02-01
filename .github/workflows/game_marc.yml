@@ -51,8 +51,6 @@ jobs:
           repo: ${{ github.repository }}
           access-token: ${{ secrets.GITHUB_TOKEN }}
       
-      - run: git pull --no-rebase
-      
       - name: Install Game maker
         run: |
           git clone https://github.com/mmasdeu/Lean-game-maker.git
