@@ -8,7 +8,7 @@ on:
   #   - cron: '0 2 * * *' # every day
   # Triggers the workflow on push or pull request events but only for the main branch
   # push:
-  #   branches: [ main ]
+  #   branches: [ main, test ]
     
 
   # Allows you to run this workflow manually from the Actions tab
@@ -22,10 +22,17 @@ jobs:
   deploy:
     runs-on: ubuntu-18.04
     steps:
-      - name: Checkout
+      - name: Checkout test branch
         uses: actions/checkout@v2
+        if: ${{ !github.event.inputs.production || github.ref_name == 'test' }}
         with:
-          submodules: true
+          ref: test
+      
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        if: ${{ github.event.inputs.production && github.event.ref == 'main' }}
+        with:
+          ref: main
 
       - name: Setup Python
         uses: actions/setup-python@v2
