@@ -56,9 +56,9 @@ jobs:
           leanproject up
           leanproject build
 
-      - name: Try to upgrade Lean and dependencies (test)
+      - name: Try to upgrade Lean and dependencies (main)
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          git checkout test
+          git checkout main
           leanproject up
           leanproject build
