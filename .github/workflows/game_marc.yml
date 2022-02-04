@@ -24,7 +24,7 @@ jobs:
     env: 
       branch: ${{ github.event.inputs.production && 'main' || 'test' }}
       source_base_url: "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.inputs.production && 'main' || 'test' }}/"
-      web_editor_url: "https://${{ github.repository_owner }}/github.io/${{ github.event.repository.name }}/${{ github.event.inputs.production && 'editor/' || 'test/editor' }}"
+      web_editor_url: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.event.inputs.production && 'editor/' || 'test/editor' }}"
     steps:
       - name: Echo branch
         run: |
