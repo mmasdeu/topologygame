@@ -74,23 +74,22 @@ jobs:
         run: |
           curl -s https://api.github.com/repos/leanprover-community/lean/releases/latest | grep "browser.zip" | grep -v name | cut -d : -f 2,3 | tr -d \"  | wget -qi -
           unzip *.zip
-          VER=`ls *zip | cut -c 6-11`
-          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
-          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
+          LATEST_BROWSER_LEAN=`ls *zip | cut -c 6-11`
+          echo "LATEST_BROWSER_LEAN=$LATEST_BROWSER_LEAN" >> $GITHUB_ENV
+          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$LATEST_BROWSER_LEAN/"
+          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$LATEST_BROWSER_LEAN/"
 
       - name: Make game
         run: make-lean-game --source_base_url=$source_base_url --web_editor_url=$web_editor_url
 
     ## Now we generate the editor ##
 
-      - name: Get Lean version
+      - name: Install latest version of Lean
         run: |
           set -o pipefail
-          LATEST_BROWSER_LEAN=$(curl -s -N https://raw.githubusercontent.com/leanprover-community/mathlib/master/leanpkg.toml | grep -m1 lean_version | cut -d'"' -f2 | cut -d':' -f2)
           elan self update
           elan toolchain install leanprover-community/lean:$LATEST_BROWSER_LEAN
-          echo "LATEST_BROWSER_LEAN=$LATEST_BROWSER_LEAN" >> $GITHUB_ENV
-
+          
       - name: Install lean editor
         run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
 
