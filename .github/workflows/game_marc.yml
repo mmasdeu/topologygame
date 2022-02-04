@@ -22,20 +22,20 @@ jobs:
   deploy:
     runs-on: ubuntu-18.04
     env: 
-      branch: ${{ if github.event.inputs.production then 'main' else 'test' }}
-      source_base_url: "https://raw.githubusercontent.com/${{ github.repository }}/${{ branch }}/"
-      web_editor_url: "https://${{ github.repository_owner }}/github.io/${{ github.event.repository.name }}/${{ if branch == 'test' then 'test/' }}editor"
+      branch: ${{ github.event.inputs.production && 'main' || 'test' }}
+      source_base_url: "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.inputs.production && 'main' || 'test' }}/"
+      web_editor_url: "https://${{ github.repository_owner }}/github.io/${{ github.event.repository.name }}/${{ github.event.inputs.production && 'editor/' || 'test/editor' }}"
     steps:
       - name: Echo branch
         run: |
-          echo Deploying branch: ${{ branch }}
-          echo Source base url: ${{ source_base_url }}
-          echo Web editor url: ${{ web_editor_url }}
+          echo Deploying branch: $branch
+          echo Source base url: $source_base_url
+          echo Web editor url: $web_editor_url
 
-      - name: Checkout ${{ branch }} branch
+      - name: Checkout ${{ env.branch }} branch
         uses: actions/checkout@v2
         with:
-          ref: ${{ branch }}
+          ref: ${{ env.branch }}
 
       - name: Setup Python
         uses: actions/setup-python@v2
@@ -74,22 +74,21 @@ jobs:
         run: |
           curl -s https://api.github.com/repos/leanprover-community/lean/releases/latest | grep "browser.zip" | grep -v name | cut -d : -f 2,3 | tr -d \"  | wget -qi -
           unzip *.zip
-          VER=`ls *zip | cut -c 6-11`
-          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
-          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$VER/"
+          LATEST_BROWSER_LEAN=`ls *zip | cut -c 6-11`
+          echo "LATEST_BROWSER_LEAN=$LATEST_BROWSER_LEAN" >> $GITHUB_ENV
+          mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$LATEST_BROWSER_LEAN/"
+          cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$LATEST_BROWSER_LEAN/"
 
-      - name: Make game
-        run: make-lean-game
-
-    ## Now we generate the editor ##
-
-      - name: Get Lean version
+      - name: Install latest version of Lean
         run: |
           set -o pipefail
-          LATEST_BROWSER_LEAN=$(curl -s -N https://raw.githubusercontent.com/leanprover-community/mathlib/master/leanpkg.toml | grep -m1 lean_version | cut -d'"' -f2 | cut -d':' -f2)
           elan self update
           elan toolchain install leanprover-community/lean:$LATEST_BROWSER_LEAN
-          echo "LATEST_BROWSER_LEAN=$LATEST_BROWSER_LEAN" >> $GITHUB_ENV
+
+      - name: Make game
+        run: make-lean-game --source_base_url=$source_base_url --web_editor_url=$web_editor_url
+
+    ## Now we generate the editor ##
 
       - name: Install lean editor
         run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
@@ -124,12 +123,12 @@ jobs:
       - name: place editor in the website
         run: mv lean-web-editor/dist html/editor
 
-      - name: Deploy ${{ if branch == 'main' then 'production' else 'test' }}
+      - name: Deploy ${{ github.event.inputs.production && 'production' || 'test' }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           token: ${{ secrets.github_token }}
           branch: gh-pages # The branch the action should deploy to.
           folder: ./html # The folder the action should deploy.
-          target-folder: ${{ if branch == 'test' then 'test/' else '' }}
+          target-folder: ${{ github.event.inputs.production && 'test/' || '' }}
           single-commit: "true"
           clean: "false"
