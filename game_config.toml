@@ -3,7 +3,6 @@ version = "1.0.0"
 extra_files = "extras"
 intro = "src/intro.lean"
 source_base_url = "https://raw.githubusercontent.com/mmasdeu/topologygame/main/"
-web_editor_url = "https://eloitor.github.io/lean-game-levels-web-editor/"
 
 [[worlds]]
 name = "Set theory"
