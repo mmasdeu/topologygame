@@ -45,7 +45,6 @@ name = "Interior world"
 id = 4
 parents = [3]
 levels = "src/interior_world/*.lean"
-]
 
 [[worlds]]
 name = "Separation world"
