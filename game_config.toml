@@ -44,12 +44,7 @@ levels = [
 name = "Interior world"
 id = 4
 parents = [3]
-levels = [
-	"src/interior_world/level1.lean",
-	"src/interior_world/level2.lean",
-	"src/interior_world/level3.lean",
-	"src/interior_world/level4.lean",
-	"src/interior_world/level5.lean",
+levels = "src/interior_world/*.lean"
 ]
 
 [[worlds]]
