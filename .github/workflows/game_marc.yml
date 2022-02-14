@@ -101,17 +101,13 @@ jobs:
       - name: generate library.zip
         run: ./generate-library.sh
 
-      - name: upload library.zip artifact
+      - name: upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: library
-          path: ./dist/library.zip
-
-      - name: upload librart_meta.zip artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: library_meta
-          path: ./dist/library.*.json
+          path: |
+            ./dist/library.zip
+            ./dist/library.*.json
 
       - name: build
         run: |
