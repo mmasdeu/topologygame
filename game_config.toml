@@ -36,4 +36,5 @@ levels = [ "src/separation_world/level*.lean" ]
 [[worlds]]
 name = "Tests"
 id = 6
+parents = [5]
 levels = [ "src/tests/*.lean", "https://raw.githubusercontent.com/ImperialCollegeLondon/natural_number_game/master/src/game/world1/level1.lean" ]
