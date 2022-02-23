@@ -50,7 +50,7 @@ jobs:
           
       - name: Install Game maker
         run: |
-          git clone https://github.com/mpedramfar/Lean-game-maker.git
+          git clone https://github.com/mmasdeu/Lean-game-maker.git
           cd Lean-game-maker/src/interactive_interface
           npm install .
           ./node_modules/.bin/webpack --mode=production
@@ -76,6 +76,7 @@ jobs:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./html # The folder the action should deploy.
           single-commit: "true"
+          clean : "false"
 
       - name: Deploy Test
         uses: JamesIves/github-pages-deploy-action@4.1.5
@@ -85,5 +86,6 @@ jobs:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./html # The folder the action should deploy.
           target-folder: test/
-          single-commit: "false"
+          single-commit: "true"
+          clean: "false"
 
