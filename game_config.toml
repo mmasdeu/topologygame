@@ -34,7 +34,19 @@ parents = [4]
 levels = [ "src/separation_world/level*.lean" ]
 
 [[worlds]]
-name = "Tests"
+name = "Filter world"
 id = 6
 parents = [5]
-levels = [ "src/tests/*.lean", "https://raw.githubusercontent.com/ImperialCollegeLondon/natural_number_game/master/src/game/world1/level1.lean" ]
+levels = [ "src/filter_world/*.lean"]
+
+[[worlds]]
+name = "Open and closed world"
+id = 6
+parents = [5]
+levels = [ "src/open_and_closed_world/*.lean"]
+
+[[worlds]]
+name = "Continuous world"
+id = 6
+parents = [5]
+levels = [ "src/continuous_world/*.lean"]
