@@ -41,12 +41,12 @@ levels = [ "src/filter_world/*.lean"]
 
 [[worlds]]
 name = "Open and closed world"
-id = 6
-parents = [5]
+id = 7
+parents = [6]
 levels = [ "src/open_and_closed_world/*.lean"]
 
 [[worlds]]
 name = "Continuous world"
-id = 6
-parents = [5]
+id = 8
+parents = [7]
 levels = [ "src/continuous_world/*.lean"]
