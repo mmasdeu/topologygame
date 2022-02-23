@@ -45,8 +45,3 @@ id = 7
 parents = [6]
 levels = [ "src/open_and_closed_world/*.lean"]
 
-[[worlds]]
-name = "Continuous world"
-id = 8
-parents = [7]
-levels = [ "src/continuous_world/*.lean"]
