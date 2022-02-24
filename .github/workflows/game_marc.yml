@@ -88,36 +88,36 @@ jobs:
       - name: Make game
         run: make-lean-game --source_base_url=$source_base_url --web_editor_url=$web_editor_url
 
-    ## Now we generate the editor ##
+#    ## Now we generate the editor ##
+#
+#      - name: Install lean editor
+#        run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
 
-      - name: Install lean editor
-        run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
+#      - name : Get server files
+#        run: |
+#          mkdir -p dist
+#          mv build/shell/* dist/
 
-      - name : Get server files
-        run: |
-          mkdir -p dist
-          mv build/shell/* dist/
+#      - name: generate library.zip
+#        run: ./generate-library.sh
 
-      - name: generate library.zip
-        run: ./generate-library.sh
+#      - name: upload artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: library
+#          path: |
+#            ./dist/library.zip
+#            ./dist/library.*.json
 
-      - name: upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: library
-          path: |
-            ./dist/library.zip
-            ./dist/library.*.json
-
-      - name: build
-        run: |
-          mv dist lean-web-editor/
-          cd lean-web-editor
-          npm install
-          NODE_ENV=production ./node_modules/.bin/webpack
+#      - name: build
+#        run: |
+#          mv dist lean-web-editor/
+#          cd lean-web-editor
+#          npm install
+#          NODE_ENV=production ./node_modules/.bin/webpack
   
-      - name: place editor in the website
-        run: mv lean-web-editor/dist html/editor
+#      - name: place editor in the website
+#        run: mv lean-web-editor/dist html/editor
 
       - name: Deploy ${{ github.event.inputs.production && 'production' || 'test' }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
@@ -127,4 +127,4 @@ jobs:
           folder: ./html # The folder the action should deploy.
           target-folder: ${{ github.event.inputs.production && '/' || '/test/' }}
           single-commit: "true"
-          clean: "false"
+          clean: "true"
