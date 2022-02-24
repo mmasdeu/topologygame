@@ -116,4 +116,4 @@ jobs:
           folder: ./html # The folder the action should deploy.
           target-folder: ''
           single-commit: "true"
-          clean: "false"
+          clean: "true"
