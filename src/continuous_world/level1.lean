@@ -1,4 +1,4 @@
-import countinuous_world.definition -- hide
+import continuous_world.definition -- hide
 import tactic -- hide
 
 /-
