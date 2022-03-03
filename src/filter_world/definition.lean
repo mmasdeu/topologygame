@@ -1,11 +1,6 @@
 import control.traversable.instances
---import data.set.finite
---import order.copy
---import tactic.monotonicity
 
 open set
-
-universes u v w x y
 
 structure filter (α : Type*) :=
 (sets                   : set (set α))
@@ -43,10 +38,3 @@ instance : partial_order (filter α) :=
 
 theorem le_def {f g : filter α} : f ≤ g ↔ ∀ x ∈ g, x ∈ f := iff.rfl
 
-
-
-
-
-
-
---@[simp] protected lemma mem_sets : s ∈ f.sets ↔ s ∈ f := iff.rfl

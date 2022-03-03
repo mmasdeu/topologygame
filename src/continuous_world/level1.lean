@@ -1,4 +1,4 @@
-import continuous_world.definition -- hide
+import basic_defs_world.level1 -- hide
 import tactic -- hide
 
 /-
@@ -12,7 +12,9 @@ In this level we prove that the identity function is continuous.
 -/
 
 open set -- hide
-variables{X Y: Type}[topological_space X] -- hide
+open topological_space -- hide
+variables {X Y: Type} [topological_space X] -- hide
+
 
 /- Lemma
 The idententiy function is continuous.

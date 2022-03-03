@@ -57,7 +57,7 @@ lemma sInter_of_inter {S : set (set X)} {P : set X → Prop} (hfin : finite S) (
  : (∀ s ∈ S, P s) → P ( sInter S ) :=
 begin
   apply finite.induction_on hfin,
-  { 
+  {
     intro h,
     rwa sInter_empty,
   },

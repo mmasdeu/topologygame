@@ -32,5 +32,8 @@ class T3_space (X : Type) [topological_space X] extends T0_space X: Prop :=
 (regular : ∀ (x : X) (F : set X) (hF : is_closed F) (hxF: x ∉ F),
   ∃ (U V : set X) (hU : is_open U) (hV : is_open V) (hUV : U ∩ V = ∅), (x ∈ U) ∧ (F ⊆ V))
 
+def continuous {X Y : Type} [topological_space X] [topological_space Y]
+  (f: X → Y) : Prop
+  := ∀ V : set Y, is_open V → is_open (f⁻¹'V)
 
 end topological_space
