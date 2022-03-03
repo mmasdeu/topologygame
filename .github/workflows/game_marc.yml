@@ -3,21 +3,15 @@
 name: MakeGame -- Marc's version
 
 # Controls when the workflow will run
-on:
-  # schedule:
-  #   - cron: '0 2 * * *' # every day
-  # Triggers the workflow on push or pull request events but only for the main branch
-  # push:
-  #   branches: [ main, test ]
-    
+on: 
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
       production:
-        description: 'Deploy to production (default: false). If false, will deploy to test subfolder.'
+        description: 'Deploy to production (default: true). If false, will deploy to test subfolder.'
         required: false
-        default: false
+        default: true
 jobs:
   deploy:
     runs-on: ubuntu-18.04
@@ -88,36 +82,36 @@ jobs:
       - name: Make game
         run: make-lean-game --source_base_url=$source_base_url --web_editor_url=$web_editor_url
 
-#    ## Now we generate the editor ##
-#
-#      - name: Install lean editor
-#        run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
+    ## Now we generate the editor ##
 
-#      - name : Get server files
-#        run: |
-#          mkdir -p dist
-#          mv build/shell/* dist/
+      - name: Install lean editor
+        run: git clone --depth=1 https://github.com/leanprover-community/lean-web-editor.git
 
-#      - name: generate library.zip
-#        run: ./generate-library.sh
+      - name : Get server files
+        run: |
+          mkdir -p dist
+          mv build/shell/* dist/
 
-#      - name: upload artifacts
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: library
-#          path: |
-#            ./dist/library.zip
-#            ./dist/library.*.json
+      - name: generate library.zip
+        run: ./generate-library.sh
 
-#      - name: build
-#        run: |
-#          mv dist lean-web-editor/
-#          cd lean-web-editor
-#          npm install
-#          NODE_ENV=production ./node_modules/.bin/webpack
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: library
+          path: |
+            ./dist/library.zip
+            ./dist/library.*.json
+
+      - name: build
+        run: |
+          mv dist lean-web-editor/
+          cd lean-web-editor
+          npm install
+          NODE_ENV=production ./node_modules/.bin/webpack
   
-#      - name: place editor in the website
-#        run: mv lean-web-editor/dist html/editor
+      - name: place editor in the website
+        run: mv lean-web-editor/dist html/editor
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
