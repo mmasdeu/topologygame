@@ -33,15 +33,15 @@ id = 5
 parents = [4]
 levels = [ "src/separation_world/level*.lean" ]
 
-# [[worlds]]
-# name = "Filter world"
-# id = 6
-# parents = [5]
-# levels = [ "src/filter_world/*.lean"]
+[[worlds]]
+name = "Filter world"
+id = 6
+parents = [5]
+levels = [ "src/filter_world/*.lean"]
 
-# [[worlds]]
-# name = "Open and closed world"
-# id = 7
-# parents = [6]
-# levels = [ "src/open_and_closed_world/*.lean"]
+[[worlds]]
+name = "Open and closed world"
+id = 7
+parents = [6]
+levels = [ "src/open_and_closed_world/*.lean"]
 
