@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: MakeGame -- Marc's version
+name: MakeGame
 
 # Controls when the workflow will run
 on: 
@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       production:
-        description: 'Deploy to production (default: true). If false, will deploy to test subfolder.'
+        description: 'Deploy to production (default: false). If false, will deploy to test subfolder.'
         required: false
-        default: true
+        default: false
 jobs:
   deploy:
     runs-on: ubuntu-18.04
@@ -73,12 +73,6 @@ jobs:
           mkdir -p "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$LATEST_BROWSER_LEAN/"
           cp build/shell/* "Lean-game-maker/src/interactive_interface/lean_server/leanprover-community/lean:$LATEST_BROWSER_LEAN/"
 
-#      - name: Install latest version of Lean
-#        run: |
-#          set -o pipefail
-#          elan self update
-#          elan toolchain install leanprover-community/lean:$LATEST_BROWSER_LEAN
-
       - name: Make game
         run: make-lean-game --source_base_url=$source_base_url --web_editor_url=$web_editor_url
 
@@ -112,19 +106,13 @@ jobs:
   
       - name: place editor in the website
         run: mv lean-web-editor/dist html/editor
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./html
     
-#      - name: Deploy ${{ github.event.inputs.production && 'production' || 'test' }}
-#        uses: JamesIves/github-pages-deploy-action@4.1.5
-#        with:
-#          token: ${{ secrets.github_token }}
-#          branch: gh-pages # The branch the action should deploy to.
-#          folder: ./html # The folder the action should deploy.
-#          target-folder: ${{ github.event.inputs.production && '/' || '/test/' }}
-#          single-commit: "true"
-#          clean: "true"
+      - name: Deploy ${{ github.event.inputs.production && 'production' || 'test' }}
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          token: ${{ secrets.github_token }}
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ./html # The folder the action should deploy.
+          target-folder: ${{ github.event.inputs.production && '/' || '/test/' }}
+          single-commit: "true"
+          clean: "false"
