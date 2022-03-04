@@ -8,7 +8,7 @@ localized "notation `P` := principal" in filters --hide
 -/
 
 /- Lemma
-There exists a bottom filter in the filters collection of a giving set.
+There exists a bottom filter among the filters of a given set.
 -/
 lemma top_bottom_filters {X : Type}: ∃ (B T : filter X), ∀ (F : filter X), B ≤ F ∧ F ≤ T :=
 begin

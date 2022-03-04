@@ -33,6 +33,6 @@ begin
 end
     
 
-localized "notation `P` := principal" in filters
+localized "notation `P` := principal" in filters -- hide
 
 end filters --hide

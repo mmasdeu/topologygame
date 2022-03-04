@@ -8,9 +8,8 @@ localized "notation `P` := principal" in filters --hide
 -/
 
 
-
 /- Lemma
-The meet of two filters filter is the greatest lower bounded of them. 
+The meet of two filters is their greatest lower bound. 
 -/
 lemma meet_greatest_lower_bound {X : Type} (V F : filter X): ∀ (T : filter X), 
     T ≤ V ∧ T ≤ F → T ≤ meet V F :=

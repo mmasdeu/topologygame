@@ -4,7 +4,7 @@ namespace filters --hide
 localized "notation `P` := principal" in filters --hide
 
 /-
-# Level 4: The meet filter of two filters
+# Level 4: The meet of a pair of filters
 -/
 
 def meet_set' {X : Type*} (V F : filter X) := {t | ∃ (v ∈ V) (f ∈ F), v ∩ f ⊆ t}
