@@ -14,7 +14,7 @@ on:
         default: false
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env: 
       branch: ${{ github.event.inputs.production && 'main' || 'test' }}
       source_base_url: "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.inputs.production && 'main' || 'test' }}/"
